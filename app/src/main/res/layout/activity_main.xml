@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#383838"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <com.khgkjg12.graphic2d.Graphic2dRenderView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        app:bufferWidth="800"
+        android:layout_gravity="center"
+        android:id="@+id/render_view"/>
+</FrameLayout>

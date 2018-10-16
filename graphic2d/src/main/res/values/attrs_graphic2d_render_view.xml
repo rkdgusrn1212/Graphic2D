@@ -1,0 +1,6 @@
+<resources>
+    <declare-styleable name="Graphic2dRenderView">
+        <attr name="bufferWidth" format="integer"/>
+        <attr name="bufferHeight" format="integer"/>
+    </declare-styleable>
+</resources>

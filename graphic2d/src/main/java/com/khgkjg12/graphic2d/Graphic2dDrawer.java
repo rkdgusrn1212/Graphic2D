@@ -30,12 +30,12 @@ public class Graphic2dDrawer {
         this.canvas = new Canvas(frameBuffer);
     }
 
-    public Graphic2d newGraphic2D(String fileName, Graphic2d.Format format) {
+    public Texture newGraphic2D(String fileName, Texture.Format format) {
 
         Bitmap.Config config = null;
-        if (format == Graphic2d.Format.RGB565)
+        if (format == Texture.Format.RGB565)
             config = Bitmap.Config.RGB_565;
-        else if (format == Graphic2d.Format.ARGB4444)
+        else if (format == Texture.Format.ARGB4444)
             config = Bitmap.Config.ARGB_4444;
         else
             config = Bitmap.Config.ARGB_8888;
@@ -64,13 +64,13 @@ public class Graphic2dDrawer {
         }
 
         if (bitmap.getConfig() == Bitmap.Config.RGB_565)
-            format = Graphic2d.Format.RGB565;
+            format = Texture.Format.RGB565;
         else if (bitmap.getConfig() == Bitmap.Config.ARGB_4444)
-            format = Graphic2d.Format.ARGB4444;
+            format = Texture.Format.ARGB4444;
         else
-            format = Graphic2d.Format.ARGB8888;
+            format = Texture.Format.ARGB8888;
 
-        return new Graphic2d(bitmap, format);
+        return new Texture(bitmap, format);
     }
 
     public void clear(int color) {
@@ -94,7 +94,7 @@ public class Graphic2dDrawer {
         canvas.drawRect(x, y, x + width - 1, y + width - 1, paint);
     }
 
-    public void drawGraphic2D(Graphic2d graphic2D, int x, int y, int width, int height, int srcX, int srcY,
+    public void drawGraphic2D(Texture texture, int x, int y, int width, int height, int srcX, int srcY,
                               int srcWidth, int srcHeight) {
 
         srcRect.left = srcX;
@@ -107,10 +107,10 @@ public class Graphic2dDrawer {
         dstRect.right = x + width - 1;
         dstRect.bottom = y + height - 1;
 
-        canvas.drawBitmap(graphic2D.bitmap, srcRect, dstRect,null);
+        canvas.drawBitmap(texture.bitmap, srcRect, dstRect,null);
     }
 
-    public void drawGraphic2D(Graphic2d graphic2D, int x, int y, int srcX, int srcY,
+    public void drawGraphic2D(Texture texture, int x, int y, int srcX, int srcY,
                               int srcWidth, int srcHeight) {
         srcRect.left = srcX;
         srcRect.top = srcY;
@@ -122,25 +122,25 @@ public class Graphic2dDrawer {
         dstRect.right = x + srcWidth - 1;
         dstRect.bottom = y + srcHeight - 1;
 
-        canvas.drawBitmap(graphic2D.bitmap, srcRect, dstRect,null);
+        canvas.drawBitmap(texture.bitmap, srcRect, dstRect,null);
     }
 
-    public void drawGraphic2D(Graphic2d graphic2D, int x, int y) {
-        canvas.drawBitmap(graphic2D.bitmap, x, y, null);
+    public void drawGraphic2D(Texture texture, int x, int y) {
+        canvas.drawBitmap(texture.bitmap, x, y, null);
     }
 
-    public void drawGraphic2D(Graphic2d graphic2D, int x, int y, int width, int height) {
+    public void drawGraphic2D(Texture texture, int x, int y, int width, int height) {
         srcRect.left = 0;
         srcRect.top = 0;
-        srcRect.right = graphic2D.getWidth();
-        srcRect.bottom = graphic2D.getHeight();
+        srcRect.right = texture.getWidth();
+        srcRect.bottom = texture.getHeight();
 
         dstRect.left = x;
         dstRect.top = y;
         dstRect.right = x + width - 1;
         dstRect.bottom = y + height - 1;
 
-        canvas.drawBitmap(graphic2D.bitmap, srcRect, dstRect, null);
+        canvas.drawBitmap(texture.bitmap, srcRect, dstRect, null);
     }
 
     public int getWidth() {

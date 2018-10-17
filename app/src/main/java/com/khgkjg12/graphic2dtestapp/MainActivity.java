@@ -3,11 +3,7 @@ package com.khgkjg12.graphic2dtestapp;
 import android.app.Activity;
 import android.graphics.Color;
 import android.os.Bundle;
-import android.os.PowerManager;
-import android.view.Window;
-import android.view.WindowManager;
-
-import com.khgkjg12.graphic2d.Graphic2d;
+import com.khgkjg12.graphic2d.Texture;
 import com.khgkjg12.graphic2d.Graphic2dDrawer;
 import com.khgkjg12.graphic2d.Graphic2dRenderView;
 import com.khgkjg12.graphic2d.TouchHandler;
@@ -29,8 +25,8 @@ public class MainActivity extends Activity implements Graphic2dRenderView.Render
 
     private final static int STAGE_WIDTH = 8;
     private final static int STAGE_HEIGHT = 8;
-    public static Graphic2d background;
-    public static Graphic2d blackStone;
+    public static Texture background;
+    public static Texture blackStone;
     private Graphic2dRenderView renderView;
     private final int STONE_WIDTH = 100;
     private final int STONE_HEIGHT = 100;
@@ -55,8 +51,8 @@ public class MainActivity extends Activity implements Graphic2dRenderView.Render
 
     @Override
     public void loadGraphics(Graphic2dDrawer graphic2dDrawer){
-        background = graphic2dDrawer.newGraphic2D("background.png", Graphic2d.Format.ARGB8888);
-        blackStone = graphic2dDrawer.newGraphic2D("black_stone.png", Graphic2d.Format.ARGB8888);
+        background = graphic2dDrawer.newGraphic2D("background.png", Texture.Format.ARGB8888);
+        blackStone = graphic2dDrawer.newGraphic2D("black_stone.png", Texture.Format.ARGB8888);
     }
 
     @Override

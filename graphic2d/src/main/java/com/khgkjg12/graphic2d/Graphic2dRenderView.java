@@ -8,7 +8,6 @@ import android.graphics.Rect;
 import android.util.AttributeSet;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
-import com.khgkjg12.reversiboard.R;
 
 public class Graphic2dRenderView extends SurfaceView implements Runnable {
     Thread renderThread = null;

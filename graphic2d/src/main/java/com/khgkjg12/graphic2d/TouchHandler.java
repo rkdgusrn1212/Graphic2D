@@ -9,9 +9,9 @@ import java.util.List;
 
 public class TouchHandler implements View.OnTouchListener {
 
-    boolean[] isTouched = new boolean[20];
-    int[] touchX = new int[20];
-    int[] touchY = new int[20];
+    private boolean[] isTouched = new boolean[20];
+    private int[] touchX = new int[20];
+    private int[] touchY = new int[20];
 
     public static class TouchEvent {
         public static final int TOUCH_DOWN = 0;
@@ -41,16 +41,16 @@ public class TouchHandler implements View.OnTouchListener {
         }
     }
 
-    Pool<TouchEvent> touchEventPool;
-    List<TouchEvent> touchEvents = new ArrayList<TouchEvent>();
-    List<TouchEvent> touchEventsBuffer = new ArrayList<TouchEvent>();
-    float scaleX;
-    float scaleY;
+    private Pool<TouchEvent> touchEventPool;
+    private List<TouchEvent> touchEvents = new ArrayList<TouchEvent>();
+    private List<TouchEvent> touchEventsBuffer = new ArrayList<TouchEvent>();
+    private float scaleX;
+    private float scaleY;
     private ScaleGestureDetector mScaleGestureDetector;
 
 
     //sdk>5
-    public TouchHandler(Graphic2dRenderView view) {
+    TouchHandler(Graphic2dRenderView view) {
         Pool.PoolObjectFactory<TouchEvent> factory = new Pool.PoolObjectFactory<TouchEvent>() {
             @Override
             public TouchEvent createObject() {

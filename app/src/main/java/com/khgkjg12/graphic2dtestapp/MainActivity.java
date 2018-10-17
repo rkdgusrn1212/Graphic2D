@@ -4,7 +4,8 @@ import android.app.Activity;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.os.PowerManager;
-import android.support.annotation.Nullable;
+import android.view.Window;
+import android.view.WindowManager;
 
 import com.khgkjg12.graphic2d.Graphic2d;
 import com.khgkjg12.graphic2d.Graphic2dDrawer;
@@ -12,6 +13,8 @@ import com.khgkjg12.graphic2d.Graphic2dRenderView;
 import com.khgkjg12.graphic2d.TouchHandler;
 
 import java.util.List;
+
+import static android.view.WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON;
 
 /**
  * 테스트 어플은 다음과 같이 작동한다.
@@ -29,7 +32,6 @@ public class MainActivity extends Activity implements Graphic2dRenderView.Render
     public static Graphic2d background;
     public static Graphic2d blackStone;
     private Graphic2dRenderView renderView;
-    PowerManager.WakeLock wakeLock;
     private final int STONE_WIDTH = 100;
     private final int STONE_HEIGHT = 100;
     private int viewportX = 0;
@@ -42,13 +44,12 @@ public class MainActivity extends Activity implements Graphic2dRenderView.Render
     private byte[][] mOccupancyList = new byte[STAGE_HEIGHT][STAGE_WIDTH];
 
     @Override
-    protected void onCreate(@Nullable Bundle savedInstanceState) {
+    protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         renderView = findViewById(R.id.render_view);
         renderView.setRenderer(this);
-        PowerManager powerManager = (PowerManager) getSystemService(POWER_SERVICE);
-        wakeLock = powerManager.newWakeLock(PowerManager.FULL_WAKE_LOCK, "GLGame");
+        getWindow().addFlags(FLAG_KEEP_SCREEN_ON);
     }
 
 
@@ -136,14 +137,12 @@ public class MainActivity extends Activity implements Graphic2dRenderView.Render
     @Override
     public void onResume() {
         super.onResume();
-        wakeLock.acquire();
         renderView.resume();
     }
 
     @Override
     public void onPause() {
         super.onPause();
-        wakeLock.release();
         renderView.pause();
     }
 }

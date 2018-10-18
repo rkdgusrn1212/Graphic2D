@@ -2,11 +2,10 @@ package com.khgkjg12.graphic2d;
 
 import android.graphics.Rect;
 
-public class Object2D {
+public class Object {
 
-    private Texture mTexture;
-    private Rect mBoundary;
-    private int x, y;
+    private String mTexturePath;
+    Rect mBoundary;
     private int mWidth, mHeight;
     private int mState;
     public static final int NO_WHERE = 0;//데이터로써만 존제.
@@ -14,8 +13,10 @@ public class Object2D {
     public static final int NO_COLLISION = 2;//충돌 불가.
     public static final int NO_TOUCH = 3;//터치 불가.
 
-    public Object2D(Texture texture, int width, int height) {
-        mTexture = texture;
+    private Texture mTexture;
+
+    public Object(String texturePath, int width, int height) {
+        mTexturePath = texturePath;
         mWidth = width;
         mHeight = height;
         mBoundary = new Rect();
@@ -32,7 +33,13 @@ public class Object2D {
         mState = state;
     }
 
-    public void dispose(){
-        mTexture.dispose();
+    boolean onTouch(int x, int y){
+        return mBoundary.contains(x, y);
+    }
+
+    void dispose(){
+        if(mTexture!=null){
+            mTexture.dispose();
+        }
     }
 }

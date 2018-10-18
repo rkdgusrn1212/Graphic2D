@@ -38,6 +38,7 @@ public class Graphic2dRenderView extends SurfaceView implements Runnable {
     public void setRenderer(Renderer renderer){
         mRenderer = renderer;
         mRenderer.loadTextures(mDrawer);
+        mRenderer.prepareWorld(mWorld);
     }
 
     private void init(Context context, AttributeSet attrs, int defStyle) {
@@ -50,6 +51,12 @@ public class Graphic2dRenderView extends SurfaceView implements Runnable {
         mBufferWidth = a.getInt(
                 R.styleable.Graphic2dRenderView_bufferWidth,
                 0);
+        int worldWidth = a.getInt(
+                R.styleable.Graphic2dRenderView_worldWidth,
+                0);
+        int worldHeight = a.getInt(
+                R.styleable.Graphic2dRenderView_worldHeight,
+                0);
         a.recycle();
         if(mBufferHeight==0&&mBufferWidth==0){
             mBufferHeight=320;
@@ -58,7 +65,7 @@ public class Graphic2dRenderView extends SurfaceView implements Runnable {
         this.holder = getHolder();
         mDrawer = new Graphic2dDrawer(context.getApplicationContext().getAssets());
         mInput = new TouchHandler(Graphic2dRenderView.this);
-        mWorld = new World(mBufferWidth, mBufferHeight);
+        mWorld = new World(worldWidth, worldHeight);
     }
 
     @Override
@@ -110,7 +117,7 @@ public class Graphic2dRenderView extends SurfaceView implements Runnable {
 
             mWorld.onTouch(mInput);
             mRenderer.updateWorld(deltaTime, mWorld);
-            mWorld.render();
+            mWorld.render(mDrawer);
 
             Canvas canvas = holder.lockCanvas();
             canvas.getClipBounds(dstRect);
@@ -140,6 +147,7 @@ public class Graphic2dRenderView extends SurfaceView implements Runnable {
     }
 
     public interface Renderer{
+        public void prepareWorld(World world);
         public void updateWorld(float deltaTime, World world);
         public void loadTextures(Graphic2dDrawer drawer);//사용 오브젝트들의 리소스들을 다 로드함.
     }

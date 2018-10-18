@@ -4,8 +4,8 @@ import android.graphics.Rect;
 
 public class Object {
 
-    Texture mTexture;
-    int mColor;
+    private Texture mTexture;
+    private int mColor;
     Rect mBoundary;
     private int mWidth, mHeight;
     private int mState;
@@ -13,11 +13,11 @@ public class Object {
     public static final int NORMAL = 1;//터치랑 충돌 모두 가능.
     public static final int NO_COLLISION = 2;//충돌 불가.
     public static final int NO_TOUCH = 3;//터치 불가.
-    private String mId;
+    String mId;
     private OnClickListener mOnClickListener;
 
     public Object(Texture texture, int width, int height, String id) {
-        mTexture = mTexture;
+        mTexture = texture;
         mColor = 0;
         mWidth = width;
         mHeight = height;
@@ -61,13 +61,23 @@ public class Object {
         mOnClickListener = onClickListener;
     }
 
+    void render(Graphic2dDrawer drawer, int worldWidth, int worldHeight, float scale, int viewportX, int viewportY){
+        int centerX = worldWidth/2-(int)(viewportX*scale);
+        int centerY = worldHeight/2-(int)(viewportY*scale);
+        if(mTexture!=null) {
+            drawer.drawObject(mTexture, (int) (centerX - worldWidth * scale / 2 + mBoundary.left * scale), (int) (centerY - mHeight / 2 + mBoundary.height() * scale), (int) (mBoundary.width() * scale), (int) (mBoundary.height() * scale));
+        }else{
+            drawer.drawRect((int) (centerX - worldWidth * scale / 2 + mBoundary.left * scale), (int) (centerY - mHeight / 2 + mBoundary.height() * scale), (int) (mBoundary.width() * scale), (int) (mBoundary.height() * scale), mColor);
+        }
+    }
+
     void dispose(){
         if(mTexture!=null){
             mTexture.dispose();
         }
     }
 
-    interface OnClickListener{
-        void onClick(Object object);
+    public interface OnClickListener{
+        public void onClick(Object object);
     }
 }

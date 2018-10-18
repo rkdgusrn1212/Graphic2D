@@ -20,10 +20,11 @@ public class World {
     World(int width, int height){
         mWidth = width;
         mHeight = height;
+        mObjects = new HashMap<>();
     }
 
-    public void putObject(Object obj, String id){
-        mObjects.put(id, obj);
+    public void putObject(Object obj){
+        mObjects.put(obj.mId, obj);
     }
 
     public void removeObject(String id){
@@ -33,11 +34,7 @@ public class World {
     void render(Graphic2dDrawer drawer){
         drawer.clear(Color.BLACK);
         for(Object object: mObjects.values()){
-            if(object.mTexture!=null){
-                int centerX = mWidth/2-(int)(viewportX*mScale);
-                int centerY = mHeight/2-(int)(viewportY*mScale);
-                drawer.drawObject(object.mTexture,  (int)(centerX - mWidth*mScale/2 + object.mBoundary.left*mScale), (int)(centerY - mHeight / 2 + object.mBoundary.height()*mScale), (int)(object.mBoundary.width()*mScale), (int)(object.mBoundary.height()*mScale));
-            }
+            object.render(drawer, mWidth, mHeight, mScale, viewportX, viewportY);
         }
     }
 

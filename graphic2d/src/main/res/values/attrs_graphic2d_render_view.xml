@@ -2,5 +2,7 @@
     <declare-styleable name="Graphic2dRenderView">
         <attr name="bufferWidth" format="integer"/>
         <attr name="bufferHeight" format="integer"/>
+        <attr name="worldWidth" format="integer"/>
+        <attr name="worldHeight" format="integer"/>
     </declare-styleable>
 </resources>

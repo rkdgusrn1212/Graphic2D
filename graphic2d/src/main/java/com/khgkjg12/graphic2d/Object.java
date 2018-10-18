@@ -4,7 +4,8 @@ import android.graphics.Rect;
 
 public class Object {
 
-    private String mTexturePath;
+    Texture mTexture;
+    int mColor;
     Rect mBoundary;
     private int mWidth, mHeight;
     private int mState;
@@ -12,15 +13,27 @@ public class Object {
     public static final int NORMAL = 1;//터치랑 충돌 모두 가능.
     public static final int NO_COLLISION = 2;//충돌 불가.
     public static final int NO_TOUCH = 3;//터치 불가.
+    private String mId;
+    private OnClickListener mOnClickListener;
 
-    private Texture mTexture;
-
-    public Object(String texturePath, int width, int height) {
-        mTexturePath = texturePath;
+    public Object(Texture texture, int width, int height, String id) {
+        mTexture = mTexture;
+        mColor = 0;
         mWidth = width;
         mHeight = height;
         mBoundary = new Rect();
         mState = NO_WHERE;
+        mId = id;
+    }
+
+    public Object(int color, int width, int height, String id) {
+        mTexture = null;
+        mColor = color;
+        mWidth = width;
+        mHeight = height;
+        mBoundary = new Rect();
+        mState = NO_WHERE;
+        mId = id;
     }
 
     //객체의 좌표를 설정.
@@ -34,12 +47,27 @@ public class Object {
     }
 
     boolean onTouch(int x, int y){
-        return mBoundary.contains(x, y);
+        if(mBoundary.contains(x, y)){
+            if(mOnClickListener!=null) {
+                mOnClickListener.onClick(this);
+            }
+            return true;
+        }else{
+            return false;
+        }
+    }
+
+    public void setOnClickListener(OnClickListener onClickListener){
+        mOnClickListener = onClickListener;
     }
 
     void dispose(){
         if(mTexture!=null){
             mTexture.dispose();
         }
+    }
+
+    interface OnClickListener{
+        void onClick(Object object);
     }
 }

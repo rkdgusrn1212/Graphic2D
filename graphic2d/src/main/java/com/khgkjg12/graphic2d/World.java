@@ -1,5 +1,7 @@
 package com.khgkjg12.graphic2d;
 
+import android.graphics.Color;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -7,14 +9,17 @@ import java.util.List;
 public class World {
 
     private int mWidth, mHeight;
-    private float mScale;
+    private float mScale = 1.0f;;
     HashMap<String, Object> mObjects;
-
+    boolean isDragging = false;
+    int startX, startY;
+    boolean isPressed = false;
+    private int viewportX = 0;
+    private int viewportY = 0;
 
     World(int width, int height){
         mWidth = width;
         mHeight = height;
-        mScale = 1.0f;
     }
 
     public void putObject(Object obj, String id){
@@ -25,13 +30,15 @@ public class World {
         mObjects.remove(id);
     }
 
-    public void setObjectPosition(int x, int y, String id){
-
-    }
-
-    //world를 그리는 메소드
-    void render(){
-
+    void render(Graphic2dDrawer drawer){
+        drawer.clear(Color.BLACK);
+        for(Object object: mObjects.values()){
+            if(object.mTexture!=null){
+                int centerX = mWidth/2-(int)(viewportX*mScale);
+                int centerY = mHeight/2-(int)(viewportY*mScale);
+                drawer.drawObject(object.mTexture,  (int)(centerX - mWidth*mScale/2 + object.mBoundary.left*mScale), (int)(centerY - mHeight / 2 + object.mBoundary.height()*mScale), (int)(object.mBoundary.width()*mScale), (int)(object.mBoundary.height()*mScale));
+            }
+        }
     }
 
     void onTouch(TouchHandler touchHandler){
@@ -40,18 +47,18 @@ public class World {
         for(int i = 0; i < len; i++) {
             TouchHandler.TouchEvent event = touchEvents.get(i);
             if(event.type == TouchHandler.TouchEvent.PINCH_TO_ZOOM){
-                scale*=event.scale;
-                scale = Math.max(1.0f, Math.min(scale, 5.0f));
+                mScale*=event.scale;
+                mScale = Math.max(1.0f, Math.min(mScale, 5.0f));
                 isDragging = false;
                 isPressed = false;
                 break;
             }else if(event.pointer == 0) {
                 if(isDragging){
                     if(event.type == TouchHandler.TouchEvent.TOUCH_DRAGGED){
-                        int deltaX = (int)((event.x - startX)/scale);
-                        int deltaY = (int)((event.y - startY)/scale);
-                        viewportX = Math.max(-STONE_WIDTH*STAGE_WIDTH/2, Math.min(viewportX-deltaX,STONE_WIDTH*STAGE_WIDTH/2));
-                        viewportY = Math.max(-STONE_HEIGHT*STAGE_HEIGHT/2, Math.min(viewportY-deltaY,STONE_HEIGHT*STAGE_HEIGHT/2));
+                        int deltaX = (int)((event.x - startX)/mScale);
+                        int deltaY = (int)((event.y - startY)/mScale);
+                        viewportX = Math.max(-mWidth/2, Math.min(viewportX-deltaX,mWidth/2));
+                        viewportY = Math.max(-mHeight/2, Math.min(viewportY-deltaY,mHeight/2));
                         startX = event.x;
                         startY = event.y;
                     }else{
@@ -69,10 +76,8 @@ public class World {
                     }
                 }else if(event.type == TouchHandler.TouchEvent.TOUCH_UP) {
                     if(isPressed){
-                        int indexX = (int)(((800/2+viewportX)*scale-renderView.getBufferWidth()/2+event.x)/(STONE_WIDTH*scale));
-                        int indexY = (int)(((800/2+viewportY)*scale-renderView.getBufferHeight()/2+event.y)/(STONE_HEIGHT*scale));
-                        if(indexX<STAGE_WIDTH&&indexY<STAGE_HEIGHT&&indexX>=0&&indexY>=0){
-                            onItemClick(indexX, indexY);
+                        for(Object object : mObjects.values()){
+                            object.onTouch((int)(((mHeight/2+viewportY)*mScale-mHeight/2+event.y)/mScale), (int)(((mHeight/2+viewportY)*mScale-mHeight/2+event.y)/mScale));
                         }
                     }
                     isPressed = false;

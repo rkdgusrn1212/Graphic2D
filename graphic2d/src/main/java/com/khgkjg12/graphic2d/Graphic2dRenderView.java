@@ -4,6 +4,7 @@ import android.content.Context;
 import android.content.res.TypedArray;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
+import android.graphics.Color;
 import android.graphics.Rect;
 import android.util.AttributeSet;
 import android.view.SurfaceHolder;
@@ -36,7 +37,7 @@ public class Graphic2dRenderView extends SurfaceView implements Runnable {
 
     public void setRenderer(Renderer renderer){
         mRenderer = renderer;
-        mRenderer.loadGraphics(mDrawer);
+        mRenderer.loadTextures(mDrawer);
     }
 
     private void init(Context context, AttributeSet attrs, int defStyle) {
@@ -139,8 +140,7 @@ public class Graphic2dRenderView extends SurfaceView implements Runnable {
     }
 
     public interface Renderer{
-        public void updateWorld(float deltaTime, Graphic2dDrawer drawer, TouchHandler input);
-        public void onLoadWorld();//사용 오브젝트들의 리소스들을 다 로드함.
-        public void onCreateWorld(World world);//오브젝트 선언,
+        public void updateWorld(float deltaTime, World world);
+        public void loadTextures(Graphic2dDrawer drawer);//사용 오브젝트들의 리소스들을 다 로드함.
     }
 }

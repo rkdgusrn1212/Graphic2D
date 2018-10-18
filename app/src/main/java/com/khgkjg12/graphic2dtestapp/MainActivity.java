@@ -50,13 +50,13 @@ public class MainActivity extends Activity implements Graphic2dRenderView.Render
 
 
     @Override
-    public void loadGraphics(Graphic2dDrawer graphic2dDrawer){
+    public void loadTextures(Graphic2dDrawer graphic2dDrawer){
         background = graphic2dDrawer.newGraphic2D("background.png", Texture.Format.ARGB8888);
         blackStone = graphic2dDrawer.newGraphic2D("black_stone.png", Texture.Format.ARGB8888);
     }
 
     @Override
-    public void update(float deltaTime, Graphic2dDrawer drawer, TouchHandler input) {
+    public void updateWorld(float deltaTime, Graphic2dDrawer drawer, TouchHandler input) {
         drawer.clear(Color.BLACK);
 
         drawBoard(drawer);

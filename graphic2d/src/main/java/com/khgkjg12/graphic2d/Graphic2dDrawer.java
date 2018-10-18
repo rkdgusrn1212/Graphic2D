@@ -94,7 +94,7 @@ public class Graphic2dDrawer {
         canvas.drawRect(x, y, x + width - 1, y + width - 1, paint);
     }
 
-    public void drawGraphic2D(Texture texture, int x, int y, int width, int height, int srcX, int srcY,
+    public void drawObject(Texture texture, int x, int y, int width, int height, int srcX, int srcY,
                               int srcWidth, int srcHeight) {
 
         srcRect.left = srcX;
@@ -110,7 +110,7 @@ public class Graphic2dDrawer {
         canvas.drawBitmap(texture.bitmap, srcRect, dstRect,null);
     }
 
-    public void drawGraphic2D(Texture texture, int x, int y, int srcX, int srcY,
+    public void drawObject(Texture texture, int x, int y, int srcX, int srcY,
                               int srcWidth, int srcHeight) {
         srcRect.left = srcX;
         srcRect.top = srcY;
@@ -125,11 +125,11 @@ public class Graphic2dDrawer {
         canvas.drawBitmap(texture.bitmap, srcRect, dstRect,null);
     }
 
-    public void drawGraphic2D(Texture texture, int x, int y) {
+    public void drawObject(Texture texture, int x, int y) {
         canvas.drawBitmap(texture.bitmap, x, y, null);
     }
 
-    public void drawGraphic2D(Texture texture, int x, int y, int width, int height) {
+    public void drawObject(Texture texture, int x, int y, int width, int height) {
         srcRect.left = 0;
         srcRect.top = 0;
         srcRect.right = texture.getWidth();

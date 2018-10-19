@@ -28,7 +28,7 @@ public class Texture {
         return format;
     }
 
-    void dispose() {
+    public void dispose() {
         bitmap.recycle();
     }
 }

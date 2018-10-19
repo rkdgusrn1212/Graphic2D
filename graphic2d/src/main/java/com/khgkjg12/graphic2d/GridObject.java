@@ -53,8 +53,7 @@ public class GridObject extends Object {
     }
 
     public void removeObject(int row, int column){
-        mObjectList[row][column].dispose();
-        mObjectList = null;
+        mObjectList[row][column] = null;
     }
 
     @Override

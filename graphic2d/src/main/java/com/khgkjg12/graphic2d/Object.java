@@ -73,12 +73,6 @@ public class Object {
         }
     }
 
-    void dispose(){
-        if(mTexture!=null){
-            mTexture.dispose();
-        }
-    }
-
     public interface OnClickListener{
         public void onClick(Object object);
     }

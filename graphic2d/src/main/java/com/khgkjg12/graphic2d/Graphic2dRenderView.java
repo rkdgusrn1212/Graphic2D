@@ -152,4 +152,9 @@ public class Graphic2dRenderView extends SurfaceView implements Runnable {
         public void updateWorld(float deltaTime, World world);
         public void loadTextures(Graphic2dDrawer drawer);//사용 오브젝트들의 리소스들을 다 로드함.
     }
+
+    @Override
+    protected void onDetachedFromWindow() {
+        super.onDetachedFromWindow();
+    }
 }

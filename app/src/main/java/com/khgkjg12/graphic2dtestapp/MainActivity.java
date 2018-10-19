@@ -81,4 +81,11 @@ public class MainActivity extends Activity implements Graphic2dRenderView.Render
             gridObject.putObject(blackStone, row, column);
         }
     }
+
+    @Override
+    protected void onDestroy() {
+        background.dispose();
+        blackStone.dispose();
+        super.onDestroy();
+    }
 }

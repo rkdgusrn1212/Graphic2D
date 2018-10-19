@@ -46,7 +46,8 @@ public class MainActivity extends Activity implements Graphic2dRenderView.Render
     @Override
     public void prepareWorld(World world) {
         GridObject gridObject = new GridObject(background, 800, 800, 8, 8, "board");
-        gridObject.setPosition(400, 400);
+        gridObject.setPosition(0, 0);
+        gridObject.setOnClickItemListener(this);
         world.putObject(gridObject);
     }
 

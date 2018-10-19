@@ -2,13 +2,12 @@ package com.khgkjg12.graphic2d;
 
 import android.graphics.Color;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
 public class World {
 
-    private int mWidth, mHeight;
+    private int mWidth, mHeight;//0은 무한.
     private float mScale = 1.0f;;
     HashMap<String, Object> mObjects;
     boolean isDragging = false;
@@ -16,6 +15,8 @@ public class World {
     boolean isPressed = false;
     private int viewportX = 0;
     private int viewportY = 0;
+    private int mFrameBufferWidth;
+    private int mFrameBufferHeight;
 
     World(int width, int height){
         mWidth = width;
@@ -31,10 +32,15 @@ public class World {
         mObjects.remove(id);
     }
 
+    void setWorldSize(int frameBufferWidth, int frameBufferHeight){
+        mFrameBufferWidth = frameBufferWidth;
+        mFrameBufferHeight = frameBufferHeight;
+    }
+
     void render(Graphic2dDrawer drawer){
         drawer.clear(Color.BLACK);
         for(Object object: mObjects.values()){
-            object.render(drawer, mWidth, mHeight, mScale, viewportX, viewportY);
+            object.render(drawer, mFrameBufferWidth, mFrameBufferHeight, mWidth, mHeight, mScale, viewportX, viewportY);
         }
     }
 
@@ -54,8 +60,16 @@ public class World {
                     if(event.type == TouchHandler.TouchEvent.TOUCH_DRAGGED){
                         int deltaX = (int)((event.x - startX)/mScale);
                         int deltaY = (int)((event.y - startY)/mScale);
-                        viewportX = Math.max(-mWidth/2, Math.min(viewportX-deltaX,mWidth/2));
-                        viewportY = Math.max(-mHeight/2, Math.min(viewportY-deltaY,mHeight/2));
+                        if(mWidth==0){
+                            viewportX=viewportX-deltaX;
+                        }else{
+                            viewportX = Math.max(-mWidth/2, Math.min(viewportX-deltaX,mWidth/2));
+                        }
+                        if(mHeight ==0){
+                            viewportY=viewportY-deltaY;
+                        }else{
+                            viewportY = Math.max(-mHeight/2, Math.min(viewportY-deltaY,mHeight/2));
+                        }
                         startX = event.x;
                         startY = event.y;
                     }else{
@@ -74,7 +88,7 @@ public class World {
                 }else if(event.type == TouchHandler.TouchEvent.TOUCH_UP) {
                     if(isPressed){
                         for(Object object : mObjects.values()){
-                            object.onTouch((int)(((mHeight/2+viewportY)*mScale-mHeight/2+event.y)/mScale), (int)(((mHeight/2+viewportY)*mScale-mHeight/2+event.y)/mScale));
+                            object.onTouch((int)(viewportX+(event.x-mFrameBufferWidth/2)/mScale), (int)(viewportY+(event.y-mFrameBufferHeight/2)/mScale));
                         }
                     }
                     isPressed = false;

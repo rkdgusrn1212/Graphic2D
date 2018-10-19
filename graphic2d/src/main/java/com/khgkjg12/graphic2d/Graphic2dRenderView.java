@@ -97,6 +97,7 @@ public class Graphic2dRenderView extends SurfaceView implements Runnable {
         setMeasuredDimension(width,height);
         mInput.setScale((float)mBufferWidth/width, (float)mBufferHeight/height);
         mDrawer.setFrameBuffer(mBufferWidth, mBufferHeight, Bitmap.Config.RGB_565);
+        mWorld.setWorldSize(mBufferWidth, mBufferHeight);
     }
 
     public void resume() {

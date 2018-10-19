@@ -18,6 +18,8 @@ public class GridObject extends Object {
     }
 
     private void init(int row, int column){
+        mColumn = column;
+        mRow = row;
         mObjectList = new Object[row][column];
     }
 
@@ -56,13 +58,13 @@ public class GridObject extends Object {
     }
 
     @Override
-    void render(Graphic2dDrawer drawer, int worldWidth, int worldHeight, float scale, int viewportX, int viewportY) {
-        super.render(drawer, worldWidth, worldHeight, scale, viewportX, viewportY);
+    void render(Graphic2dDrawer drawer,int bufferWidth, int bufferHeight, int worldWidth, int worldHeight, float scale, int viewportX, int viewportY) {
+        super.render(drawer, bufferWidth, bufferHeight, worldWidth, worldHeight, scale, viewportX, viewportY);
         for(int i=0; i<mRow; i++){
             for(int j=0; j<mColumn; j++){
                 Object obj = mObjectList[i][j];
                 if(obj!=null){
-                    obj.render(drawer, worldWidth, worldHeight, scale, viewportX, viewportY);
+                    obj.render(drawer,  bufferWidth, bufferHeight, worldWidth, worldHeight, scale, viewportX, viewportY);
                 }
             }
         }

@@ -1,6 +1,7 @@
 package com.khgkjg12.graphic2d;
 
 import android.graphics.Rect;
+import android.util.Log;
 
 public class Object {
 
@@ -61,13 +62,14 @@ public class Object {
         mOnClickListener = onClickListener;
     }
 
-    void render(Graphic2dDrawer drawer, int worldWidth, int worldHeight, float scale, int viewportX, int viewportY){
-        int centerX = worldWidth/2-(int)(viewportX*scale);
-        int centerY = worldHeight/2-(int)(viewportY*scale);
+    void render(Graphic2dDrawer drawer, int bufferWidth, int bufferHeight, int worldWidth, int worldHeight, float scale, int viewportX, int viewportY){
+        int deltaX = (int)((mBoundary.left-viewportX)*scale);
+        int deltaY = (int)((mBoundary.top-viewportY)*scale);
+
         if(mTexture!=null) {
-            drawer.drawObject(mTexture, (int) (centerX - worldWidth * scale / 2 + mBoundary.left * scale), (int) (centerY - mHeight / 2 + mBoundary.height() * scale), (int) (mBoundary.width() * scale), (int) (mBoundary.height() * scale));
+            drawer.drawObject(mTexture, bufferWidth/2+deltaX, bufferHeight/2+deltaY, (int) (mBoundary.width() * scale), (int) (mBoundary.height() * scale));
         }else{
-            drawer.drawRect((int) (centerX - worldWidth * scale / 2 + mBoundary.left * scale), (int) (centerY - mHeight / 2 + mBoundary.height() * scale), (int) (mBoundary.width() * scale), (int) (mBoundary.height() * scale), mColor);
+            drawer.drawRect(bufferWidth/2+deltaX, bufferHeight/2+deltaY, (int) (mBoundary.width() * scale), (int) (mBoundary.height() * scale), mColor);
         }
     }
 

@@ -76,4 +76,15 @@ public class Object {
     public interface OnClickListener{
         public void onClick(Object object);
     }
+
+    public void flip(){
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                for(int degree =0; degree< 180; degree++){
+                    mBoundary.set((int)(mBoundary.left+mBoundary.width()*Math.cos(degree*Math.PI/180)), mBoundary.top, (int)(mBoundary.left+mBoundary.width()*Math.cos(degree*Math.PI/180)));
+                }
+            }
+        }).start();
+    }
 }

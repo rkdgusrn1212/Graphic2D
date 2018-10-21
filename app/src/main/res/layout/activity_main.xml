@@ -9,7 +9,7 @@
     <com.khgkjg12.graphic2d.Graphic2dRenderView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        app:bufferWidth="800"
+        app:viewportWidth="800"
         android:layout_gravity="center"
         android:id="@+id/render_view"/>
 </FrameLayout>

@@ -1,8 +1,13 @@
 <resources>
     <declare-styleable name="Graphic2dRenderView">
-        <attr name="bufferWidth" format="integer"/>
-        <attr name="bufferHeight" format="integer"/>
+        <attr name="viewportWidth" format="integer"/>
+        <attr name="viewportHeight" format="integer"/>
+        <attr name="viewportX" format="integer"/>
+        <attr name="viewportY" format="integer"/>
         <attr name="worldWidth" format="integer"/>
         <attr name="worldHeight" format="integer"/>
+        <attr name="cameraZ" format="integer"/>
+        <attr name="maxCameraZ" format="integer"/>
+        <attr name="minCameraZ" format="integer"/>
     </declare-styleable>
 </resources>

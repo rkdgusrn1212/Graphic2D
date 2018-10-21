@@ -16,8 +16,18 @@ public class Object {
     public static final int NO_TOUCH = 3;//터치 불가.
     String mId;
     private OnClickListener mOnClickListener;
+    private int mZ;
+    private int mDegree;
 
     public Object(Texture texture, int width, int height, String id) {
+        this(texture, width, height, 0, 0, id);
+    }
+
+    public Object(int color, int width, int height, String id) {
+        this(color, width, height, 0, 0, id);
+    }
+
+    public Object(Texture texture, int width, int height, int z, int degree, String id){
         mTexture = texture;
         mColor = 0;
         mWidth = width;
@@ -25,9 +35,11 @@ public class Object {
         mBoundary = new Rect();
         mState = NO_WHERE;
         mId = id;
+        mZ = z;
+        mDegree = degree%360;
     }
 
-    public Object(int color, int width, int height, String id) {
+    public Object(int color, int width, int height, int z, int degree, String id){
         mTexture = null;
         mColor = color;
         mWidth = width;
@@ -35,11 +47,19 @@ public class Object {
         mBoundary = new Rect();
         mState = NO_WHERE;
         mId = id;
+        mZ = z;
+        mDegree = degree%360;
     }
 
     //객체의 좌표를 설정.
-    public void setPosition(int x, int y){
-        mBoundary.set(x-mWidth/2, y-mHeight/2, x+mWidth/2, y+mHeight/2);
+    boolean setPosition(int x, int y, int worldWidth, int worldHeight){
+        Rect nextBoundary = new Rect(x-mWidth/2, y-mHeight/2, x+mWidth/2, y+mHeight/2);
+        if(nextBoundary.intersect(-worldWidth/2, -worldHeight/2, worldWidth/2, worldHeight/2)){
+            mBoundary.set(nextBoundary);
+            return true;
+        }else{
+            return false;
+        }
     }
 
     //객체를 물리적 상태를 변화.
@@ -62,14 +82,29 @@ public class Object {
         mOnClickListener = onClickListener;
     }
 
-    void render(Graphic2dDrawer drawer, int bufferWidth, int bufferHeight, int worldWidth, int worldHeight, float scale, int viewportX, int viewportY){
-        int deltaX = (int)((mBoundary.left-viewportX)*scale);
-        int deltaY = (int)((mBoundary.top-viewportY)*scale);
+    void render(Graphic2dDrawer drawer, int viewportWidth, int viewportHeight, int cameraZ, int viewportX, int viewportY){
+        if(mZ>=cameraZ){
+            return;
+        }
+        int width = mBoundary.width()*cameraZ/(cameraZ-mZ);
+        int height = mBoundary.height()*cameraZ/(cameraZ-mZ);
+
+        int x = viewportWidth/2-viewportX+mBoundary.centerX()-width/2;
+        int y = viewportHeight/2-viewportY+mBoundary.centerY()-height/2;
+        int left = Math.max(x,0);
+        int top = Math.max(y,0);
+        int right = Math.min(x + width - 1, viewportWidth-1);
+        int bottom = Math.min(y + height - 1, viewportHeight-1);
 
         if(mTexture!=null) {
-            drawer.drawObject(mTexture, bufferWidth/2+deltaX, bufferHeight/2+deltaY, (int) (mBoundary.width() * scale), (int) (mBoundary.height() * scale));
+            int srcRight = Math.min(width-1,viewportWidth-x-1);
+            int srcBottom = Math.min(height-1,viewportHeight-y-1);
+            int srcLeft = Math.max(-x,0);
+            int srcTop = Math.max(-y,0);
+
+            drawer.drawObject(mTexture, left, top, right, bottom, srcLeft, srcTop, srcRight, srcBottom);
         }else{
-            drawer.drawRect(bufferWidth/2+deltaX, bufferHeight/2+deltaY, (int) (mBoundary.width() * scale), (int) (mBoundary.height() * scale), mColor);
+            drawer.drawRect( left, top, right, bottom, mColor);
         }
     }
 
@@ -77,14 +112,19 @@ public class Object {
         public void onClick(Object object);
     }
 
-    public void flip(){
-        new Thread(new Runnable() {
-            @Override
-            public void run() {
-                for(int degree =0; degree< 180; degree++){
-                    mBoundary.set((int)(mBoundary.left+mBoundary.width()*Math.cos(degree*Math.PI/180)), mBoundary.top, (int)(mBoundary.left+mBoundary.width()*Math.cos(degree*Math.PI/180)));
-                }
-            }
-        }).start();
+    public void setHorizontalFlip(int degree){
+        int halfWidth = (int)(mBoundary.width()*Math.abs(Math.cos(degree*Math.PI/180))*0.5/Math.abs(Math.cos(mDegree*Math.PI/180)));
+        mDegree = degree%360;
+        mBoundary.set(mBoundary.centerX()-halfWidth, mBoundary.top, mBoundary.centerX()+halfWidth, mBoundary.bottom);
+    }
+
+    public void setVerticalFlip(int degree){
+        int halfHeight = (int)(mBoundary.height()*Math.abs(Math.cos(degree*Math.PI/180))*0.5/Math.abs(Math.cos(mDegree*Math.PI/180)));
+        mDegree = degree%360;
+        mBoundary.set(mBoundary.left, mBoundary.centerY()-halfHeight, mBoundary.right, mBoundary.centerY()+halfHeight);
+    }
+
+    public void setZ(int z){
+        mZ = z;
     }
 }

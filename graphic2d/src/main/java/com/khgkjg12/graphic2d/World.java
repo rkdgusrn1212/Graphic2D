@@ -8,19 +8,26 @@ import java.util.List;
 public class World {
 
     private int mWidth, mHeight;//0은 무한.
-    private float mScale = 1.0f;;
     HashMap<String, Object> mObjects;
     boolean isDragging = false;
     int startX, startY;
     boolean isPressed = false;
-    private int viewportX = 0;
-    private int viewportY = 0;
-    private int mFrameBufferWidth;
-    private int mFrameBufferHeight;
+    private int mViewportX;
+    private int mViewportY;
+    private int mViewportWidth;
+    private int mViewportHeight;
+    private int mCameraZ;
+    private int mMinCameraZ;
+    private int mMaxCameraZ;
 
-    World(int width, int height){
+    World(int width, int height, int viewportX, int viewportY, int cameraZ, int minCameraZ, int maxCameraZ){
         mWidth = width;
         mHeight = height;
+        mViewportX = viewportX;
+        mViewportY = viewportY;
+        mCameraZ = cameraZ;
+        mMinCameraZ = minCameraZ;
+        mMaxCameraZ = maxCameraZ;
         mObjects = new HashMap<>();
     }
 
@@ -32,15 +39,19 @@ public class World {
         mObjects.remove(id);
     }
 
-    void setWorldSize(int frameBufferWidth, int frameBufferHeight){
-        mFrameBufferWidth = frameBufferWidth;
-        mFrameBufferHeight = frameBufferHeight;
+    public boolean setObjectPosition(int x, int y, String id){
+        return mObjects.get(id).setPosition(x, y, mWidth, mHeight);
+    }
+
+    void setViewportSize(int viewportWidth, int viewportHeight){
+        mViewportWidth = viewportWidth;
+        mViewportHeight = viewportHeight;
     }
 
     void render(Graphic2dDrawer drawer){
         drawer.clear(Color.BLACK);
         for(Object object: mObjects.values()){
-            object.render(drawer, mFrameBufferWidth, mFrameBufferHeight, mWidth, mHeight, mScale, viewportX, viewportY);
+            object.render(drawer, mViewportWidth, mViewportHeight, mCameraZ, mViewportX, mViewportY);
         }
     }
 
@@ -50,25 +61,25 @@ public class World {
         for(int i = 0; i < len; i++) {
             TouchHandler.TouchEvent event = touchEvents.get(i);
             if(event.type == TouchHandler.TouchEvent.PINCH_TO_ZOOM){
-                mScale*=event.scale;
-                mScale = Math.max(1.0f, Math.min(mScale, 5.0f));
+                mCameraZ/=event.scale;
+                mCameraZ = Math.max(mMinCameraZ, Math.min(mCameraZ, mMaxCameraZ));
                 isDragging = false;
                 isPressed = false;
                 break;
             }else if(event.pointer == 0) {
                 if(isDragging){
                     if(event.type == TouchHandler.TouchEvent.TOUCH_DRAGGED){
-                        int deltaX = (int)((event.x - startX)/mScale);
-                        int deltaY = (int)((event.y - startY)/mScale);
+                        int deltaX = (event.x - startX)*mMaxCameraZ/mCameraZ;
+                        int deltaY = (event.y - startY)*mMaxCameraZ/mCameraZ;
                         if(mWidth==0){
-                            viewportX=viewportX-deltaX;
+                            mViewportX=mViewportX-deltaX;
                         }else{
-                            viewportX = Math.max(-mWidth/2, Math.min(viewportX-deltaX,mWidth/2));
+                            mViewportX = Math.max(-mWidth/2, Math.min(mViewportX-deltaX,mWidth/2));
                         }
                         if(mHeight ==0){
-                            viewportY=viewportY-deltaY;
+                            mViewportY=mViewportY-deltaY;
                         }else{
-                            viewportY = Math.max(-mHeight/2, Math.min(viewportY-deltaY,mHeight/2));
+                            mViewportY = Math.max(-mHeight/2, Math.min(mViewportY-deltaY,mHeight/2));
                         }
                         startX = event.x;
                         startY = event.y;
@@ -88,7 +99,7 @@ public class World {
                 }else if(event.type == TouchHandler.TouchEvent.TOUCH_UP) {
                     if(isPressed){
                         for(Object object : mObjects.values()){
-                            object.onTouch((int)(viewportX+(event.x-mFrameBufferWidth/2)/mScale), (int)(viewportY+(event.y-mFrameBufferHeight/2)/mScale));
+                            object.onTouch(mViewportX+(event.x-mViewportWidth/2)*mMaxCameraZ/mCameraZ, mViewportY+(event.y-mViewportHeight/2)*mMaxCameraZ/mCameraZ);
                         }
                     }
                     isPressed = false;

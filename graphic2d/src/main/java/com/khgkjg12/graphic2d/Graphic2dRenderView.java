@@ -17,7 +17,7 @@ public class Graphic2dRenderView extends SurfaceView implements Runnable {
     private Renderer mRenderer;
     private Graphic2dDrawer mDrawer;
     private TouchHandler mInput = null;
-    private int mBufferWidth, mBufferHeight;
+    private int mViewportWidth, mViewportHeight;
     private World mWorld;
 
     public Graphic2dRenderView(Context context) {
@@ -46,10 +46,10 @@ public class Graphic2dRenderView extends SurfaceView implements Runnable {
         final TypedArray a = getContext().obtainStyledAttributes(
                 attrs, R.styleable.Graphic2dRenderView, defStyle, 0);
 
-        mBufferHeight = a.getInt(
-                R.styleable.Graphic2dRenderView_bufferHeight,0);
-        mBufferWidth = a.getInt(
-                R.styleable.Graphic2dRenderView_bufferWidth,
+        mViewportHeight = a.getInt(
+                R.styleable.Graphic2dRenderView_viewportHeight,0);
+        mViewportWidth = a.getInt(
+                R.styleable.Graphic2dRenderView_viewportWidth,
                 0);
         int worldWidth = a.getInt(
                 R.styleable.Graphic2dRenderView_worldWidth,
@@ -57,15 +57,30 @@ public class Graphic2dRenderView extends SurfaceView implements Runnable {
         int worldHeight = a.getInt(
                 R.styleable.Graphic2dRenderView_worldHeight,
                 0);
-        a.recycle();
-        if(mBufferHeight==0&&mBufferWidth==0){
-            mBufferHeight=320;
-            mBufferWidth=320;
+        int viewportX = a.getInt(R.styleable.Graphic2dRenderView_viewportX, 0);
+        int viewportY = a.getInt(R.styleable.Graphic2dRenderView_viewportY, 0);
+        int cameraZ = a.getInt(R.styleable.Graphic2dRenderView_cameraZ, 100);
+        int maxCameraZ = a.getInt(R.styleable.Graphic2dRenderView_maxCameraZ,cameraZ);
+        int minCameraZ = a.getInt(R.styleable.Graphic2dRenderView_minCameraZ, cameraZ/5);
+                a.recycle();
+        if(mViewportHeight==0&&mViewportWidth==0){
+            mViewportHeight=320;
+            mViewportWidth=320;
+        }
+        if(viewportX<-worldWidth/2){
+            viewportX = -worldWidth/2;
+        }else if(viewportX>worldWidth/2){
+            viewportX = worldWidth/2;
+        }
+        if(viewportY<-worldHeight/2){
+            viewportY = -worldHeight/2;
+        }else if(viewportY>worldHeight/2){
+            viewportY = worldHeight/2;
         }
         this.holder = getHolder();
         mDrawer = new Graphic2dDrawer(context.getApplicationContext().getAssets());
         mInput = new TouchHandler(Graphic2dRenderView.this);
-        mWorld = new World(worldWidth, worldHeight);
+        mWorld = new World(worldWidth, worldHeight, viewportX, viewportY, cameraZ, minCameraZ, maxCameraZ);
     }
 
     @Override
@@ -75,29 +90,29 @@ public class Graphic2dRenderView extends SurfaceView implements Runnable {
         int widthMode = MeasureSpec.getMode(widthMeasureSpec);
         int heightMode = MeasureSpec.getMode(heightMeasureSpec);
         if(heightMode != MeasureSpec.AT_MOST && widthMode != MeasureSpec.AT_MOST){
-            if(mBufferHeight==0){
-                mBufferHeight = mBufferWidth*height/width;
-            }else if(mBufferWidth==0){
-                mBufferWidth = mBufferHeight*width/height;
+            if(mViewportHeight==0){
+                mViewportHeight = mViewportWidth*height/width;
+            }else if(mViewportWidth==0){
+                mViewportWidth = mViewportHeight*width/height;
             }
         }
-        if(mBufferWidth==0){
-            mBufferWidth = mBufferHeight;
-        }else if(mBufferHeight == 0){
-            mBufferHeight = mBufferWidth;
+        if(mViewportWidth==0){
+            mViewportWidth = mViewportHeight;
+        }else if(mViewportHeight == 0){
+            mViewportHeight = mViewportWidth;
         }
         if (heightMode == MeasureSpec.AT_MOST && widthMode != MeasureSpec.AT_MOST) {
-            height = width * mBufferHeight / mBufferWidth;
+            height = width * mViewportHeight / mViewportWidth;
         } else if (heightMode != MeasureSpec.AT_MOST && widthMode == MeasureSpec.AT_MOST) {
-            width = height * mBufferWidth / mBufferHeight;
+            width = height * mViewportWidth / mViewportHeight;
         } else if (heightMode == MeasureSpec.AT_MOST && widthMode == MeasureSpec.AT_MOST) {
-            height = mBufferHeight;
-            width = mBufferWidth;
+            height = mViewportHeight;
+            width = mViewportWidth;
         }
         setMeasuredDimension(width,height);
-        mInput.setScale((float)mBufferWidth/width, (float)mBufferHeight/height);
-        mDrawer.setFrameBuffer(mBufferWidth, mBufferHeight, Bitmap.Config.RGB_565);
-        mWorld.setWorldSize(mBufferWidth, mBufferHeight);
+        mInput.setScale((float)mViewportWidth/width, (float)mViewportHeight/height);
+        mDrawer.setFrameBuffer(mViewportWidth, mViewportHeight, Bitmap.Config.RGB_565);
+        mWorld.setViewportSize(mViewportWidth, mViewportHeight);
     }
 
     public void resume() {
@@ -137,14 +152,6 @@ public class Graphic2dRenderView extends SurfaceView implements Runnable {
                 // retry
             }
         }
-    }
-
-    public int getBufferWidth(){
-        return mBufferWidth;
-    }
-
-    public int getBufferHeight(){
-        return mBufferHeight;
     }
 
     public interface Renderer{

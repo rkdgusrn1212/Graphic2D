@@ -12,7 +12,7 @@ import java.io.InputStream;
 
 public class Graphic2dDrawer {
     AssetManager assets;
-    Bitmap frameBuffer;
+    Bitmap mFrameBuffer;
     Canvas canvas;
     Paint paint;
     Rect srcRect = new Rect();
@@ -25,9 +25,9 @@ public class Graphic2dDrawer {
 
     void setFrameBuffer(int bufferWidth, int bufferHeight, Bitmap.Config config){
 
-        this.frameBuffer = Bitmap.createBitmap(bufferWidth,
+        mFrameBuffer = Bitmap.createBitmap(bufferWidth,
                 bufferHeight, config);
-        this.canvas = new Canvas(frameBuffer);
+        this.canvas = new Canvas(mFrameBuffer);
     }
 
     public Texture newGraphic2D(String fileName, Texture.Format format) {
@@ -88,70 +88,29 @@ public class Graphic2dDrawer {
         canvas.drawLine(x, y, x2, y2, paint);
     }
 
-    public void drawRect(int x, int y, int width, int height, int color) {
+    public void drawRect(int left, int top, int right, int bottom, int color) {
         paint.setColor(color);
         paint.setStyle(Paint.Style.FILL);
-        canvas.drawRect(x, y, x + width - 1, y + width - 1, paint);
+        canvas.drawRect(left, top, right, bottom, paint);
     }
 
-    public void drawObject(Texture texture, int x, int y, int width, int height, int srcX, int srcY,
-                              int srcWidth, int srcHeight) {
+    public void drawObject(Texture texture, int left, int top, int right, int bottom, int srcLeft, int srcTop,
+                              int srcRight, int srcBottom) {
 
-        srcRect.left = srcX;
-        srcRect.top = srcY;
-        srcRect.right = srcX + srcWidth - 1;
-        srcRect.bottom = srcY + srcHeight - 1;
+        srcRect.left = srcLeft;
+        srcRect.top = srcTop;
+        srcRect.right = srcRight;
+        srcRect.bottom = srcBottom;
 
-        dstRect.left = x;
-        dstRect.top = y;
-        dstRect.right = x + width - 1;
-        dstRect.bottom = y + height - 1;
+        dstRect.left = left;
+        dstRect.top = top;
+        dstRect.right = right;
+        dstRect.bottom = bottom;
 
         canvas.drawBitmap(texture.bitmap, srcRect, dstRect,null);
-    }
-
-    public void drawObject(Texture texture, int x, int y, int srcX, int srcY,
-                              int srcWidth, int srcHeight) {
-        srcRect.left = srcX;
-        srcRect.top = srcY;
-        srcRect.right = srcX + srcWidth - 1;
-        srcRect.bottom = srcY + srcHeight - 1;
-
-        dstRect.left = x;
-        dstRect.top = y;
-        dstRect.right = x + srcWidth - 1;
-        dstRect.bottom = y + srcHeight - 1;
-
-        canvas.drawBitmap(texture.bitmap, srcRect, dstRect,null);
-    }
-
-    public void drawObject(Texture texture, int x, int y) {
-        canvas.drawBitmap(texture.bitmap, x, y, null);
-    }
-
-    public void drawObject(Texture texture, int x, int y, int width, int height) {
-        srcRect.left = 0;
-        srcRect.top = 0;
-        srcRect.right = texture.getWidth();
-        srcRect.bottom = texture.getHeight();
-
-        dstRect.left = x;
-        dstRect.top = y;
-        dstRect.right = x + width - 1;
-        dstRect.bottom = y + height - 1;
-
-        canvas.drawBitmap(texture.bitmap, srcRect, dstRect, null);
-    }
-
-    public int getWidth() {
-        return frameBuffer.getWidth();
-    }
-
-    public int getHeight() {
-        return frameBuffer.getHeight();
     }
 
     public Bitmap getFrameBuffer() {
-        return frameBuffer;
+        return mFrameBuffer;
     }
 }

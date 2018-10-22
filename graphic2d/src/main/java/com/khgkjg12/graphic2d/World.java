@@ -19,8 +19,9 @@ public class World {
     private int mCameraZ;
     private int mMinCameraZ;
     private int mMaxCameraZ;
+    private int mFocusedZ;
 
-    World(int width, int height, int viewportX, int viewportY, int cameraZ, int minCameraZ, int maxCameraZ){
+    World(int width, int height, int viewportX, int viewportY, int cameraZ, int minCameraZ, int maxCameraZ, int focusedZ){
         mWidth = width;
         mHeight = height;
         mViewportX = viewportX;
@@ -28,6 +29,7 @@ public class World {
         mCameraZ = cameraZ;
         mMinCameraZ = minCameraZ;
         mMaxCameraZ = maxCameraZ;
+        mFocusedZ = focusedZ;
         mObjects = new HashMap<>();
     }
 
@@ -39,10 +41,6 @@ public class World {
         mObjects.remove(id);
     }
 
-    public boolean setObjectPosition(int x, int y, String id){
-        return mObjects.get(id).setPosition(x, y, mWidth, mHeight);
-    }
-
     void setViewportSize(int viewportWidth, int viewportHeight){
         mViewportWidth = viewportWidth;
         mViewportHeight = viewportHeight;
@@ -51,7 +49,7 @@ public class World {
     void render(Graphic2dDrawer drawer){
         drawer.clear(Color.BLACK);
         for(Object object: mObjects.values()){
-            object.render(drawer, mViewportWidth, mViewportHeight, mCameraZ, mViewportX, mViewportY);
+            object.render(drawer, mViewportWidth, mViewportHeight, mCameraZ, mFocusedZ, mViewportX, mViewportY);
         }
     }
 
@@ -69,8 +67,8 @@ public class World {
             }else if(event.pointer == 0) {
                 if(isDragging){
                     if(event.type == TouchHandler.TouchEvent.TOUCH_DRAGGED){
-                        int deltaX = (event.x - startX)*mMaxCameraZ/mCameraZ;
-                        int deltaY = (event.y - startY)*mMaxCameraZ/mCameraZ;
+                        int deltaX = (event.x - startX)*mFocusedZ/mCameraZ;
+                        int deltaY = (event.y - startY)*mFocusedZ/mCameraZ;
                         if(mWidth==0){
                             mViewportX=mViewportX-deltaX;
                         }else{
@@ -99,7 +97,7 @@ public class World {
                 }else if(event.type == TouchHandler.TouchEvent.TOUCH_UP) {
                     if(isPressed){
                         for(Object object : mObjects.values()){
-                            object.onTouch(mViewportX+(event.x-mViewportWidth/2)*mMaxCameraZ/mCameraZ, mViewportY+(event.y-mViewportHeight/2)*mMaxCameraZ/mCameraZ);
+                            object.onTouch(mViewportX+(event.x-mViewportWidth/2)*mFocusedZ/mCameraZ, mViewportY+(event.y-mViewportHeight/2)*mFocusedZ/mCameraZ);
                         }
                     }
                     isPressed = false;

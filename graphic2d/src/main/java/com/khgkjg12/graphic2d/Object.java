@@ -52,14 +52,10 @@ public class Object {
     }
 
     //객체의 좌표를 설정.
-    boolean setPosition(int x, int y, int worldWidth, int worldHeight){
-        Rect nextBoundary = new Rect(x-mWidth/2, y-mHeight/2, x+mWidth/2, y+mHeight/2);
-        if(nextBoundary.intersect(-worldWidth/2, -worldHeight/2, worldWidth/2, worldHeight/2)){
-            mBoundary.set(nextBoundary);
-            return true;
-        }else{
-            return false;
-        }
+    public void setPosition(int x, int y){
+        int left = x-mWidth/2;
+        int top = y-mWidth/2;
+        mBoundary.set(left, top, left+mWidth-1, top+mHeight-1);
     }
 
     //객체를 물리적 상태를 변화.
@@ -82,12 +78,12 @@ public class Object {
         mOnClickListener = onClickListener;
     }
 
-    void render(Graphic2dDrawer drawer, int viewportWidth, int viewportHeight, int cameraZ, int viewportX, int viewportY){
+    void render(Graphic2dDrawer drawer, int viewportWidth, int viewportHeight, int cameraZ, int focusedZ, int viewportX, int viewportY){
         if(mZ>=cameraZ){
             return;
         }
-        int width = mBoundary.width()*cameraZ/(cameraZ-mZ);
-        int height = mBoundary.height()*cameraZ/(cameraZ-mZ);
+        int width = mBoundary.width()*focusedZ/(cameraZ-mZ);
+        int height = mBoundary.height()*focusedZ/(cameraZ-mZ);
 
         int x = viewportWidth/2-viewportX+mBoundary.centerX()-width/2;
         int y = viewportHeight/2-viewportY+mBoundary.centerY()-height/2;

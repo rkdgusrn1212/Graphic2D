@@ -9,5 +9,6 @@
         <attr name="cameraZ" format="integer"/>
         <attr name="maxCameraZ" format="integer"/>
         <attr name="minCameraZ" format="integer"/>
+        <attr name="focusedZ" format="integer"/>
     </declare-styleable>
 </resources>

@@ -30,7 +30,7 @@ public class Graphic2dDrawer {
         this.canvas = new Canvas(mFrameBuffer);
     }
 
-    public Texture newGraphic2D(String fileName, Texture.Format format) {
+    public Texture newTexture(String fileName, Texture.Format format) {
 
         Bitmap.Config config = null;
         if (format == Texture.Format.RGB565)

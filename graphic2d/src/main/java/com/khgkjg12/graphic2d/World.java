@@ -72,12 +72,12 @@ public class World {
                         if(mWidth==0){
                             mViewportX=mViewportX-deltaX;
                         }else{
-                            mViewportX = Math.max(-mWidth/2, Math.min(mViewportX-deltaX,mWidth/2));
+                            mViewportX = Math.max(-mWidth/2, Math.min(mViewportX-deltaX,-mWidth/2+mWidth));
                         }
                         if(mHeight ==0){
                             mViewportY=mViewportY-deltaY;
                         }else{
-                            mViewportY = Math.max(-mHeight/2, Math.min(mViewportY-deltaY,mHeight/2));
+                            mViewportY = Math.max(-mHeight/2, Math.min(mViewportY-deltaY,-mHeight/2+mHeight));
                         }
                         startX = event.x;
                         startY = event.y;

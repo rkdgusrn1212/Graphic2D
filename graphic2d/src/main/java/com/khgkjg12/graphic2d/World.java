@@ -16,12 +16,11 @@ public class World {
     private int mViewportY;
     private int mViewportWidth;
     private int mViewportHeight;
-    private int mCameraZ;
-    private int mMinCameraZ;
-    private int mMaxCameraZ;
-    private int mFocusedZ;
-
-    World(int width, int height, int viewportX, int viewportY, int cameraZ, int minCameraZ, int maxCameraZ, int focusedZ){
+    private float mCameraZ;
+    private float mMinCameraZ;
+    private float mMaxCameraZ;
+    private float mFocusedZ;
+    World(int width, int height, int viewportX, int viewportY, float cameraZ, float minCameraZ, float maxCameraZ, float focusedZ){
         mWidth = width;
         mHeight = height;
         mViewportX = viewportX;
@@ -65,10 +64,11 @@ public class World {
                 isPressed = false;
                 break;
             }else if(event.pointer == 0) {
+                float scale = mFocusedZ/mCameraZ;
                 if(isDragging){
                     if(event.type == TouchHandler.TouchEvent.TOUCH_DRAGGED){
-                        int deltaX = (event.x - startX)*mFocusedZ/mCameraZ;
-                        int deltaY = (event.y - startY)*mFocusedZ/mCameraZ;
+                        int deltaX = (int)((event.x - startX)/scale);
+                        int deltaY = (int)((event.y - startY)/scale);
                         if(mWidth==0){
                             mViewportX=mViewportX-deltaX;
                         }else{
@@ -97,7 +97,7 @@ public class World {
                 }else if(event.type == TouchHandler.TouchEvent.TOUCH_UP) {
                     if(isPressed){
                         for(Object object : mObjects.values()){
-                            object.onTouch(mViewportX+(event.x-mViewportWidth/2)*mFocusedZ/mCameraZ, mViewportY+(event.y-mViewportHeight/2)*mFocusedZ/mCameraZ);
+                            object.onTouch((int)(mViewportX+(event.x-mViewportWidth/2)/scale), (int)(mViewportY+(event.y-mViewportHeight/2)/scale));
                         }
                     }
                     isPressed = false;

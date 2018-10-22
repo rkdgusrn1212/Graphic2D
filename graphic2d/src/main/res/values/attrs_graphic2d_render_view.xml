@@ -6,9 +6,9 @@
         <attr name="viewportY" format="integer"/>
         <attr name="worldWidth" format="integer"/>
         <attr name="worldHeight" format="integer"/>
-        <attr name="cameraZ" format="integer"/>
-        <attr name="maxCameraZ" format="integer"/>
-        <attr name="minCameraZ" format="integer"/>
-        <attr name="focusedZ" format="integer"/>
+        <attr name="cameraZ" format="float"/>
+        <attr name="maxCameraZ" format="float"/>
+        <attr name="minCameraZ" format="float"/>
+        <attr name="focusedZ" format="float"/>
     </declare-styleable>
 </resources>

@@ -16,7 +16,7 @@ public class Object {
     public static final int NO_TOUCH = 3;//터치 불가.
     String mId;
     private OnClickListener mOnClickListener;
-    private int mZ;
+    private float mZ;
     private int mDegree;
 
     public Object(Texture texture, int width, int height, String id) {
@@ -53,9 +53,7 @@ public class Object {
 
     //객체의 좌표를 설정.
     public void setPosition(int x, int y){
-        int left = x-mWidth/2;
-        int top = y-mWidth/2;
-        mBoundary.set(left, top, left+mWidth-1, top+mHeight-1);
+        mBoundary.set(x-mWidth/2, y-mWidth/2, x+mWidth/2, y+mWidth/2);
     }
 
     //객체를 물리적 상태를 변화.
@@ -78,25 +76,24 @@ public class Object {
         mOnClickListener = onClickListener;
     }
 
-    void render(Graphic2dDrawer drawer, int viewportWidth, int viewportHeight, int cameraZ, int focusedZ, int viewportX, int viewportY){
+    void render(Graphic2dDrawer drawer, int viewportWidth, int viewportHeight, float cameraZ, float focusedZ, int viewportX, int viewportY){
         if(mZ>=cameraZ){
             return;
         }
-        int width = mBoundary.width()*focusedZ/(cameraZ-mZ);
-        int height = mBoundary.height()*focusedZ/(cameraZ-mZ);
-
-        int x = viewportWidth/2-viewportX+mBoundary.centerX()-width/2;
-        int y = viewportHeight/2-viewportY+mBoundary.centerY()-height/2;
+        float scale = focusedZ/(cameraZ-mZ);
+        float invScale = 1/scale;
+        int x = viewportWidth/2-(int)((viewportX-mBoundary.centerX()+mBoundary.width()/2)*scale);
+        int y = viewportHeight/2-(int)((viewportY-mBoundary.centerY()+mBoundary.height()/2)*scale);
         int left = Math.max(x,0);
         int top = Math.max(y,0);
-        int right = Math.min(x + width - 1, viewportWidth-1);
-        int bottom = Math.min(y + height - 1, viewportHeight-1);
+        int right = Math.min((int)(x + mBoundary.width()*scale), viewportWidth)-1;
+        int bottom = Math.min((int)(y + mBoundary.height()*scale), viewportHeight)-1;
 
         if(mTexture!=null) {
-            int srcRight = Math.min(width-1,viewportWidth-x-1);
-            int srcBottom = Math.min(height-1,viewportHeight-y-1);
-            int srcLeft = Math.max(-x,0);
-            int srcTop = Math.max(-y,0);
+            int srcLeft = (int)((left-x)*invScale);
+            int srcTop = (int)((top-y)*invScale);
+            int srcRight = (int)(srcLeft+(right-left)*invScale);
+            int srcBottom = (int)(srcTop+(bottom-top)*invScale);
 
             drawer.drawObject(mTexture, left, top, right, bottom, srcLeft, srcTop, srcRight, srcBottom);
         }else{
@@ -120,7 +117,7 @@ public class Object {
         mBoundary.set(mBoundary.left, mBoundary.centerY()-halfHeight, mBoundary.right, mBoundary.centerY()+halfHeight);
     }
 
-    public void setZ(int z){
+    public void setZ(float z){
         mZ = z;
     }
 }

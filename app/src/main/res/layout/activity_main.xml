@@ -10,6 +10,8 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         app:viewportWidth="800"
+        app:worldWidth="800"
+        app:worldHeight="800"
         android:layout_gravity="center"
         android:id="@+id/render_view"/>
 </FrameLayout>

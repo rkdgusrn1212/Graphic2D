@@ -57,7 +57,7 @@ public class GridObject extends Object {
     }
 
     @Override
-    void render(Graphic2dDrawer drawer, int viewportWidth, int viewportHeight, int cameraZ, int focusedZ, int viewportX, int viewportY) {
+    void render(Graphic2dDrawer drawer, int viewportWidth, int viewportHeight, float cameraZ, float focusedZ, int viewportX, int viewportY) {
         super.render(drawer, viewportWidth, viewportHeight, cameraZ, focusedZ, viewportX, viewportY);
         for(int i=0; i<mRow; i++){
             for(int j=0; j<mColumn; j++){

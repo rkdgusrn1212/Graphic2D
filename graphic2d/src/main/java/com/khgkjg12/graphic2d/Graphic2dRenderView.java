@@ -59,10 +59,10 @@ public class Graphic2dRenderView extends SurfaceView implements Runnable {
                 0);
         int viewportX = a.getInt(R.styleable.Graphic2dRenderView_viewportX, 0);
         int viewportY = a.getInt(R.styleable.Graphic2dRenderView_viewportY, 0);
-        int cameraZ = a.getInt(R.styleable.Graphic2dRenderView_cameraZ, 100);
-        int focusedZ = a.getInt(R.styleable.Graphic2dRenderView_focusedZ, cameraZ);
-        int maxCameraZ = a.getInt(R.styleable.Graphic2dRenderView_maxCameraZ,cameraZ);
-        int minCameraZ = a.getInt(R.styleable.Graphic2dRenderView_minCameraZ, cameraZ/5);
+        float cameraZ = a.getFloat(R.styleable.Graphic2dRenderView_cameraZ, 100.0f);
+        float focusedZ = a.getFloat(R.styleable.Graphic2dRenderView_focusedZ, cameraZ);
+        float maxCameraZ = a.getFloat(R.styleable.Graphic2dRenderView_maxCameraZ,cameraZ);
+        float minCameraZ = a.getFloat(R.styleable.Graphic2dRenderView_minCameraZ, cameraZ/5);
                 a.recycle();
         if(mViewportHeight==0&&mViewportWidth==0){
             mViewportHeight=320;
@@ -81,7 +81,7 @@ public class Graphic2dRenderView extends SurfaceView implements Runnable {
         this.holder = getHolder();
         mDrawer = new Graphic2dDrawer(context.getApplicationContext().getAssets());
         mInput = new TouchHandler(Graphic2dRenderView.this);
-        mWorld = new World(worldWidth, worldHeight, viewportX, viewportY, cameraZ, focusedZ, minCameraZ, maxCameraZ);
+        mWorld = new World(worldWidth, worldHeight, viewportX, viewportY, cameraZ, minCameraZ, maxCameraZ, focusedZ);
     }
 
     @Override

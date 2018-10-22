@@ -27,8 +27,6 @@ import static android.view.WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON;
 
 public class MainActivity extends Activity implements Graphic2dRenderView.Renderer, GridObject.OnClickItemListener {
 
-    private final static int STAGE_WIDTH = 8;
-    private final static int STAGE_HEIGHT = 8;
     public static Texture background;
     public static Texture blackStone;
     private Graphic2dRenderView renderView;

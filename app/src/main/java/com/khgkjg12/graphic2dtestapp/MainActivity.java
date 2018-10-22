@@ -30,6 +30,11 @@ public class MainActivity extends Activity implements Graphic2dRenderView.Render
     public static Texture background;
     public static Texture blackStone;
     private Graphic2dRenderView renderView;
+    private float startTime = 0;
+    private boolean flip = false;
+    private Object flipObject = null;
+    private boolean pop = false;
+    private Object popObject = null;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -51,7 +56,26 @@ public class MainActivity extends Activity implements Graphic2dRenderView.Render
 
     @Override
     public void updateWorld(float deltaTime, World world) {
-
+        /*if(flip){
+            startTime+=deltaTime;
+            flipObject.setHorizontalFlip((int)(startTime*90));
+            if(startTime>=2){
+                flip = false;
+                flipObject = null;
+                startTime = 0;
+            }
+        }*/
+        if(pop){
+            startTime+=deltaTime;
+            if(startTime>=2){
+                pop = false;
+                popObject.setZ(0);
+                popObject = null;
+                startTime = 0;
+            }else{
+                popObject.setZ(980*startTime-0.5f*980*startTime*startTime);
+            }
+        }
     }
 
     @Override
@@ -77,6 +101,11 @@ public class MainActivity extends Activity implements Graphic2dRenderView.Render
 
         if(objectList[row][column]==null){
             gridObject.putObject(blackStone, row, column);
+        }else{
+            pop = true;
+            popObject = objectList[row][column];
+            //flip = true;
+            //flipObject = objectList[row][column];
         }
     }
 

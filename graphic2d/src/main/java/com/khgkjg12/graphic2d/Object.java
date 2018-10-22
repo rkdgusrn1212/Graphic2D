@@ -17,17 +17,18 @@ public class Object {
     String mId;
     private OnClickListener mOnClickListener;
     private float mZ;
-    private int mDegree;
+    private int mHoriaontalDegree;
+    private int mVerticalDegree;
 
     public Object(Texture texture, int width, int height, String id) {
-        this(texture, width, height, 0, 0, id);
+        this(texture, width, height, 0, 0, 0, id);
     }
 
     public Object(int color, int width, int height, String id) {
-        this(color, width, height, 0, 0, id);
+        this(color, width, height, 0, 0, 0, id);
     }
 
-    public Object(Texture texture, int width, int height, int z, int degree, String id){
+    public Object(Texture texture, int width, int height, int z, int degreeH, int degreeV, String id){
         mTexture = texture;
         mColor = 0;
         mWidth = width;
@@ -36,10 +37,11 @@ public class Object {
         mState = NO_WHERE;
         mId = id;
         mZ = z;
-        mDegree = degree%360;
+        mHoriaontalDegree = degreeH%360;
+        mVerticalDegree = degreeV%360;
     }
 
-    public Object(int color, int width, int height, int z, int degree, String id){
+    public Object(int color, int width, int height, int z, int degreeH, int degreeV, String id){
         mTexture = null;
         mColor = color;
         mWidth = width;
@@ -48,7 +50,8 @@ public class Object {
         mState = NO_WHERE;
         mId = id;
         mZ = z;
-        mDegree = degree%360;
+        mHoriaontalDegree = degreeH%360;
+        mVerticalDegree = degreeV%360;
     }
 
     //객체의 좌표를 설정.
@@ -82,20 +85,25 @@ public class Object {
         }
         float scale = focusedZ/(cameraZ-mZ);
         float invScale = 1/scale;
-        int x = viewportWidth/2-(int)((viewportX-mBoundary.centerX()+mBoundary.width()/2)*scale);
-        int y = viewportHeight/2-(int)((viewportY-mBoundary.centerY()+mBoundary.height()/2)*scale);
+
+
+        int width = (int)(mBoundary.width()*Math.abs(Math.cos(mHoriaontalDegree*Math.PI/180)));
+        int height = (int)(mBoundary.height()*Math.abs(Math.cos(mVerticalDegree*Math.PI/180)));
+
+        int x = viewportWidth/2-(int)((viewportX-mBoundary.centerX()+width*0.5)*scale);
+        int y = viewportHeight/2-(int)((viewportY-mBoundary.centerY()+height*0.5)*scale);
         int left = Math.max(x,0);
         int top = Math.max(y,0);
-        int right = Math.min((int)(x + mBoundary.width()*scale), viewportWidth)-1;
-        int bottom = Math.min((int)(y + mBoundary.height()*scale), viewportHeight)-1;
+        int right = Math.min((int)(x+width*scale), viewportWidth)-1;
+        int bottom = Math.min((int)(y+height*scale), viewportHeight)-1;
 
         if(mTexture!=null) {
-            int srcLeft = (int)((left-x)*invScale);
-            int srcTop = (int)((top-y)*invScale);
-            int srcRight = (int)(srcLeft+(right-left)*invScale);
-            int srcBottom = (int)(srcTop+(bottom-top)*invScale);
+            float srcLeftOffset = (left-x)*invScale/width;
+            float srcTopOffset = (top-y)*invScale/height;
+            float srcWidth = (right-left)*invScale/width;
+            float srcHeight = (bottom-top)*invScale/height;
 
-            drawer.drawObject(mTexture, left, top, right, bottom, srcLeft, srcTop, srcRight, srcBottom);
+            drawer.drawObject(mTexture, left, top, right, bottom, srcLeftOffset, srcTopOffset, srcWidth, srcHeight);
         }else{
             drawer.drawRect( left, top, right, bottom, mColor);
         }
@@ -106,18 +114,20 @@ public class Object {
     }
 
     public void setHorizontalFlip(int degree){
-        int halfWidth = (int)(mBoundary.width()*Math.abs(Math.cos(degree*Math.PI/180))*0.5/Math.abs(Math.cos(mDegree*Math.PI/180)));
-        mDegree = degree%360;
-        mBoundary.set(mBoundary.centerX()-halfWidth, mBoundary.top, mBoundary.centerX()+halfWidth, mBoundary.bottom);
+        mVerticalDegree = 0;
+        mHoriaontalDegree = degree%360;
     }
 
     public void setVerticalFlip(int degree){
-        int halfHeight = (int)(mBoundary.height()*Math.abs(Math.cos(degree*Math.PI/180))*0.5/Math.abs(Math.cos(mDegree*Math.PI/180)));
-        mDegree = degree%360;
-        mBoundary.set(mBoundary.left, mBoundary.centerY()-halfHeight, mBoundary.right, mBoundary.centerY()+halfHeight);
+        mHoriaontalDegree = 0;
+        mVerticalDegree = degree%360;
     }
 
     public void setZ(float z){
         mZ = z;
+    }
+
+    public float getZ(){
+        return mZ;
     }
 }

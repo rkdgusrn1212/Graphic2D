@@ -41,7 +41,7 @@ Handle Click Events
     GridObject.setOnItemClickListener(new OnClickItemListener(){});
     
 # Gradle Dependency
-    implementation 'com.khgkjg12.graphic2d:graphic2d:1.0.3'
+    implementation 'com.khgkjg12.graphic2d:graphic2d:1.0.4'
 
 # License
     Copyright 2018 Hyungu Kang

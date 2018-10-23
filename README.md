@@ -2,7 +2,7 @@
 Android 2D Graphic Framework.
 # Download
 
-# Licence
+# License
     Copyright 2018 Hyungu Kang
 
     Licensed under the Apache License, Version 2.0 (the "License");

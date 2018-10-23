@@ -14,8 +14,8 @@ Android 2D Graphic Framework.
         app:minCameraZ:20
         android:layout_gravity="center"
         android:id="@+id/render_view"/>
-# Download
-
+# Gradle Dependency
+    implementation 'com.khgkjg12.graphic2d:graphic2d:1.0.0'
 # License
     Copyright 2018 Hyungu Kang
 

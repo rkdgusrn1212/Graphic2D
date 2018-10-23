@@ -1,5 +1,19 @@
 # Graphic2D
 Android 2D Graphic Framework.
+# Usage
+    <com.khgkjg12.graphic2d.Graphic2dRenderView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        app:viewportWidth:800
+        app:viewportHeight:800
+        app:worldWidth:0
+        app:worldHeight:0
+        app:cameraZ:100
+        app:focusedZ:100
+        app:maxCameraZ:100
+        app:minCameraZ:20
+        android:layout_gravity="center"
+        android:id="@+id/render_view"/>
 # Download
 
 # License

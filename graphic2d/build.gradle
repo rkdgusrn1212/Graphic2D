@@ -1,5 +1,8 @@
 apply plugin: 'com.android.library'
-
+apply plugin: 'com.novoda.bintray-release'
+tasks.withType(Javadoc){
+    options.addStringOption('encoding','UTF-8')
+}
 android {
     compileSdkVersion 26
 
@@ -21,4 +24,14 @@ android {
 
 dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
+}
+
+publish{
+    userOrg = 'rkdgusrn1212'
+    groupId = 'com.khgkjg12.graphic2d'
+    artifactId = 'graphic2d'
+    publishVersion = '1.0.0'
+    licences = ['Apache-2.0']
+    desc = 'Android 2D Graphic Library using SurfaceView.'
+    website = 'https://github.com/rkdgusrn1212/graphic2d'
 }

@@ -34,6 +34,7 @@ public class Object {
     private int mHoriaontalDegree;
     private int mVerticalDegree;
 
+
     public Object(Texture texture, int width, int height, String id) {
         this(texture, width, height, 0, 0, 0, id);
     }
@@ -66,6 +67,10 @@ public class Object {
         mZ = z;
         mHoriaontalDegree = degreeH%360;
         mVerticalDegree = degreeV%360;
+    }
+
+    public void setTexture(Texture texture){
+        mTexture = texture;
     }
 
     //객체의 좌표를 설정.

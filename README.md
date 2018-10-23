@@ -1,7 +1,7 @@
 # Graphic2D
 Android 2D Graphic Framework.
-# Usage
 
+# Usage
 Write .xml
 
     <com.khgkjg12.graphic2d.Graphic2dRenderView
@@ -42,6 +42,7 @@ Handle Click Events
     
 # Gradle Dependency
     implementation 'com.khgkjg12.graphic2d:graphic2d:1.0.0'
+
 # License
     Copyright 2018 Hyungu Kang
 
@@ -56,3 +57,6 @@ Handle Click Events
     WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
     See the License for the specific language governing permissions and
     limitations under the License.
+
+#Contact
+    khgkjg12@naver.com, please mail me!

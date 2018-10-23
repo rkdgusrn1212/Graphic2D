@@ -16,7 +16,10 @@
 package com.khgkjg12.graphic2d;
 
 import android.graphics.Color;
+import android.util.Log;
 
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 
@@ -62,8 +65,25 @@ public class World {
 
     void render(Graphic2dDrawer drawer){
         drawer.clear(Color.BLACK);
-        for(Object object: mObjects.values()){
-            object.render(drawer, mViewportWidth, mViewportHeight, mCameraZ, mFocusedZ, mViewportX, mViewportY);
+        List<Object> objects =  new ArrayList<>(mObjects.values());
+        for(int i=0; i<objects.size();i++){
+            if(objects.get(i) instanceof GridObject){
+                List<Object> itemList = ((GridObject)(objects.get(i))).getObjects();
+                objects.addAll(itemList);
+            }
+        }
+        for(int i=0; i< objects.size()-1; i++){
+            for(int j=i+1; j<objects.size();j++){
+                if(objects.get(i).getZ()>objects.get(j).getZ()){
+                    Object tempObj = objects.remove(j);
+                    objects.add(j,objects.get(i));
+                    objects.remove(i);
+                    objects.add(i,tempObj);
+                }
+            }
+        }
+        for(int i=0; i<objects.size(); i++){
+            objects.get(i).render(drawer, mViewportWidth, mViewportHeight, mCameraZ, mFocusedZ, mViewportX, mViewportY);
         }
     }
 

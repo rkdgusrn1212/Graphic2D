@@ -88,7 +88,7 @@ public class MainActivity extends Activity implements Graphic2dRenderView.Render
                 popObject = null;
                 startTime = 0;
             }else{
-                popObject.setZ(980*startTime-0.5f*980*startTime*startTime);
+                popObject.setZ(98*startTime-0.5f*98*startTime*startTime);
             }
         }
     }

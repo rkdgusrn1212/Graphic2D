@@ -15,6 +15,9 @@
  */
 package com.khgkjg12.graphic2d;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class GridObject extends Object {
 
     Object[][] mObjectList;
@@ -73,17 +76,17 @@ public class GridObject extends Object {
         mObjectList[row][column] = null;
     }
 
-    @Override
-    void render(Graphic2dDrawer drawer, int viewportWidth, int viewportHeight, float cameraZ, float focusedZ, int viewportX, int viewportY) {
-        super.render(drawer, viewportWidth, viewportHeight, cameraZ, focusedZ, viewportX, viewportY);
+    List<Object> getObjects(){
+        List<Object> objects = new ArrayList<Object>();
         for(int i=0; i<mRow; i++){
             for(int j=0; j<mColumn; j++){
                 Object obj = mObjectList[i][j];
                 if(obj!=null){
-                    obj.render(drawer, viewportWidth, viewportHeight, cameraZ, focusedZ, viewportX, viewportY);
+                    objects.add(obj);
                 }
             }
         }
+        return objects;
     }
 
     public interface OnClickItemListener{

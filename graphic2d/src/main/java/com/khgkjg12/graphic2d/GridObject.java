@@ -43,6 +43,17 @@ public class GridObject extends Object {
         return mObjectList[row][column];
     }
 
+    public Object[][] getObjectArray(){
+        return mObjectList;
+    }
+
+    public int getRowSize(){
+        return mRow;
+    }
+    public int getColumnSize(){
+        return mColumn;
+    }
+
     boolean onTouch(int x, int y){
         int column = (x-mBoundary.left)*mColumn/mBoundary.width();
         int row = (y-mBoundary.top)*mRow/mBoundary.height();

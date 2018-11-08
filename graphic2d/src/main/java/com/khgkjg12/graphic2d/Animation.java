@@ -34,15 +34,15 @@ public abstract class Animation {
             return false;
         }
         if(mTimer<mDuration){
-            onProgressAnimate();
+            onProgressAnimate(object,mTimer/mDuration);
             return false;
         }else{
-            onPostAnimate();
+            onPostAnimate(object);
             return true;
         }
     }
 
-    protected abstract void onProgressAnimate();
+    protected abstract void onProgressAnimate(Object object, float progress);
 
-    protected abstract void onPostAnimate();
+    protected abstract void onPostAnimate(Object object);
 }

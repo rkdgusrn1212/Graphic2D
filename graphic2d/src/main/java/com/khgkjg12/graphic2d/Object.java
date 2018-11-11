@@ -23,11 +23,7 @@ public class Object {
     private int mColor;
     Rect mBoundary;
     private int mWidth, mHeight;
-    private int mState;
-    public static final int NO_WHERE = 0;//데이터로써만 존제.
-    public static final int NORMAL = 1;//터치랑 충돌 모두 가능.
-    public static final int NO_COLLISION = 2;//충돌 불가.
-    public static final int NO_TOUCH = 3;//터치 불가.
+    private boolean mVisibility;
     String mId;
     private OnClickListener mOnClickListener;
     private float mZ;
@@ -49,7 +45,7 @@ public class Object {
         mWidth = width;
         mHeight = height;
         mBoundary = new Rect();
-        mState = NO_WHERE;
+        mVisibility = true;
         mId = id;
         mZ = z;
         mHoriaontalDegree = degreeH%360;
@@ -62,7 +58,7 @@ public class Object {
         mWidth = width;
         mHeight = height;
         mBoundary = new Rect();
-        mState = NO_WHERE;
+        mVisibility = true;
         mId = id;
         mZ = z;
         mHoriaontalDegree = degreeH%360;
@@ -75,12 +71,12 @@ public class Object {
 
     //객체의 좌표를 설정.
     public void setPosition(int x, int y){
-        mBoundary.set(x-mWidth/2, y-mWidth/2, x+mWidth/2, y+mWidth/2);
+        mBoundary.set(x-mWidth/2, y-mHeight/2, x+mWidth/2, y+mHeight/2);
     }
 
     //객체를 물리적 상태를 변화.
-    public void setState(int state){
-        mState = state;
+    public void setVisibility(boolean visible){
+        mVisibility = visible;
     }
 
     boolean onTouch(int x, int y){
@@ -99,7 +95,7 @@ public class Object {
     }
 
     void render(Graphic2dDrawer drawer, int viewportWidth, int viewportHeight, float cameraZ, float focusedZ, int viewportX, int viewportY){
-        if(mZ>=cameraZ){
+        if(!mVisibility||mZ>=cameraZ){
             return;
         }
         float scale = focusedZ/(cameraZ-mZ);

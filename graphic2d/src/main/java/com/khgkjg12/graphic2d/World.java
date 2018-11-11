@@ -38,7 +38,10 @@ public class World {
     private float mMinCameraZ;
     private float mMaxCameraZ;
     private float mFocusedZ;
-    World(int width, int height, int viewportX, int viewportY, float cameraZ, float minCameraZ, float maxCameraZ, float focusedZ){
+    private int mBackgroundColor;
+    private Texture mBackgroundTexture;
+
+    World(int width, int height, int viewportX, int viewportY, float cameraZ, float minCameraZ, float maxCameraZ, float focusedZ, int backgroundColor){
         mWidth = width;
         mHeight = height;
         mViewportX = viewportX;
@@ -48,6 +51,7 @@ public class World {
         mMaxCameraZ = maxCameraZ;
         mFocusedZ = focusedZ;
         mObjects = new HashMap<>();
+        mBackgroundColor = backgroundColor;
     }
 
     public void putObject(Object obj){
@@ -63,8 +67,16 @@ public class World {
         mViewportHeight = viewportHeight;
     }
 
+    public void setBackgroundTexture(Texture texture){
+        mBackgroundTexture = texture;
+    }
+
     void render(Graphic2dDrawer drawer){
-        drawer.clear(Color.BLACK);
+        if(mBackgroundTexture!=null){
+            drawer.drawObject(mBackgroundTexture, 0, 0, mViewportWidth, mViewportHeight, 0,0, 0, 0);
+        }else{
+            drawer.clear(mBackgroundColor);
+        }
         List<Object> objects =  new ArrayList<>(mObjects.values());
         for(int i=0; i<objects.size();i++){
             if(objects.get(i) instanceof GridObject){

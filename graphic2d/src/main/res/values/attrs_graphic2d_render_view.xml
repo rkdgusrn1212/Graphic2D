@@ -10,5 +10,6 @@
         <attr name="maxCameraZ" format="float"/>
         <attr name="minCameraZ" format="float"/>
         <attr name="focusedZ" format="float"/>
+        <attr name="backgroundColor" format="color"/>
     </declare-styleable>
 </resources>

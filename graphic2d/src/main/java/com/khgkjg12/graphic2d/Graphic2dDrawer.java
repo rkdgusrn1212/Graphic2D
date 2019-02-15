@@ -109,13 +109,13 @@ public class Graphic2dDrawer {
         canvas.drawRect(left, top, right, bottom, paint);
     }
 
-    public void drawObject(Texture texture, int left, int top, int right, int bottom, float srcLeftOffset, float srcTopOffset,
-                              float srcWidth, float srcHeight) {
+    public void drawObject(Texture texture, int left, int top, int right, int bottom, float srcLeftOffsetRatio, float srcTopOffsetRatio,
+                              float srcWidthRatio, float srcHeightRatio) {
 
-        srcRect.left = (int)(texture.bitmap.getWidth()*srcLeftOffset);
-        srcRect.top = (int)(texture.bitmap.getHeight()*srcTopOffset);
-        srcRect.right = srcRect.left+(int)(texture.bitmap.getWidth()*srcWidth)-1;
-        srcRect.bottom = srcRect.top+(int)(texture.bitmap.getHeight()*srcHeight)-1;
+        srcRect.left = (int)(texture.bitmap.getWidth()*srcLeftOffsetRatio);
+        srcRect.top = (int)(texture.bitmap.getHeight()*srcTopOffsetRatio);
+        srcRect.right = srcRect.left+(int)(texture.bitmap.getWidth()*srcWidthRatio)-1;
+        srcRect.bottom = srcRect.top+(int)(texture.bitmap.getHeight()*srcHeightRatio)-1;
 
         dstRect.left = left;
         dstRect.top = top;

@@ -73,7 +73,7 @@ public class World {
 
     void render(Graphic2dDrawer drawer){
         if(mBackgroundTexture!=null){
-            drawer.drawObject(mBackgroundTexture, 0, 0, mViewportWidth, mViewportHeight, 0,0, 0, 0);
+            drawer.drawObject(mBackgroundTexture, 0, 0, mViewportWidth, mViewportHeight,0 ,0, mBackgroundTexture.getWidth(), mBackgroundTexture.getHeight());
         }else{
             drawer.clear(mBackgroundColor);
         }

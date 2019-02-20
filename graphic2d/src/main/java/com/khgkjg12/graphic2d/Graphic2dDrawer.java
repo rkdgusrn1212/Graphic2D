@@ -40,9 +40,16 @@ public class Graphic2dDrawer {
 
     void setFrameBuffer(int bufferWidth, int bufferHeight, Bitmap.Config config){
 
-        mFrameBuffer = Bitmap.createBitmap(bufferWidth,
-                bufferHeight, config);
-        this.canvas = new Canvas(mFrameBuffer);
+        if(mFrameBuffer!=null){
+            Bitmap tempBitmap =  mFrameBuffer;
+            mFrameBuffer = Bitmap.createBitmap(bufferWidth, bufferHeight, config);
+            tempBitmap.recycle();
+            this.canvas.setBitmap(mFrameBuffer);
+        }else {
+            mFrameBuffer = Bitmap.createBitmap(bufferWidth,
+                    bufferHeight, config);
+            this.canvas = new Canvas(mFrameBuffer);
+        }
     }
 
     public Texture newTexture(String fileName, Texture.Format format) {

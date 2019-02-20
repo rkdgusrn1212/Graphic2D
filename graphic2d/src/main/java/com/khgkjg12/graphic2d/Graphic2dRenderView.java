@@ -33,6 +33,7 @@ public class Graphic2dRenderView extends SurfaceView implements Runnable {
     private Graphic2dDrawer mDrawer;
     private TouchHandler mInput = null;
     private int mViewportWidth, mViewportHeight;
+    private int mPreViewportWidth, mPreViewportHeight;
     private World mWorld;
 
     public Graphic2dRenderView(Context context) {
@@ -61,9 +62,9 @@ public class Graphic2dRenderView extends SurfaceView implements Runnable {
         final TypedArray a = getContext().obtainStyledAttributes(
                 attrs, R.styleable.Graphic2dRenderView, defStyle, 0);
 
-        mViewportHeight = a.getInt(
+        mPreViewportHeight = a.getInt(
                 R.styleable.Graphic2dRenderView_viewportHeight,0);
-        mViewportWidth = a.getInt(
+        mPreViewportWidth = a.getInt(
                 R.styleable.Graphic2dRenderView_viewportWidth,
                 0);
         int worldWidth = a.getInt(
@@ -80,9 +81,9 @@ public class Graphic2dRenderView extends SurfaceView implements Runnable {
         float minCameraZ = a.getFloat(R.styleable.Graphic2dRenderView_minCameraZ, cameraZ/5);
         int backgroundColor = a.getColor(R.styleable.Graphic2dRenderView_backgroundColor, Color.BLACK);
         a.recycle();
-        if(mViewportHeight==0&&mViewportWidth==0){
-            mViewportHeight=320;
-            mViewportWidth=320;
+        if(mPreViewportHeight==0&&mPreViewportWidth==0){
+            mPreViewportHeight=320;
+            mPreViewportWidth=320;
         }
         if(viewportX<-worldWidth/2){
             viewportX = -worldWidth/2;
@@ -106,25 +107,46 @@ public class Graphic2dRenderView extends SurfaceView implements Runnable {
         int height = MeasureSpec.getSize(heightMeasureSpec);
         int widthMode = MeasureSpec.getMode(widthMeasureSpec);
         int heightMode = MeasureSpec.getMode(heightMeasureSpec);
-        if(heightMode != MeasureSpec.AT_MOST && widthMode != MeasureSpec.AT_MOST){
-            if(mViewportHeight==0){
-                mViewportHeight = mViewportWidth*height/width;
-            }else if(mViewportWidth==0){
-                mViewportWidth = mViewportHeight*width/height;
-            }
-        }
-        if(mViewportWidth==0){
-            mViewportWidth = mViewportHeight;
-        }else if(mViewportHeight == 0){
-            mViewportHeight = mViewportWidth;
-        }
+
         if (heightMode == MeasureSpec.AT_MOST && widthMode != MeasureSpec.AT_MOST) {
+            if(mPreViewportWidth==0){
+                mViewportWidth = mPreViewportHeight;
+                mViewportHeight = mPreViewportHeight;
+            }else if(mPreViewportHeight == 0){
+                mViewportWidth = mPreViewportWidth;
+                mViewportHeight = mPreViewportWidth;
+            }
             height = width * mViewportHeight / mViewportWidth;
         } else if (heightMode != MeasureSpec.AT_MOST && widthMode == MeasureSpec.AT_MOST) {
+            if(mPreViewportWidth==0){
+                mViewportWidth = mPreViewportHeight;
+                mViewportHeight = mPreViewportHeight;
+            }else if(mPreViewportHeight == 0){
+                mViewportWidth = mPreViewportWidth;
+                mViewportHeight = mPreViewportWidth;
+            }
             width = height * mViewportWidth / mViewportHeight;
         } else if (heightMode == MeasureSpec.AT_MOST && widthMode == MeasureSpec.AT_MOST) {
+            if(mPreViewportWidth==0){
+                mViewportWidth = mPreViewportHeight;
+                mViewportHeight = mPreViewportHeight;
+            }else if(mPreViewportHeight == 0){
+                mViewportWidth = mPreViewportWidth;
+                mViewportHeight = mPreViewportWidth;
+            }
             height = mViewportHeight;
             width = mViewportWidth;
+        }else{
+            if(mPreViewportHeight==0){
+                mViewportHeight = mPreViewportWidth*height/width;
+                mViewportWidth = mPreViewportWidth;
+            }else if(mPreViewportWidth==0){
+                mViewportWidth = mPreViewportHeight*width/height;
+                mViewportHeight= mPreViewportHeight;
+            }else{
+                mViewportWidth = mPreViewportWidth;
+                mViewportHeight = mPreViewportHeight;
+            }
         }
         setMeasuredDimension(width,height);
         mInput.setScale((float)mViewportWidth/width, (float)mViewportHeight/height);
@@ -181,6 +203,22 @@ public class Graphic2dRenderView extends SurfaceView implements Runnable {
         public void prepareWorld(World world);
         public void updateWorld(float deltaTime, World world);
         public void loadTextures(Graphic2dDrawer drawer);//사용 오브젝트들의 리소스들을 다 로드함.
+    }
+
+    /**
+     * this only works after onMeasure() method called
+     * do not w:0 h:0, it will be automatically set to 300: 300
+     * @param width viewportWidth 0 for match view size, with view's w-h ratio
+     * @param height viewportHeight 0 for match view size, with view's w-h ratio
+     * */
+    public void changeViewPortSize(int width, int height){
+        if(width==0&&height==0){
+            mPreViewportWidth = 300;
+            mPreViewportHeight = 300;
+        }else {
+            mPreViewportWidth = width;
+            mPreViewportHeight = height;
+        }
     }
 
     @Override

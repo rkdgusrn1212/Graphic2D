@@ -16,6 +16,8 @@
 package com.khgkjg12.graphic2dtestapp;
 
 import android.app.Activity;
+import android.content.res.Configuration;
+import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.os.Bundle;
 
@@ -122,6 +124,17 @@ public class MainActivity extends Activity implements Graphic2dRenderView.Render
             //flip = true;
             //flipObject = objectList[row][column];
         }
+    }
+
+    @Override
+    public void onConfigurationChanged(Configuration newConfig) {
+        if(newConfig.orientation==Configuration.ORIENTATION_LANDSCAPE){
+
+            renderView.changeViewPortSize(0, 800 );
+        }else{
+            renderView.changeViewPortSize(800, 0 );
+        }
+        super.onConfigurationChanged(newConfig);
     }
 
     @Override

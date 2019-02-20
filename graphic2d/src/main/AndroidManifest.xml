@@ -1,2 +1,6 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.khgkjg12.graphic2d" />
+    package="com.khgkjg12.graphic2d" >
+    <application
+        android:hardwareAccelerated="true"
+        />
+</manifest>

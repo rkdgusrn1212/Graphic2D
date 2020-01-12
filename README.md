@@ -17,6 +17,8 @@ Write .xml
         app:focusedZ:100
         app:maxCameraZ:100
         app:minCameraZ:20
+        app:pinchToZoom:true //default true.
+        app:dragToMove:true //default true.
         android:layout_gravity="center"
         android:id="@+id/render_view"/>
  
@@ -51,7 +53,7 @@ Change Viewport Size
     //only works when onMeasure() is called.
 
 # Gradle Dependency
-    implementation 'com.khgkjg12.graphic2d:graphic2d:1.1.3'
+    implementation 'com.khgkjg12.graphic2d:graphic2d:1.2.0'
 
 # License
     Copyright 2018 Hyungu Kang

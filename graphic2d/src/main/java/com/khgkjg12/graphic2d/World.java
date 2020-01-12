@@ -40,8 +40,10 @@ public class World {
     private float mFocusedZ;
     private int mBackgroundColor;
     private Texture mBackgroundTexture;
+    private boolean mDragToMove;
+    private boolean mPinchToZoom;
 
-    World(int width, int height, int viewportX, int viewportY, float cameraZ, float minCameraZ, float maxCameraZ, float focusedZ, int backgroundColor){
+    World(int width, int height, int viewportX, int viewportY, float cameraZ, float minCameraZ, float maxCameraZ, float focusedZ, int backgroundColor, boolean dragToMove, boolean pinchToZoom){
         mWidth = width;
         mHeight = height;
         mViewportX = viewportX;
@@ -52,6 +54,8 @@ public class World {
         mFocusedZ = focusedZ;
         mObjects = new HashMap<>();
         mBackgroundColor = backgroundColor;
+        mDragToMove = dragToMove;
+        mPinchToZoom = pinchToZoom;
     }
 
     public void putObject(Object obj){
@@ -104,8 +108,8 @@ public class World {
         int len = touchEvents.size();
         for(int i = 0; i < len; i++) {
             TouchHandler.TouchEvent event = touchEvents.get(i);
-            if(event.type == TouchHandler.TouchEvent.PINCH_TO_ZOOM){
-                mCameraZ/=event.scale;
+            if(mPinchToZoom && event.type == TouchHandler.TouchEvent.PINCH_TO_ZOOM){
+                mCameraZ /= event.scale;
                 mCameraZ = Math.max(mMinCameraZ, Math.min(mCameraZ, mMaxCameraZ));
                 isDragging = false;
                 isPressed = false;
@@ -114,17 +118,19 @@ public class World {
                 float scale = mFocusedZ/mCameraZ;
                 if(isDragging){
                     if(event.type == TouchHandler.TouchEvent.TOUCH_DRAGGED){
-                        int deltaX = (int)((event.x - startX)/scale);
-                        int deltaY = (int)((event.y - startY)/scale);
-                        if(mWidth==0){
-                            mViewportX=mViewportX-deltaX;
-                        }else{
-                            mViewportX = Math.max(-mWidth/2, Math.min(mViewportX-deltaX,-mWidth/2+mWidth));
-                        }
-                        if(mHeight ==0){
-                            mViewportY=mViewportY-deltaY;
-                        }else{
-                            mViewportY = Math.max(-mHeight/2, Math.min(mViewportY-deltaY,-mHeight/2+mHeight));
+                        if(mDragToMove) {
+                            int deltaX = (int) ((event.x - startX) / scale);
+                            int deltaY = (int) ((event.y - startY) / scale);
+                            if (mWidth == 0) {
+                                mViewportX = mViewportX - deltaX;
+                            } else {
+                                mViewportX = Math.max(-mWidth / 2, Math.min(mViewportX - deltaX, -mWidth / 2 + mWidth));
+                            }
+                            if (mHeight == 0) {
+                                mViewportY = mViewportY - deltaY;
+                            } else {
+                                mViewportY = Math.max(-mHeight / 2, Math.min(mViewportY - deltaY, -mHeight / 2 + mHeight));
+                            }
                         }
                         startX = event.x;
                         startY = event.y;
@@ -151,5 +157,12 @@ public class World {
                 }
             }
         }
+    }
+    void setPinchToZoom(boolean pinchToZoom){
+
+    }
+
+    void setDragToMove(boolean dragToMove){
+
     }
 }

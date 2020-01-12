@@ -11,5 +11,7 @@
         <attr name="minCameraZ" format="float"/>
         <attr name="focusedZ" format="float"/>
         <attr name="backgroundColor" format="color"/>
+        <attr name="dragToMove" format="boolean"/>
+        <attr name="pinchToZoom" format="boolean"/>
     </declare-styleable>
 </resources>

@@ -80,6 +80,8 @@ public class Graphic2dRenderView extends SurfaceView implements Runnable {
         float maxCameraZ = a.getFloat(R.styleable.Graphic2dRenderView_maxCameraZ,cameraZ);
         float minCameraZ = a.getFloat(R.styleable.Graphic2dRenderView_minCameraZ, cameraZ/5);
         int backgroundColor = a.getColor(R.styleable.Graphic2dRenderView_backgroundColor, Color.BLACK);
+        boolean dragToMove = a.getBoolean(R.styleable.Graphic2dRenderView_dragToMove, true);
+        boolean pinchToZoom = a.getBoolean(R.styleable.Graphic2dRenderView_pinchToZoom, true);
         a.recycle();
         if(mPreViewportHeight==0&&mPreViewportWidth==0){
             mPreViewportHeight=320;
@@ -98,7 +100,7 @@ public class Graphic2dRenderView extends SurfaceView implements Runnable {
         this.holder = getHolder();
         mDrawer = new Graphic2dDrawer(context.getApplicationContext().getAssets());
         mInput = new TouchHandler(Graphic2dRenderView.this);
-        mWorld = new World(worldWidth, worldHeight, viewportX, viewportY, cameraZ, minCameraZ, maxCameraZ, focusedZ, backgroundColor);
+        mWorld = new World(worldWidth, worldHeight, viewportX, viewportY, cameraZ, minCameraZ, maxCameraZ, focusedZ, backgroundColor, dragToMove, pinchToZoom);
     }
 
     @Override
@@ -219,6 +221,14 @@ public class Graphic2dRenderView extends SurfaceView implements Runnable {
             mPreViewportWidth = width;
             mPreViewportHeight = height;
         }
+    }
+
+    public void setPinchToZoom(boolean pinchToZoom){
+        mWorld.setPinchToZoom(pinchToZoom);
+    }
+
+    public void setDragToMove(boolean dragToMove){
+        mWorld.setDragToMove(dragToMove);
     }
 
     @Override

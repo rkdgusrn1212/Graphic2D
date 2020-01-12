@@ -109,8 +109,8 @@ public class Object {
         int y = viewportHeight/2-(int)((viewportY-mBoundary.centerY()+height*0.5)*scale);
         int left = Math.max(x,0);
         int top = Math.max(y,0);
-        int right = Math.min((int)(x+width*scale), viewportWidth)-1;
-        int bottom = Math.min((int)(y+height*scale), viewportHeight)-1;
+        int right = Math.min((int)(x+width*scale), viewportWidth);
+        int bottom = Math.min((int)(y+height*scale), viewportHeight);
 
         if(mTexture!=null) {
             float srcLeftOffset = (left-x)*invScale/width;

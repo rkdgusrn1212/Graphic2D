@@ -65,6 +65,22 @@ public class MainActivity extends Activity implements Graphic2dRenderView.Render
 
     @Override
     public void prepareWorld(World world) {
+        for(int i=0; i< 9; i++) {
+            Object verLine = new Object(Color.parseColor(i%3==0?"#021aee":"#d602ee"), 1, 801, "vertical_line_"+i);
+            verLine.setPosition(-400+100*i,0);
+            if(i%3!=0){
+                verLine.setZ(+0.01f);
+            }
+            world.putObject(verLine);
+        }
+        for(int i=0; i< 9; i++) {
+            Object horLine = new Object(Color.parseColor(i%3==0?"#021aee":"#d602ee"), 801, 1, "horizontal_line_"+i);
+            horLine.setPosition(0,-400 + 100 * i);
+            if(i%3!=0){
+                horLine.setZ(+0.01f);
+            }
+            world.putObject(horLine);
+        }
         GridObject gridObject = new GridObject(background, 800, 800, 8, 8, "board");
         gridObject.setPosition(0, 0);
         gridObject.setOnClickItemListener(this);
@@ -130,9 +146,9 @@ public class MainActivity extends Activity implements Graphic2dRenderView.Render
     public void onConfigurationChanged(Configuration newConfig) {
         if(newConfig.orientation==Configuration.ORIENTATION_LANDSCAPE){
 
-            renderView.changeViewPortSize(0, 800 );
+            renderView.changeViewPortSize(0, 801 );
         }else{
-            renderView.changeViewPortSize(800, 0 );
+            renderView.changeViewPortSize(801, 0 );
         }
         super.onConfigurationChanged(newConfig);
     }

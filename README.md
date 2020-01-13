@@ -53,7 +53,7 @@ Change Viewport Size
     //only works when onMeasure() is called.
 
 # Gradle Dependency
-    implementation 'com.khgkjg12.graphic2d:graphic2d:1.2.1'
+    implementation 'com.khgkjg12.graphic2d:graphic2d:1.2.2'
 
 # License
     Copyright 2018 Hyungu Kang

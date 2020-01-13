@@ -71,7 +71,9 @@ public class Object {
 
     //객체의 좌표를 설정.
     public void setPosition(int x, int y){
-        mBoundary.set(x-mWidth/2, y-mHeight/2, x+mWidth/2, y+mHeight/2);
+        int left = x-mWidth/2;
+        int top = y-mHeight/2;
+        mBoundary.set(left, top, left+mWidth, top+mHeight);
     }
 
     //객체를 물리적 상태를 변화.
@@ -105,13 +107,15 @@ public class Object {
         int width = (int)(mBoundary.width()*Math.abs(Math.cos(mHoriaontalDegree*Math.PI/180)));
         int height = (int)(mBoundary.height()*Math.abs(Math.cos(mVerticalDegree*Math.PI/180)));
 
-        int x = viewportWidth/2-(int)((viewportX-mBoundary.centerX()+width*0.5)*scale);
-        int y = viewportHeight/2-(int)((viewportY-mBoundary.centerY()+height*0.5)*scale);
+        int x = (viewportWidth>>1)-(int)((viewportX-mBoundary.centerX()+(width>>1))*scale);
+        int y = (viewportHeight>>1)-(int)((viewportY-mBoundary.centerY()+(height>>1))*scale);
         int left = Math.max(x,0);
         int top = Math.max(y,0);
         int right = Math.min((int)(x+width*scale), viewportWidth);
         int bottom = Math.min((int)(y+height*scale), viewportHeight);
-
+        if(left>right || top>=bottom){
+            return;
+        }
         if(mTexture!=null) {
             float srcLeftOffset = (left-x)*invScale/width;
             float srcTopOffset = (top-y)*invScale/height;

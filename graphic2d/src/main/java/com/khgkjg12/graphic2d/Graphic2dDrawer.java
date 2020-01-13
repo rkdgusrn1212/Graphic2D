@@ -121,8 +121,8 @@ public class Graphic2dDrawer {
 
         srcRect.left = (int)(texture.bitmap.getWidth()*srcLeftOffsetRatio);
         srcRect.top = (int)(texture.bitmap.getHeight()*srcTopOffsetRatio);
-        srcRect.right = srcRect.left+(int)(texture.bitmap.getWidth()*srcWidthRatio)-1;
-        srcRect.bottom = srcRect.top+(int)(texture.bitmap.getHeight()*srcHeightRatio)-1;
+        srcRect.right = srcRect.left+(int)(texture.bitmap.getWidth()*srcWidthRatio);
+        srcRect.bottom = srcRect.top+(int)(texture.bitmap.getHeight()*srcHeightRatio);
 
         dstRect.left = left;
         dstRect.top = top;

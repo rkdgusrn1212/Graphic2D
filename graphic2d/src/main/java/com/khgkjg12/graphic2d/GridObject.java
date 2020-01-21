@@ -21,10 +21,13 @@ import java.util.List;
 public class GridObject extends Object {
 
     Object[][] mObjectList;
+    Object mBackgroundObject;
     int mRow, mColumn;
     private OnClickItemListener mOnClickItemListener;
 
-    public GridObject(Texture texture, int width, int height, int row, int column, String id){
+    public GridObject(Texture texture, int width, int height, int row, int column, int z, int x, int y, int degreeH, int degreeV, boolean backgroundVisibility, String id){
+        super(z, x, y, degreeH, degreeV, false, true, id);
+        mBackgroundObject = new TextureObject(texture, width, height, id);
         super(texture, width, height, id);
         init(row, column);
     }
@@ -54,17 +57,19 @@ public class GridObject extends Object {
         return mColumn;
     }
 
+    @Override
     boolean onTouch(int x, int y){
-        int column = (x-mBoundary.left)*mColumn/mBoundary.width();
-        int row = (y-mBoundary.top)*mRow/mBoundary.height();
-        if(column>=0&&row>=0&&column<mColumn&&row<mRow){
-            if(mOnClickItemListener!=null) {
-                mOnClickItemListener.onClickItem(this, mObjectList, row, column);
+        if(mClickable) {
+            int column = (x - mBoundary.left) * mColumn / mBoundary.width();
+            int row = (y - mBoundary.top) * mRow / mBoundary.height();
+            if (column >= 0 && row >= 0 && column < mColumn && row < mRow) {
+                if (mOnClickItemListener != null) {
+                    mOnClickItemListener.onClickItem(this, mObjectList, row, column);
+                }
+                return true;
             }
-            return true;
-        }else{
-            return false;
         }
+        return false;
     }
 
     public void setOnClickItemListener(OnClickItemListener onClickItemListener){

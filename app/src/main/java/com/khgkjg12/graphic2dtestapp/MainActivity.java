@@ -20,6 +20,7 @@ import android.content.res.Configuration;
 import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.os.Bundle;
+import android.util.Log;
 
 import com.khgkjg12.graphic2d.GridObject;
 import com.khgkjg12.graphic2d.Object;
@@ -52,6 +53,8 @@ public class MainActivity extends Activity implements Graphic2dRenderView.Render
     private Object flipObject = null;
     private boolean pop = false;
     private Object popObject = null;
+    private float timeAcc = 0;
+    private int count = 0;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -65,7 +68,7 @@ public class MainActivity extends Activity implements Graphic2dRenderView.Render
 
     @Override
     public void prepareWorld(World world) {
-        for(int i=0; i< 9; i++) {
+        /*for(int i=0; i< 9; i++) {
             Object verLine = new Object(Color.parseColor(i%3==0?"#021aee":"#d602ee"), 1, 801, "vertical_line_"+i);
             verLine.setPosition(-400+100*i,0);
             if(i%3!=0){
@@ -80,7 +83,7 @@ public class MainActivity extends Activity implements Graphic2dRenderView.Render
                 horLine.setZ(+0.01f);
             }
             world.putObject(horLine);
-        }
+        }*/
         GridObject gridObject = new GridObject(background, 800, 800, 8, 8, "board");
         gridObject.setPosition(0, 0);
         gridObject.setOnClickItemListener(this);
@@ -98,6 +101,13 @@ public class MainActivity extends Activity implements Graphic2dRenderView.Render
                 startTime = 0;
             }
         }*/
+        count++;
+        timeAcc += deltaTime;
+        if(count == 50){
+            Log.d("frame_rate", 50/timeAcc+"fps");
+            count = 0;
+            timeAcc = 0;
+        }
         if(pop){
             startTime+=deltaTime;
             if(startTime>=2){

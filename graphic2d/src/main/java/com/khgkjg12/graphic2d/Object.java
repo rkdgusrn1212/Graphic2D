@@ -15,65 +15,32 @@
  */
 package com.khgkjg12.graphic2d;
 
-import android.graphics.Rect;
+public abstract class Object {
 
-public class Object {
-
-    private Texture mTexture;
-    private int mColor;
-    Rect mBoundary;
-    private int mWidth, mHeight;
     private boolean mVisibility;
+    private boolean mClickable;
     String mId;
     private OnClickListener mOnClickListener;
     private float mZ;
-    private int mHoriaontalDegree;
-    private int mVerticalDegree;
+    private int mX, mY;
+    int mHoriaontalDegree;
+    int mVerticalDegree;
 
-
-    public Object(Texture texture, int width, int height, String id) {
-        this(texture, width, height, 0, 0, 0, id);
-    }
-
-    public Object(int color, int width, int height, String id) {
-        this(color, width, height, 0, 0, 0, id);
-    }
-
-    public Object(Texture texture, int width, int height, int z, int degreeH, int degreeV, String id){
-        mTexture = texture;
-        mColor = 0;
-        mWidth = width;
-        mHeight = height;
-        mBoundary = new Rect();
-        mVisibility = true;
+    public Object(int z, int x, int y, int degreeH, int degreeV, boolean visibility, boolean clickable, String id){
+        mVisibility = visibility;
+        mClickable = clickable;
         mId = id;
         mZ = z;
+        mX = x;
+        mY = y;
         mHoriaontalDegree = degreeH%360;
         mVerticalDegree = degreeV%360;
-    }
-
-    public Object(int color, int width, int height, int z, int degreeH, int degreeV, String id){
-        mTexture = null;
-        mColor = color;
-        mWidth = width;
-        mHeight = height;
-        mBoundary = new Rect();
-        mVisibility = true;
-        mId = id;
-        mZ = z;
-        mHoriaontalDegree = degreeH%360;
-        mVerticalDegree = degreeV%360;
-    }
-
-    public void setTexture(Texture texture){
-        mTexture = texture;
     }
 
     //객체의 좌표를 설정.
     public void setPosition(int x, int y){
-        int left = x-mWidth/2;
-        int top = y-mHeight/2;
-        mBoundary.set(left, top, left+mWidth, top+mHeight);
+        mX = x;
+        mY = y;
     }
 
     //객체를 물리적 상태를 변화.
@@ -81,52 +48,48 @@ public class Object {
         mVisibility = visible;
     }
 
+    public void setClickable(boolean clickable){
+        mClickable = clickable;
+    }
+
     boolean onTouch(int x, int y){
-        if(mBoundary.contains(x, y)){
-            if(mOnClickListener!=null) {
-                mOnClickListener.onClick(this);
-            }
-            return true;
-        }else{
+        if(!mClickable||!checkBoundary(x, y)){
             return false;
         }
+        if(mOnClickListener!=null) {
+            mOnClickListener.onClick(this);
+        }
+        return true;
     }
+
+    /**
+     * 경계선 채크 메소드.
+     * @param x
+     * @param y
+     * @return x, y 가 경계선 안에 있으면 참.
+     */
+    abstract boolean checkBoundary(int x, int y);
 
     public void setOnClickListener(OnClickListener onClickListener){
         mOnClickListener = onClickListener;
     }
 
     void render(Graphic2dDrawer drawer, int viewportWidth, int viewportHeight, float cameraZ, float focusedZ, int viewportX, int viewportY){
-        if(!mVisibility||mZ>=cameraZ){
-            return;
-        }
-        float scale = focusedZ/(cameraZ-mZ);
-        float invScale = 1/scale;
-
-
-        int width = (int)(mBoundary.width()*Math.abs(Math.cos(mHoriaontalDegree*Math.PI/180)));
-        int height = (int)(mBoundary.height()*Math.abs(Math.cos(mVerticalDegree*Math.PI/180)));
-
-        int x = (viewportWidth>>1)-(int)((viewportX-mBoundary.centerX()+(width>>1))*scale);
-        int y = (viewportHeight>>1)-(int)((viewportY-mBoundary.centerY()+(height>>1))*scale);
-        int left = Math.max(x,0);
-        int top = Math.max(y,0);
-        int right = Math.min((int)(x+width*scale), viewportWidth);
-        int bottom = Math.min((int)(y+height*scale), viewportHeight);
-        if(left>right || top>=bottom){
-            return;
-        }
-        if(mTexture!=null) {
-            float srcLeftOffset = (left-x)*invScale/width;
-            float srcTopOffset = (top-y)*invScale/height;
-            float srcWidth = (right-left)*invScale/width;
-            float srcHeight = (bottom-top)*invScale/height;
-
-            drawer.drawObject(mTexture, left, top, right, bottom, srcLeftOffset, srcTopOffset, srcWidth, srcHeight);
-        }else{
-            drawer.drawRect( left, top, right, bottom, mColor);
+        if(mVisibility&&mZ<cameraZ) {
+            float scale = focusedZ / (cameraZ - mZ);
+            float renderX = (viewportWidth / 2f) - (viewportX - mX) * scale;
+            float renderY = (viewportHeight / 2f) - (viewportY - mY) * scale;
+            render(drawer, scale, renderX, renderY, mVerticalDegree, mHoriaontalDegree);
         }
     }
+
+    /**
+     * 렌더 프레임상 x, y좌표 와 카메라 위치에 따른 스케일.
+     * @param scale 너비 및 높이 또는 반지름에 곱해야함.
+     * @param renderX 렌더프레임상 오브젝트 중심 x.
+     * @param renderY 렌더프레임상 오브젝트 중심 y.
+     */
+    abstract void render(Graphic2dDrawer drawer, float scale, float renderX, float renderY, float verticalDegree, float horizontalDegree);
 
     public interface OnClickListener{
         public void onClick(Object object);

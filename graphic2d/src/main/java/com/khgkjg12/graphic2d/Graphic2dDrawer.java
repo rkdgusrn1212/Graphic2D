@@ -21,6 +21,7 @@ import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Paint;
 import android.graphics.Rect;
+import android.graphics.RectF;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -30,8 +31,6 @@ public class Graphic2dDrawer {
     Bitmap mFrameBuffer;
     Canvas canvas;
     Paint paint;
-    Rect srcRect = new Rect();
-    Rect dstRect = new Rect();
 
     public Graphic2dDrawer(AssetManager assets) {
         this.assets = assets;
@@ -100,36 +99,32 @@ public class Graphic2dDrawer {
                 (color & 0xff));
     }
 
-    public void drawPixel(int x, int y, int color) {
+    public void drawPoint(float x, float y, float width, int color) {
         paint.setColor(color);
+        paint.setStrokeWidth(width);
         canvas.drawPoint(x, y, paint);
     }
 
-    public void drawLine(int x, int y, int x2, int y2, int color) {
+    public void drawLine(float x, float y, float x2, float y2, float width, int color) {
         paint.setColor(color);
+        paint.setStrokeWidth(width);
         canvas.drawLine(x, y, x2, y2, paint);
     }
 
-    public void drawRect(int left, int top, int right, int bottom, int color) {
+    public void drawRoundRect(float left, float top, float right, float bottom, float rx, float ry, int color){
+        paint.setColor(color);
+        paint.setStyle(Paint.Style.FILL);
+        canvas.drawRoundRect(new RectF(left, top, right, bottom), rx, ry, paint);
+    }
+
+    public void drawRect(float left, float top, float right, float bottom, int color) {
         paint.setColor(color);
         paint.setStyle(Paint.Style.FILL);
         canvas.drawRect(left, top, right, bottom, paint);
     }
 
-    public void drawObject(Texture texture, int left, int top, int right, int bottom, float srcLeftOffsetRatio, float srcTopOffsetRatio,
-                              float srcWidthRatio, float srcHeightRatio) {
-
-        srcRect.left = (int)(texture.bitmap.getWidth()*srcLeftOffsetRatio);
-        srcRect.top = (int)(texture.bitmap.getHeight()*srcTopOffsetRatio);
-        srcRect.right = srcRect.left+(int)(texture.bitmap.getWidth()*srcWidthRatio);
-        srcRect.bottom = srcRect.top+(int)(texture.bitmap.getHeight()*srcHeightRatio);
-
-        dstRect.left = left;
-        dstRect.top = top;
-        dstRect.right = right;
-        dstRect.bottom = bottom;
-
-        canvas.drawBitmap(texture.bitmap, srcRect, dstRect,null);
+    public void drawObject(Texture texture, float left, float top, float right, float bottom) {
+        canvas.drawBitmap(texture.bitmap, null, new RectF(left, top, right, bottom),null);
     }
 
     public Bitmap getFrameBuffer() {

@@ -176,8 +176,7 @@ public class Graphic2dRenderView extends SurfaceView implements Runnable {
             mRenderer.updateWorld(deltaTime, mWorld);
             mWorld.render(mDrawer);
 
-
-            Canvas canvas = null;
+            Canvas canvas;
             if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
                 canvas = holder.lockHardwareCanvas();
             }else{

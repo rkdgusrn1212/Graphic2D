@@ -15,24 +15,35 @@
  */
 package com.khgkjg12.graphic2d;
 
+import android.graphics.Color;
+
 import java.util.ArrayList;
 import java.util.List;
 
-public class GridObject extends Object {
+public class GridObject extends RectObject {
 
     Object[][] mObjectList;
-    Object mBackgroundObject;
     int mRow, mColumn;
     private OnClickItemListener mOnClickItemListener;
 
-    public GridObject(Texture texture, int width, int height, int row, int column, int z, int x, int y, int degreeH, int degreeV, boolean backgroundVisibility, String id){
-        super(z, x, y, degreeH, degreeV, false, true, id);
-        mBackgroundObject = new TextureObject(texture, width, height, id);
-        super(texture, width, height, id);
+
+    public GridObject(int width, int height, int row, int column, int z, int x, int y, String id){
+        super(Color.TRANSPARENT, width, height, z, x, y, 0, 0, false, true, id);
         init(row, column);
     }
-    public GridObject(int color, int width, int height, int row, int column, String id){
-        super(color, width, height, id);
+
+    public GridObject(int color, int width, int height, int row, int column, int z, int x, int y, String id){
+        super(color, width, height, z, x, y, 0, 0, true, true, id);
+        init(row, column);
+    }
+
+    public GridObject(int width, int height, int row, int column, int z, int x, int y, int degreeH, int degreeV, String id){
+        super(Color.TRANSPARENT, width, height, z, x, y, degreeH, degreeV, false, true, id);
+        init(row, column);
+    }
+
+    public GridObject(int color, int width, int height, int row, int column, int z, int x, int y, int degreeH, int degreeV, String id){
+        super(color, width, height, z, x, y, degreeH, degreeV, true, true, id);
         init(row, column);
     }
 
@@ -60,8 +71,8 @@ public class GridObject extends Object {
     @Override
     boolean onTouch(int x, int y){
         if(mClickable) {
-            int column = (x - mBoundary.left) * mColumn / mBoundary.width();
-            int row = (y - mBoundary.top) * mRow / mBoundary.height();
+            int column = (x - mX - mWidth/2) * mColumn / mWidth;
+            int row = (y - mY- mHeight/2) * mRow / mHeight;
             if (column >= 0 && row >= 0 && column < mColumn && row < mRow) {
                 if (mOnClickItemListener != null) {
                     mOnClickItemListener.onClickItem(this, mObjectList, row, column);
@@ -72,20 +83,40 @@ public class GridObject extends Object {
         return false;
     }
 
+    @Override
+    boolean checkBoundary(int x, int y) {
+        if(super.checkBoundary(x, y)){
+            if (mOnClickItemListener != null) {
+                int column = (x - mX - mWidth/2) * mColumn / mWidth;
+                int row = (y - mY - mHeight/2) * mRow / mHeight;
+                mOnClickItemListener.onClickItem(this, mObjectList, row, column);
+            }
+            return true;
+        }
+        return false;
+    }
+
     public void setOnClickItemListener(OnClickItemListener onClickItemListener){
         mOnClickItemListener = onClickItemListener;
     }
 
     public void putObject(Object obj, int row, int column){
-        obj.setPosition((int)(mBoundary.left+mBoundary.width()*(column+0.5)/mColumn),(int)(mBoundary.top+mBoundary.height()*(row+0.5)/mRow));
+        obj.setPosition(mX-(mWidth>>1)+mWidth*column/mColumn+((mWidth/mColumn)>>1) ,mY-(mHeight>>1)+mHeight*row/mRow+((mHeight/mRow)>>1));
+        obj.setHorizontalFlip(mHoriaontalDegree);
+        obj.setVerticalFlip(mVerticalDegree);
         mObjectList[row][column] = obj;
     }
 
     public void putObject(Texture texture, int row, int column){
-        putObject(new Object(texture, mBoundary.width()/mColumn, mBoundary.height()/mRow, null), row, column);
+        int x = mX-(mWidth>>1)+mWidth*column/mColumn+((mWidth/mColumn)>>1);
+        int y = mY-(mHeight>>1)+mHeight*row/mRow+((mHeight/mRow)>>1);
+        putObject(new TextureObject(texture, mWidth/mColumn, mHeight/mRow, mZ, x, y, mHoriaontalDegree, mVerticalDegree, true, true, null), row, column);
     }
+
     public void putObject(int color, int row, int column){
-        putObject(new Object(color, mBoundary.width()/mColumn, mBoundary.height()/mRow, null), row, column);
+        int x = mX-(mWidth>>1)+mWidth*column/mColumn+((mWidth/mColumn)>>1);
+        int y = mY-(mHeight>>1)+mHeight*row/mRow+((mHeight/mRow)>>1);
+        putObject(new RectObject(color, mWidth/mColumn, mHeight/mRow, mZ, x, y, mHoriaontalDegree, mVerticalDegree, true, true, null), row, column);
     }
 
     public void removeObject(int row, int column){

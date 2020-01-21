@@ -18,15 +18,15 @@ package com.khgkjg12.graphic2d;
 public abstract class Object {
 
     private boolean mVisibility;
-    private boolean mClickable;
+    boolean mClickable;
     String mId;
     private OnClickListener mOnClickListener;
-    private float mZ;
-    private int mX, mY;
+    float mZ;
+    int mX, mY;
     int mHoriaontalDegree;
     int mVerticalDegree;
 
-    public Object(int z, int x, int y, int degreeH, int degreeV, boolean visibility, boolean clickable, String id){
+    public Object(float z, int x, int y, int degreeH, int degreeV, boolean visibility, boolean clickable, String id){
         mVisibility = visibility;
         mClickable = clickable;
         mId = id;

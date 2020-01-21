@@ -84,7 +84,7 @@ public class MainActivity extends Activity implements Graphic2dRenderView.Render
             }
             world.putObject(horLine);
         }*/
-        GridObject gridObject = new GridObject(background, 800, 800, 8, 8, "board");
+        GridObject gridObject = new GridObject(background, 800, 800, 0, 8, 8, "board");
         gridObject.setPosition(0, 0);
         gridObject.setOnClickItemListener(this);
         world.putObject(gridObject);

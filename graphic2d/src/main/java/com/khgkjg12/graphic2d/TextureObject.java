@@ -6,15 +6,15 @@ import android.support.annotation.NonNull;
 public class TextureObject extends RectObject {
     private Texture mTexture;
 
-    public TextureObject(@NonNull Texture texture, int width, int height, int z, int x, int y, String id) {
+    public TextureObject(@NonNull Texture texture, int width, int height, float z, int x, int y, String id) {
         this(texture, width, height, z, x, y, 0, 0, id);
     }
 
-    public TextureObject(@NonNull Texture texture, int width, int height, int z, int x, int y, int degreeH, int degreeV, String id) {
+    public TextureObject(@NonNull Texture texture, int width, int height, float z, int x, int y, int degreeH, int degreeV, String id) {
         this(texture, width, height, z, x, y, degreeH, degreeV, true, true, id);
     }
 
-    public TextureObject(@NonNull Texture texture, int width, int height, int z, int x, int y, int degreeH, int degreeV, boolean visibility, boolean cilickable, String id){
+    public TextureObject(@NonNull Texture texture, int width, int height, float z, int x, int y, int degreeH, int degreeV, boolean visibility, boolean cilickable, String id){
         super(Color.TRANSPARENT, width, height, z, x, y, degreeH, degreeV, visibility, cilickable, id);
         mTexture = texture;
     }

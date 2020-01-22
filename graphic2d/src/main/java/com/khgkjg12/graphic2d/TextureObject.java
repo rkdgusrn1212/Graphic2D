@@ -14,8 +14,8 @@ public class TextureObject extends RectObject {
         this(texture, width, height, z, x, y, degreeH, degreeV, true, true, id);
     }
 
-    public TextureObject(@NonNull Texture texture, int width, int height, float z, int x, int y, int degreeH, int degreeV, boolean visibility, boolean cilickable, String id){
-        super(Color.TRANSPARENT, width, height, z, x, y, degreeH, degreeV, visibility, cilickable, id);
+    public TextureObject(@NonNull Texture texture, int width, int height, float z, int x, int y, int degreeH, int degreeV, boolean visibility, boolean clickable, String id){
+        super(Color.TRANSPARENT, width, height, z, x, y, degreeH, degreeV, visibility, clickable, id);
         mTexture = texture;
     }
 
@@ -32,5 +32,10 @@ public class TextureObject extends RectObject {
         float right = left + width * scale;
         float bottom = top + height * scale;
         drawer.drawObject(mTexture, left, top, right, bottom);
+    }
+
+    @Override
+    boolean checkBoundary(int x, int y) {
+        return super.checkBoundary(x, y);
     }
 }

@@ -15,11 +15,7 @@
  */
 package com.khgkjg12.graphic2d;
 
-import android.graphics.Color;
-import android.util.Log;
-
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 

@@ -17,8 +17,6 @@ package com.khgkjg12.graphic2dtestapp;
 
 import android.app.Activity;
 import android.content.res.Configuration;
-import android.graphics.Bitmap;
-import android.graphics.Color;
 import android.os.Bundle;
 import android.util.Log;
 
@@ -27,10 +25,9 @@ import com.khgkjg12.graphic2d.Object;
 import com.khgkjg12.graphic2d.Texture;
 import com.khgkjg12.graphic2d.Graphic2dDrawer;
 import com.khgkjg12.graphic2d.Graphic2dRenderView;
-import com.khgkjg12.graphic2d.TouchHandler;
+import com.khgkjg12.graphic2d.TextureGridObject;
+import com.khgkjg12.graphic2d.TextureObject;
 import com.khgkjg12.graphic2d.World;
-
-import java.util.List;
 
 import static android.view.WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON;
 
@@ -84,10 +81,11 @@ public class MainActivity extends Activity implements Graphic2dRenderView.Render
             }
             world.putObject(horLine);
         }*/
-        GridObject gridObject = new GridObject(background, 800, 800, 0, 8, 8, "board");
+        TextureGridObject gridObject = new TextureGridObject(background, 800, 800, 8, 8, 0, 0, 0, "board");
         gridObject.setPosition(0, 0);
         gridObject.setOnClickItemListener(this);
         world.putObject(gridObject);
+        world.putObject(new TextureObject(blackStone, 200, 200, 0, 0, 0, "test1"));
     }
 
     @Override
@@ -141,7 +139,6 @@ public class MainActivity extends Activity implements Graphic2dRenderView.Render
 
     @Override
     public void onClickItem(GridObject gridObject, Object[][] objectList, int row, int column) {
-
         if(objectList[row][column]==null){
             gridObject.putObject(blackStone, row, column);
         }else{

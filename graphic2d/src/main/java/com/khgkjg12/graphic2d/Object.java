@@ -15,6 +15,8 @@
  */
 package com.khgkjg12.graphic2d;
 
+import android.util.Log;
+
 public abstract class Object {
 
     private boolean mVisibility;
@@ -53,13 +55,13 @@ public abstract class Object {
     }
 
     boolean onTouch(int x, int y){
-        if(!mClickable||!checkBoundary(x, y)){
-            return false;
+        if(mClickable&&checkBoundary(x, y)){
+            if(mOnClickListener!=null) {
+                mOnClickListener.onClick(this);
+            }
+            return true;
         }
-        if(mOnClickListener!=null) {
-            mOnClickListener.onClick(this);
-        }
-        return true;
+        return false;
     }
 
     /**

@@ -33,9 +33,4 @@ public class TextureObject extends RectObject {
         float bottom = top + height * scale;
         drawer.drawObject(mTexture, left, top, right, bottom);
     }
-
-    @Override
-    boolean checkBoundary(int x, int y) {
-        return super.checkBoundary(x, y);
-    }
 }

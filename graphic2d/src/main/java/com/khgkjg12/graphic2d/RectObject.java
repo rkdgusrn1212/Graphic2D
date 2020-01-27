@@ -2,7 +2,7 @@ package com.khgkjg12.graphic2d;
 
 
 public class RectObject extends Object {
-    private int mColor;
+    int mColor;
     int mWidth, mHeight;
 
     public RectObject(int color, int width, int height, float z, int x, int y, String id){
@@ -22,8 +22,8 @@ public class RectObject extends Object {
 
     @Override
     boolean checkBoundary(int x, int y) {
-        int left = x-mWidth/2;
-        int top = y-mHeight/2;
+        int left = mX-mWidth/2;
+        int top = mY-mHeight/2;
         int right = left + mWidth;
         int bottom = top + mHeight;
         return x < right && x >= left && y < bottom && y >= top;

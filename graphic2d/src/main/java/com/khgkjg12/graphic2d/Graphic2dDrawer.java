@@ -20,21 +20,21 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Paint;
-import android.graphics.Rect;
 import android.graphics.RectF;
 
 import java.io.IOException;
 import java.io.InputStream;
 
 public class Graphic2dDrawer {
-    AssetManager assets;
+    AssetManager mAssets;
     Bitmap mFrameBuffer;
-    Canvas canvas;
-    Paint paint;
+    Canvas mCanvas;
+    Paint mPaint;
 
     public Graphic2dDrawer(AssetManager assets) {
-        this.assets = assets;
-        this.paint = new Paint();
+        this.mAssets = assets;
+        mPaint = new Paint();
+        mPaint.setStyle(Paint.Style.FILL);
     }
 
     void setFrameBuffer(int bufferWidth, int bufferHeight, Bitmap.Config config){
@@ -43,17 +43,17 @@ public class Graphic2dDrawer {
             Bitmap tempBitmap =  mFrameBuffer;
             mFrameBuffer = Bitmap.createBitmap(bufferWidth, bufferHeight, config);
             tempBitmap.recycle();
-            this.canvas.setBitmap(mFrameBuffer);
+            this.mCanvas.setBitmap(mFrameBuffer);
         }else {
             mFrameBuffer = Bitmap.createBitmap(bufferWidth,
                     bufferHeight, config);
-            this.canvas = new Canvas(mFrameBuffer);
+            this.mCanvas = new Canvas(mFrameBuffer);
         }
     }
 
     public Texture newTexture(String fileName, Texture.Format format) {
 
-        Bitmap.Config config = null;
+        Bitmap.Config config;
         if (format == Texture.Format.RGB565)
             config = Bitmap.Config.RGB_565;
         else if (format == Texture.Format.ARGB4444)
@@ -65,9 +65,9 @@ public class Graphic2dDrawer {
         options.inPreferredConfig = config;
 
         InputStream in = null;
-        Bitmap bitmap = null;
+        Bitmap bitmap;
         try {
-            in = assets.open(fileName);
+            in = mAssets.open(fileName);
             bitmap = BitmapFactory.decodeStream(in);
             if (bitmap == null)
                 throw new RuntimeException("Couldn't load bitmap from asset '"
@@ -95,36 +95,50 @@ public class Graphic2dDrawer {
     }
 
     public void clear(int color) {
-        canvas.drawRGB((color & 0xff0000) >> 16, (color & 0xff00) >> 8,
+        mCanvas.drawRGB((color & 0xff0000) >> 16, (color & 0xff00) >> 8,
                 (color & 0xff));
     }
 
     public void drawPoint(float x, float y, float width, int color) {
-        paint.setColor(color);
-        paint.setStrokeWidth(width);
-        canvas.drawPoint(x, y, paint);
+        mPaint.setColor(color);
+        mPaint.setStrokeWidth(width);
+        mCanvas.drawPoint(x, y, mPaint);
+    }
+    
+    public void drawPoint(float x, float y, Paint paint) {
+        mCanvas.drawPoint(x, y, paint);
     }
 
     public void drawLine(float x, float y, float x2, float y2, float width, int color) {
-        paint.setColor(color);
-        paint.setStrokeWidth(width);
-        canvas.drawLine(x, y, x2, y2, paint);
+        mPaint.setColor(color);
+        mPaint.setStrokeWidth(width);
+        mCanvas.drawLine(x, y, x2, y2, mPaint);
+    }
+    
+    public void drawLine(float x, float y, float x2, float y2, Paint paint) {
+        mCanvas.drawLine(x, y, x2, y2, paint);
     }
 
     public void drawRoundRect(float left, float top, float right, float bottom, float rx, float ry, int color){
-        paint.setColor(color);
-        paint.setStyle(Paint.Style.FILL);
-        canvas.drawRoundRect(new RectF(left, top, right, bottom), rx, ry, paint);
+        mPaint.setColor(color);
+        mCanvas.drawRoundRect(new RectF(left, top, right, bottom), rx, ry, mPaint);
+    }
+
+    public void drawRoundRect(float left, float top, float right, float bottom, float rx, float ry, Paint paint){
+        mCanvas.drawRoundRect(new RectF(left, top, right, bottom), rx, ry, paint);
     }
 
     public void drawRect(float left, float top, float right, float bottom, int color) {
-        paint.setColor(color);
-        paint.setStyle(Paint.Style.FILL);
-        canvas.drawRect(left, top, right, bottom, paint);
+        mPaint.setColor(color);
+        mCanvas.drawRect(left, top, right, bottom, mPaint);
+    }
+
+    public void drawRect(float left, float top, float right, float bottom, Paint paint) {
+        mCanvas.drawRect(left, top, right, bottom, paint);
     }
 
     public void drawObject(Texture texture, float left, float top, float right, float bottom) {
-        canvas.drawBitmap(texture.bitmap, null, new RectF(left, top, right, bottom),null);
+        mCanvas.drawBitmap(texture.bitmap, null, new RectF(left, top, right, bottom),null);
     }
 
     public Bitmap getFrameBuffer() {

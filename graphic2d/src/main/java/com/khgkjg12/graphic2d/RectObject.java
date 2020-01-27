@@ -1,8 +1,10 @@
 package com.khgkjg12.graphic2d;
 
 
+import android.graphics.Paint;
+
 public class RectObject extends Object {
-    int mColor;
+    Paint mPaint;
     int mWidth, mHeight;
 
     public RectObject(int color, int width, int height, float z, int x, int y, String id){
@@ -15,7 +17,8 @@ public class RectObject extends Object {
 
     public RectObject(int color, int width, int height, float z, int x, int y, int degreeH, int degreeV, boolean visibility, boolean clickable, String id){
         super(z, x, y, degreeH, degreeV, visibility, clickable, id);
-        mColor = color;
+        mPaint = new Paint();
+        mPaint.setColor(color);
         mWidth = width;
         mHeight = height;
     }
@@ -29,6 +32,10 @@ public class RectObject extends Object {
         return x < right && x >= left && y < bottom && y >= top;
     }
 
+    public void changeColor(int color){
+        mPaint.setColor(color);
+    }
+
     @Override
     void render(Graphic2dDrawer drawer, float scale, float renderX, float renderY, float verticalDegree, float horizontalDegree) {
         float width = mWidth * Math.abs((float) Math.cos(mHoriaontalDegree * Math.PI / 180));
@@ -37,6 +44,6 @@ public class RectObject extends Object {
         float top = renderY - height/2;
         float right = left + width * scale;
         float bottom = top + height * scale;
-        drawer.drawRect(left, top, right, bottom, mColor);
+        drawer.drawRect(left, top, right, bottom, mPaint);
     }
 }

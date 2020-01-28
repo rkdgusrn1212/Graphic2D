@@ -17,11 +17,13 @@ package com.khgkjg12.graphic2dtestapp;
 
 import android.app.Activity;
 import android.content.res.Configuration;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.util.Log;
 
 import com.khgkjg12.graphic2d.GridObject;
 import com.khgkjg12.graphic2d.Object;
+import com.khgkjg12.graphic2d.RoundRectObject;
 import com.khgkjg12.graphic2d.Texture;
 import com.khgkjg12.graphic2d.Graphic2dDrawer;
 import com.khgkjg12.graphic2d.Graphic2dRenderView;
@@ -140,7 +142,7 @@ public class MainActivity extends Activity implements Graphic2dRenderView.Render
     @Override
     public void onClickItem(GridObject gridObject, Object[][] objectList, int row, int column) {
         if(objectList[row][column]==null){
-            gridObject.putObject(blackStone, row, column);
+            gridObject.putObject(new RoundRectObject(Color.RED, 20, 20, 100, 100, 0, 0,0, null), row, column);
         }else{
             pop = true;
             popObject = objectList[row][column];
@@ -152,7 +154,6 @@ public class MainActivity extends Activity implements Graphic2dRenderView.Render
     @Override
     public void onConfigurationChanged(Configuration newConfig) {
         if(newConfig.orientation==Configuration.ORIENTATION_LANDSCAPE){
-
             renderView.changeViewPortSize(0, 801 );
         }else{
             renderView.changeViewPortSize(801, 0 );

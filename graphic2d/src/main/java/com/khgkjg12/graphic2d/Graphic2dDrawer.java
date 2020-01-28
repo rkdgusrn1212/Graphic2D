@@ -137,8 +137,8 @@ public class Graphic2dDrawer {
         mCanvas.drawRect(left, top, right, bottom, paint);
     }
 
-    public void drawObject(Texture texture, float left, float top, float right, float bottom) {
-        mCanvas.drawBitmap(texture.bitmap, null, new RectF(left, top, right, bottom),null);
+    public void drawObject(Texture texture, RectF rectF) {
+        mCanvas.drawBitmap(texture.bitmap, null, rectF,null);
     }
 
     public Bitmap getFrameBuffer() {

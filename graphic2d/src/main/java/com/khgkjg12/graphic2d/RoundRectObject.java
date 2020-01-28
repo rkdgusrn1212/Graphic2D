@@ -30,6 +30,6 @@ public class RoundRectObject extends RectObject {
         float top = renderY - height/2;
         float right = left + width * scale;
         float bottom = top + height * scale;
-        drawer.drawRoundRect(left, top, right, bottom, mRX, mRY, super.mColor);
+        drawer.drawRoundRect(left, top, right, bottom, mRX, mRY, super.mPaint);
     }
 }

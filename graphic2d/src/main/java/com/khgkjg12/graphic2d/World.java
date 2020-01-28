@@ -15,6 +15,8 @@
  */
 package com.khgkjg12.graphic2d;
 
+import android.graphics.RectF;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -38,6 +40,7 @@ public class World {
     private Texture mBackgroundTexture;
     private boolean mDragToMove;
     private boolean mPinchToZoom;
+    private RectF mRectF;
 
     World(int width, int height, int viewportX, int viewportY, float cameraZ, float minCameraZ, float maxCameraZ, float focusedZ, int backgroundColor, boolean dragToMove, boolean pinchToZoom){
         mWidth = width;
@@ -52,6 +55,7 @@ public class World {
         mBackgroundColor = backgroundColor;
         mDragToMove = dragToMove;
         mPinchToZoom = pinchToZoom;
+        mRectF = new RectF(0, 0, mViewportWidth, mViewportHeight);
     }
 
     public void putObject(Object obj){
@@ -72,10 +76,10 @@ public class World {
     }
 
     void render(Graphic2dDrawer drawer){
-        if(mBackgroundTexture!=null){
-            drawer.drawObject(mBackgroundTexture, 0, 0, mViewportWidth, mViewportHeight);
-        }else{
+        if(mBackgroundTexture==null){
             drawer.clear(mBackgroundColor);
+        }else{
+            drawer.drawObject(mBackgroundTexture, mRectF);
         }
         List<Object> objects =  new ArrayList<>(mObjects.values());
         for(int i=0; i<objects.size();i++){

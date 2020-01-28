@@ -38,12 +38,12 @@ public class RectObject extends Object {
 
     @Override
     void render(Graphic2dDrawer drawer, float scale, float renderX, float renderY, float verticalDegree, float horizontalDegree) {
-        float width = mWidth * Math.abs((float) Math.cos(mHoriaontalDegree * Math.PI / 180));
-        float height = mHeight * Math.abs((float) Math.cos(mVerticalDegree * Math.PI / 180));
+        float width = mWidth * Math.abs((float) Math.cos(mHoriaontalDegree * Math.PI / 180))*scale;
+        float height = mHeight * Math.abs((float) Math.cos(mVerticalDegree * Math.PI / 180))*scale;
         float left = renderX - width/2;
         float top = renderY - height/2;
-        float right = left + width * scale;
-        float bottom = top + height * scale;
+        float right = left + width;
+        float bottom = top + height;
         drawer.drawRect(left, top, right, bottom, mPaint);
     }
 }

@@ -90,8 +90,6 @@ public class RectGridObject extends RectObject implements GridObject {
     @Override
     public void putObject(Object obj, int row, int column){
         obj.setPosition(mX-(mWidth>>1)+mWidth*column/mColumn+((mWidth/mColumn)>>1) ,mY-(mHeight>>1)+mHeight*row/mRow+((mHeight/mRow)>>1));
-        obj.setHorizontalFlip(mHoriaontalDegree);
-        obj.setVerticalFlip(mVerticalDegree);
         mObjectList[row][column] = obj;
     }
 
@@ -99,14 +97,14 @@ public class RectGridObject extends RectObject implements GridObject {
     public void putObject(Texture texture, int row, int column){
         int x = mX-(mWidth>>1)+mWidth*column/mColumn+((mWidth/mColumn)>>1);
         int y = mY-(mHeight>>1)+mHeight*row/mRow+((mHeight/mRow)>>1);
-        putObject(new TextureObject(texture, mWidth/mColumn, mHeight/mRow, mZ, x, y, mHoriaontalDegree, mVerticalDegree, true, true, null), row, column);
+        putObject(new TextureObject(texture, mWidth/mColumn, mHeight/mRow, mZ, x, y, mHorizontalDegree, mVerticalDegree, true, true, null), row, column);
     }
 
     @Override
     public void putObject(int color, int row, int column){
         int x = mX-(mWidth>>1)+mWidth*column/mColumn+((mWidth/mColumn)>>1);
         int y = mY-(mHeight>>1)+mHeight*row/mRow+((mHeight/mRow)>>1);
-        putObject(new RectObject(color, mWidth/mColumn, mHeight/mRow, mZ, x, y, mHoriaontalDegree, mVerticalDegree, true, true, null), row, column);
+        putObject(new RectObject(color, mWidth/mColumn, mHeight/mRow, mZ, x, y, mHorizontalDegree, mVerticalDegree, true, true, null), row, column);
     }
 
     @Override

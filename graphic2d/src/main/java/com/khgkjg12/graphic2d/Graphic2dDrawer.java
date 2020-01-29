@@ -141,6 +141,10 @@ public class Graphic2dDrawer {
         mCanvas.drawBitmap(texture.bitmap, null, rectF,null);
     }
 
+    public void drawText(String text, float x, float y, Paint paint){
+        mCanvas.drawText(text, x, y, paint);
+    }
+
     public Bitmap getFrameBuffer() {
         return mFrameBuffer;
     }

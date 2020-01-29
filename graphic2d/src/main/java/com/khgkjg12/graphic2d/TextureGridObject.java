@@ -15,7 +15,6 @@
  */
 package com.khgkjg12.graphic2d;
 
-import android.util.Log;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -74,12 +73,9 @@ public class TextureGridObject extends TextureObject implements GridObject {
     public void setOnClickItemListener(OnClickItemListener onClickItemListener){
         mOnClickItemListener = onClickItemListener;
     }
-
     @Override
     public void putObject(Object obj, int row, int column){
         obj.setPosition(mX-(mWidth>>1)+mWidth*column/mColumn+((mWidth/mColumn)>>1) ,mY-(mHeight>>1)+mHeight*row/mRow+((mHeight/mRow)>>1));
-        obj.setHorizontalFlip(mHoriaontalDegree);
-        obj.setVerticalFlip(mVerticalDegree);
         mObjectList[row][column] = obj;
     }
 
@@ -87,16 +83,15 @@ public class TextureGridObject extends TextureObject implements GridObject {
     public void putObject(Texture texture, int row, int column){
         int x = mX-(mWidth>>1)+mWidth*column/mColumn+((mWidth/mColumn)>>1);
         int y = mY-(mHeight>>1)+mHeight*row/mRow+((mHeight/mRow)>>1);
-        mObjectList[row][column] = new TextureObject(texture, mWidth/mColumn, mHeight/mRow, mZ, x, y, mHoriaontalDegree, mVerticalDegree, true, true, null);
+        mObjectList[row][column] = new TextureObject(texture, mWidth/mColumn, mHeight/mRow, mZ, x, y, mHorizontalDegree, mVerticalDegree, true, true, null);
     }
 
     @Override
     public void putObject(int color, int row, int column){
         int x = mX-(mWidth>>1)+mWidth*column/mColumn+((mWidth/mColumn)>>1);
         int y = mY-(mHeight>>1)+mHeight*row/mRow+((mHeight/mRow)>>1);
-        mObjectList[row][column] = new RectObject(color, mWidth/mColumn, mHeight/mRow, mZ, x, y, mHoriaontalDegree, mVerticalDegree, true, true, null);
+        mObjectList[row][column] = new RectObject(color, mWidth/mColumn, mHeight/mRow, mZ, x, y, mHorizontalDegree, mVerticalDegree, true, true, null);
     }
-
     @Override
     public void removeObject(int row, int column){
         mObjectList[row][column] = null;

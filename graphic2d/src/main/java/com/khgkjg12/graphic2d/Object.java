@@ -15,7 +15,7 @@
  */
 package com.khgkjg12.graphic2d;
 
-import android.util.Log;
+import android.support.annotation.Nullable;
 
 public abstract class Object {
 
@@ -25,18 +25,14 @@ public abstract class Object {
     private OnClickListener mOnClickListener;
     float mZ;
     int mX, mY;
-    int mHoriaontalDegree;
-    int mVerticalDegree;
 
-    public Object(float z, int x, int y, int degreeH, int degreeV, boolean visibility, boolean clickable, String id){
+    public Object(float z, int x, int y, boolean visibility, boolean clickable, @Nullable String id){
         mVisibility = visibility;
         mClickable = clickable;
         mId = id;
         mZ = z;
         mX = x;
         mY = y;
-        mHoriaontalDegree = degreeH%360;
-        mVerticalDegree = degreeV%360;
     }
 
     //객체의 좌표를 설정.
@@ -81,7 +77,7 @@ public abstract class Object {
             float scale = focusedZ / (cameraZ - mZ);
             float renderX = (viewportWidth / 2f) - (viewportX - mX) * scale;
             float renderY = (viewportHeight / 2f) - (viewportY - mY) * scale;
-            render(drawer, scale, renderX, renderY, mVerticalDegree, mHoriaontalDegree);
+            render(drawer, scale, renderX, renderY);
         }
     }
 
@@ -91,20 +87,10 @@ public abstract class Object {
      * @param renderX 렌더프레임상 오브젝트 중심 x.
      * @param renderY 렌더프레임상 오브젝트 중심 y.
      */
-    abstract void render(Graphic2dDrawer drawer, float scale, float renderX, float renderY, float verticalDegree, float horizontalDegree);
+    abstract void render(Graphic2dDrawer drawer, float scale, float renderX, float renderY);
 
     public interface OnClickListener{
         public void onClick(Object object);
-    }
-
-    public void setHorizontalFlip(int degree){
-        mVerticalDegree = 0;
-        mHoriaontalDegree = degree%360;
-    }
-
-    public void setVerticalFlip(int degree){
-        mHoriaontalDegree = 0;
-        mVerticalDegree = degree%360;
     }
 
     public void setZ(float z){

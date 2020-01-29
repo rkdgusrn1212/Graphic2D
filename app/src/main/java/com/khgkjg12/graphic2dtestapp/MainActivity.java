@@ -24,6 +24,7 @@ import android.util.Log;
 import com.khgkjg12.graphic2d.GridObject;
 import com.khgkjg12.graphic2d.Object;
 import com.khgkjg12.graphic2d.RoundRectObject;
+import com.khgkjg12.graphic2d.TextObject;
 import com.khgkjg12.graphic2d.Texture;
 import com.khgkjg12.graphic2d.Graphic2dDrawer;
 import com.khgkjg12.graphic2d.Graphic2dRenderView;
@@ -87,7 +88,7 @@ public class MainActivity extends Activity implements Graphic2dRenderView.Render
         gridObject.setPosition(0, 0);
         gridObject.setOnClickItemListener(this);
         world.putObject(gridObject);
-        world.putObject(new TextureObject(blackStone, 200, 200, 0, 0, 0, "test1"));
+        world.putObject(new TextObject("lplplp", Color.BLACK, 100, 0.1f, 0, 0, true, true, null));
     }
 
     @Override
@@ -142,7 +143,7 @@ public class MainActivity extends Activity implements Graphic2dRenderView.Render
     @Override
     public void onClickItem(GridObject gridObject, Object[][] objectList, int row, int column) {
         if(objectList[row][column]==null){
-            gridObject.putObject(new RoundRectObject(Color.RED, 20, 20, 100, 100, 0, 0,0, null), row, column);
+            gridObject.putObject(new TextObject("IgIg", Color.BLACK, 100, 0, 100, 100, null ), row, column);
         }else{
             pop = true;
             popObject = objectList[row][column];

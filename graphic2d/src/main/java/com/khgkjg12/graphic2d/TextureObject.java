@@ -28,12 +28,12 @@ public class TextureObject extends RectObject {
 
     @Override
     void render(Graphic2dDrawer drawer, float scale, float renderX, float renderY) {
-        float width = mWidth * Math.abs((float) Math.cos(mHorizontalDegree * Math.PI / 180)) * scale;
-        float height = mHeight * Math.abs((float) Math.cos(mVerticalDegree * Math.PI / 180)) * scale;
-        mRectF.left = renderX - width / 2;
-        mRectF.top = renderY - height / 2;
-        mRectF.right = mRectF.left + width;
-        mRectF.bottom = mRectF.top + height;
+        mRenderWidth = mWidth * Math.abs((float) Math.cos(mHorizontalDegree * Math.PI / 180))*scale;
+        mRenderHeight = mHeight * Math.abs((float) Math.cos(mVerticalDegree * Math.PI / 180))*scale;
+        mRectF.left = mRenderLeft = renderX - mRenderWidth/2;
+        mRectF.top = mRenderTop = renderY - mRenderHeight/2;
+        mRectF.right = mRenderRight = mRenderLeft + mRenderWidth;
+        mRectF.bottom = mRenderBottom = mRenderTop + mRenderHeight;
         drawer.drawObject(mTexture, mRectF);
     }
 }

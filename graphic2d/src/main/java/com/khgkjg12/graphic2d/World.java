@@ -152,7 +152,6 @@ public class World {
                     if(isPressed){
                         for(Object object : mObjects.values()){
                             object.onTouch(event.x, event.y);
-                            Log.d("text", event.x +":"+event.y);
                         }
                     }
                     isPressed = false;

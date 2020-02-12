@@ -28,7 +28,6 @@ public abstract class Object {
     private float mRenderX;
     private float mRenderY;
     private float mScale;
-    private boolean mFrontCam;
 
     public Object(float z, int x, int y, boolean visibility, boolean clickable, @Nullable String id){
         mVisibility = visibility;
@@ -55,7 +54,7 @@ public abstract class Object {
     }
 
     boolean onTouch(int x, int y){
-        if(mClickable&&mFrontCam&&checkBoundary(mScale, mRenderX, mRenderY, x, y)){
+        if(mClickable&&mScale!=0&&checkBoundary(mScale, mRenderX, mRenderY, x, y)){
             if(mOnClickListener!=null) {
                 mOnClickListener.onClick(this);
             }
@@ -78,7 +77,6 @@ public abstract class Object {
 
     void render(Graphic2dDrawer drawer, int viewportWidth, int viewportHeight, float cameraZ, float focusedZ, int viewportX, int viewportY){
         if(mZ<cameraZ) {
-            mFrontCam = true;
             mScale = focusedZ / (cameraZ - mZ);
             mRenderX = (viewportWidth / 2f) - (viewportX - mX) * mScale;
             mRenderY = (viewportHeight / 2f) - (viewportY - mY) * mScale;
@@ -86,7 +84,7 @@ public abstract class Object {
                 render(drawer, mScale, mRenderX, mRenderY);
             }
         }else{
-            mFrontCam = false;
+            mScale = 0;
         }
     }
 

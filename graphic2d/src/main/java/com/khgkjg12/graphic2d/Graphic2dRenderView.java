@@ -172,9 +172,9 @@ public class Graphic2dRenderView extends SurfaceView implements Runnable {
             float deltaTime = (System.nanoTime()-startTime) / 1000000000.0f;
             startTime = System.nanoTime();
 
-            mWorld.onTouch(mInput);
             mRenderer.updateWorld(deltaTime, mWorld);
             mWorld.render(mDrawer);
+            mWorld.onTouch(mInput);
 
             Canvas canvas;
             if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {

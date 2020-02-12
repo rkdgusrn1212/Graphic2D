@@ -18,6 +18,7 @@ package com.khgkjg12.graphic2dtestapp;
 import android.app.Activity;
 import android.content.res.Configuration;
 import android.graphics.Color;
+import android.graphics.Typeface;
 import android.os.Bundle;
 import android.util.Log;
 
@@ -88,7 +89,7 @@ public class MainActivity extends Activity implements Graphic2dRenderView.Render
         gridObject.setPosition(0, 0);
         gridObject.setOnClickItemListener(this);
         world.putObject(gridObject);
-        world.putObject(new TextObject("lplplp", Color.BLACK, 100, 0.1f, 0, 0, true, true, null));
+        world.putObject(new TextObject("lplplp", Typeface.SANS_SERIF, Color.BLACK, 100, 0.1f, 0, 0, true, true, null));
     }
 
     @Override
@@ -143,7 +144,7 @@ public class MainActivity extends Activity implements Graphic2dRenderView.Render
     @Override
     public void onClickItem(GridObject gridObject, Object[][] objectList, int row, int column) {
         if(objectList[row][column]==null){
-            gridObject.putObject(new TextObject("IgIg", Color.BLACK, 100, 0, 100, 100, null ), row, column);
+            gridObject.putObject(new TextObject("IgIg", Typeface.SERIF, Color.BLACK, 100, 0, 100, 100, null ), row, column);
         }else{
             pop = true;
             popObject = objectList[row][column];

@@ -16,6 +16,7 @@
 package com.khgkjg12.graphic2d;
 
 import android.graphics.RectF;
+import android.util.Log;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -150,7 +151,8 @@ public class World {
                 }else if(event.type == TouchHandler.TouchEvent.TOUCH_UP) {
                     if(isPressed){
                         for(Object object : mObjects.values()){
-                            object.onTouch((int)(mViewportX+(event.x-mViewportWidth/2)/scale), (int)(mViewportY+(event.y-mViewportHeight/2)/scale));
+                            object.onTouch(event.x, event.y);
+                            Log.d("text", event.x +":"+event.y);
                         }
                     }
                     isPressed = false;
@@ -159,10 +161,10 @@ public class World {
         }
     }
     void setPinchToZoom(boolean pinchToZoom){
-
+        mPinchToZoom = pinchToZoom;
     }
 
     void setDragToMove(boolean dragToMove){
-
+        mDragToMove = dragToMove;
     }
 }

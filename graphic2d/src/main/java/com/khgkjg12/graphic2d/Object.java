@@ -25,6 +25,10 @@ public abstract class Object {
     private OnClickListener mOnClickListener;
     float mZ;
     int mX, mY;
+    private float mRenderX;
+    private float mRenderY;
+    private float mScale;
+    private boolean mFrontCam;
 
     public Object(float z, int x, int y, boolean visibility, boolean clickable, @Nullable String id){
         mVisibility = visibility;
@@ -51,7 +55,7 @@ public abstract class Object {
     }
 
     boolean onTouch(int x, int y){
-        if(mClickable&&checkBoundary(x, y)){
+        if(mClickable&&mFrontCam&&checkBoundary(mScale, mRenderX, mRenderY, x, y)){
             if(mOnClickListener!=null) {
                 mOnClickListener.onClick(this);
             }
@@ -66,18 +70,23 @@ public abstract class Object {
      * @param y
      * @return x, y 가 경계선 안에 있으면 참.
      */
-    abstract boolean checkBoundary(int x, int y);
+    abstract boolean checkBoundary(float scale, float renderX, float mRenderY, int x, int y);
 
     public void setOnClickListener(OnClickListener onClickListener){
         mOnClickListener = onClickListener;
     }
 
     void render(Graphic2dDrawer drawer, int viewportWidth, int viewportHeight, float cameraZ, float focusedZ, int viewportX, int viewportY){
-        if(mVisibility&&mZ<cameraZ) {
-            float scale = focusedZ / (cameraZ - mZ);
-            float renderX = (viewportWidth / 2f) - (viewportX - mX) * scale;
-            float renderY = (viewportHeight / 2f) - (viewportY - mY) * scale;
-            render(drawer, scale, renderX, renderY);
+        if(mZ<cameraZ) {
+            mFrontCam = true;
+            mScale = focusedZ / (cameraZ - mZ);
+            mRenderX = (viewportWidth / 2f) - (viewportX - mX) * mScale;
+            mRenderY = (viewportHeight / 2f) - (viewportY - mY) * mScale;
+            if(mVisibility) {
+                render(drawer, mScale, mRenderX, mRenderY);
+            }
+        }else{
+            mFrontCam = false;
         }
     }
 

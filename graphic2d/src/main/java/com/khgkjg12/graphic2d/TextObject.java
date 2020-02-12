@@ -15,36 +15,28 @@ public class TextObject extends Object {
     private Paint.FontMetrics mFontMetrics;
     private Rect mBound;
 
-    public TextObject(@NonNull String text, int color, int textSize, float z, int x, int y, @Nullable String id){
-        this(text, color, textSize, z, x, y, true, false, id);
+    public TextObject(@NonNull String text, Typeface typeface, int color, int textSize, float z, int x, int y, @Nullable String id){
+        this(text, typeface, color, textSize, z, x, y, true, false, id);
     }
 
-    public TextObject(int color, int textSize, float z, int x, int y, @Nullable String id){
-        this(color, textSize, z, x, y, true, false, id);
+    public TextObject(Typeface typeface, int color, int textSize, float z, int x, int y, @Nullable String id){
+        this(typeface, color, textSize, z, x, y, true, false, id);
     }
 
-    public TextObject(int color, int textSize, float z, int x, int y, boolean visibility, boolean clickable, @Nullable String id) {
-        this("", color, textSize, z, x, y, visibility, clickable, id);
+    public TextObject(Typeface typeface, int color, int textSize, float z, int x, int y, boolean visibility, boolean clickable, @Nullable String id) {
+        this("", typeface, color, textSize, z, x, y, visibility, clickable, id);
     }
 
-    public TextObject(@NonNull String text, int color, int textSize, float z, int x, int y, boolean visibility, boolean clickable, @Nullable String id) {
+    public TextObject(@NonNull String text, Typeface typeface, int color, int textSize, float z, int x, int y, boolean visibility, boolean clickable, @Nullable String id) {
         super(z, x, y, visibility, clickable, id);
         mPaint = new Paint();
         mPaint.setColor(color);
         mPaint.setTextAlign(Paint.Align.CENTER);
-        mPaint.setTypeface(Typeface.SERIF);
+        mPaint.setTypeface(typeface);
         mTextSize = textSize;
         mText = text;
         mBound = new Rect();
         mFontMetrics = new Paint.FontMetrics();
-        mPaint.setTextSize(mTextSize);
-        mPaint.getFontMetrics(mFontMetrics);
-        mPaint.getTextBounds(mText, 0, mText.length(), mBound);
-        float halfWidth = mPaint.measureText(mText)/2;
-        mBound.left -= halfWidth;
-        mBound.right -= halfWidth;
-        mBound.top -= mFontMetrics.bottom - textSize/2;
-        mBound.bottom -= mFontMetrics.bottom - textSize/2;
     }
 
     public void setText(@NonNull String text){
@@ -59,12 +51,17 @@ public class TextObject extends Object {
         mPaint.setTextSize(textSize);
     }
 
+
     @Override
-    boolean checkBoundary(int x, int y) {
-        int left = mX+mBound.left;
-        int top = mY+mBound.top;
-        int right = mX+mBound.right;
-        int bottom = mY+mBound.bottom;
+    boolean checkBoundary(float scale, float renderX, float renderY, int x, int y) {
+        float textSize = mPaint.getTextSize();
+        mPaint.getFontMetrics(mFontMetrics);
+        mPaint.getTextBounds(mText, 0, mText.length(), mBound);
+        float halfWidth = mPaint.measureText(mText)/2;
+        int left = (int)(renderX+mBound.left-halfWidth);
+        int top = (int)(renderY+mBound.top-mFontMetrics.bottom+textSize/2);
+        int right = (int)(renderX+mBound.right-halfWidth);
+        int bottom = (int)(renderY+mBound.bottom-mFontMetrics.bottom+textSize/2);
         return x < right && x >= left && y < bottom && y >= top;
     }
 
@@ -72,7 +69,6 @@ public class TextObject extends Object {
     void render(Graphic2dDrawer drawer, float scale, float renderX, float renderY) {
         float scaledSize = mTextSize * scale;
         mPaint.setTextSize(scaledSize);
-        renderY+=scaledSize/2-mFontMetrics.bottom*scale;
-        drawer.drawText(mText, renderX, renderY, mPaint);
+        drawer.drawText(mText, renderX, renderY+scaledSize/2-mFontMetrics.bottom*scale, mPaint);
     }
 }

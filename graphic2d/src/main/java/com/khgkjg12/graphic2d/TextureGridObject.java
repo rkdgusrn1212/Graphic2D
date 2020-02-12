@@ -57,11 +57,11 @@ public class TextureGridObject extends TextureObject implements GridObject {
     }
 
     @Override
-    boolean checkBoundary(int x, int y) {
-        if(super.checkBoundary(x, y)){
+    boolean checkBoundary(float scale, float renderX, float renderY, int x, int y) {
+        if(super.checkBoundary(scale, renderX, renderY, x, y)){
             if (mOnClickItemListener != null) {
-                int column = (x - mX + mWidth/2) * mColumn / mWidth;
-                int row = (y - mY + mHeight/2) * mRow / mHeight;
+                int column = (int)((x - mRenderLeft) * mColumn / mRenderWidth);
+                int row = (int)((y - mRenderTop) * mRow / mRenderHeight);
                 mOnClickItemListener.onClickItem(this, mObjectList, row, column);
             }
             return true;

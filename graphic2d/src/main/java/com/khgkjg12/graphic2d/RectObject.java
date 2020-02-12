@@ -8,6 +8,8 @@ public class RectObject extends Object {
     int mWidth, mHeight;
     int mHorizontalDegree;
     int mVerticalDegree;
+    float mRenderWidth, mRenderHeight;
+    float mRenderLeft, mRenderRight, mRenderTop, mRenderBottom;
 
     public RectObject(int color, int width, int height, float z, int x, int y, String id){
         this(color, width, height, z, x, y, 0, 0, true, true, id);
@@ -28,12 +30,8 @@ public class RectObject extends Object {
     }
 
     @Override
-    boolean checkBoundary(int x, int y) {
-        int left = mX-mWidth/2;
-        int top = mY-mHeight/2;
-        int right = left + mWidth;
-        int bottom = top + mHeight;
-        return x < right && x >= left && y < bottom && y >= top;
+    boolean checkBoundary(float scale, float renderX, float renderY, int x, int y) {
+        return x < mRenderRight && x > mRenderLeft && y < mRenderBottom && y > mRenderTop;
     }
 
     public void setHorizontalFlip(int degree){
@@ -52,12 +50,12 @@ public class RectObject extends Object {
 
     @Override
     void render(Graphic2dDrawer drawer, float scale, float renderX, float renderY) {
-        float width = mWidth * Math.abs((float) Math.cos(mHorizontalDegree * Math.PI / 180))*scale;
-        float height = mHeight * Math.abs((float) Math.cos(mVerticalDegree * Math.PI / 180))*scale;
-        float left = renderX - width/2;
-        float top = renderY - height/2;
-        float right = left + width;
-        float bottom = top + height;
-        drawer.drawRect(left, top, right, bottom, mPaint);
+        mRenderWidth = mWidth * Math.abs((float) Math.cos(mHorizontalDegree * Math.PI / 180))*scale;
+        mRenderHeight = mHeight * Math.abs((float) Math.cos(mVerticalDegree * Math.PI / 180))*scale;
+        mRenderLeft = renderX - mRenderWidth/2;
+        mRenderTop = renderY - mRenderHeight/2;
+        mRenderRight = mRenderLeft + mRenderWidth;
+        mRenderBottom = mRenderTop + mRenderHeight;
+        drawer.drawRect(mRenderLeft, mRenderTop, mRenderRight, mRenderBottom, mPaint);
     }
 }

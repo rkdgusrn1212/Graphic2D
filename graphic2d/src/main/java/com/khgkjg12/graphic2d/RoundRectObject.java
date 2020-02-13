@@ -23,13 +23,7 @@ public class RoundRectObject extends RectObject {
     }
 
     @Override
-    void render(Graphic2dDrawer drawer, float scale, float renderX, float renderY) {
-        float width = mWidth * Math.abs((float) Math.cos(mHorizontalDegree * Math.PI / 180))* scale;
-        float height = mHeight * Math.abs((float) Math.cos(mVerticalDegree * Math.PI / 180))* scale;
-        float left = renderX - width/2;
-        float top = renderY - height/2;
-        float right = left + width;
-        float bottom = top + height;
-        drawer.drawRoundRect(left, top, right, bottom, mRX, mRY, super.mPaint);
+    void render(Graphic2dDrawer drawer) {
+        drawer.drawRoundRect(mRenderLeft, mRenderTop, mRenderRight, mRenderBottom, mRX, mRY, super.mPaint);
     }
 }

@@ -70,8 +70,8 @@ public class RectGridObject extends RectObject implements GridObject {
     }
 
     @Override
-    boolean checkBoundary(float scale, float renderX, float renderY, int x, int y) {
-        if(super.checkBoundary(scale, renderX, renderY, x, y)){
+    boolean checkBoundary(int x, int y) {
+        if(super.checkBoundary(x, y)){
             if (mOnClickItemListener != null) {
                 int column = (int)((x - mRenderLeft) * mColumn / mRenderWidth);
                 int row = (int)((y - mRenderTop) * mRow / mRenderHeight);

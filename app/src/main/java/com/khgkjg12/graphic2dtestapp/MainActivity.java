@@ -89,7 +89,7 @@ public class MainActivity extends Activity implements Graphic2dRenderView.Render
         gridObject.setPosition(0, 0);
         gridObject.setOnClickItemListener(this);
         world.putObject(gridObject);
-        world.putObject(new TextObject("lplplp", Typeface.SANS_SERIF, Color.BLACK, 100, 0.1f, 0, 0, true, true, null));
+        world.putObject(new TextObject("lplplp", Typeface.SANS_SERIF, Color.BLACK, 100, 0, 0, 0, true, true, null));
     }
 
     @Override

@@ -4,9 +4,14 @@ import android.graphics.Color;
 import android.graphics.RectF;
 import android.support.annotation.NonNull;
 
-public class TextureObject extends RectObject {
+public class TextureObject extends Object {
     private Texture mTexture;
-    private RectF mRectF;
+    int mWidth, mHeight;
+    RectF mRectF;
+    int mHorizontalDegree;
+    int mVerticalDegree;
+    float mRenderWidth;
+    float mRenderHeight;
 
     public TextureObject(@NonNull Texture texture, int width, int height, float z, int x, int y, String id) {
         this(texture, width, height, z, x, y, 0, 0, id);
@@ -17,9 +22,13 @@ public class TextureObject extends RectObject {
     }
 
     public TextureObject(@NonNull Texture texture, int width, int height, float z, int x, int y, int degreeH, int degreeV, boolean visibility, boolean clickable, String id){
-        super(Color.TRANSPARENT, width, height, z, x, y, degreeH, degreeV, visibility, clickable, id);
+        super(z, x, y, visibility, clickable, id);
         mTexture = texture;
         mRectF = new RectF();
+        mWidth = width;
+        mHeight = height;
+        mHorizontalDegree = degreeH%360;
+        mVerticalDegree = degreeV%360;
     }
 
     public void setTexture(@NonNull Texture texture){
@@ -27,13 +36,23 @@ public class TextureObject extends RectObject {
     }
 
     @Override
-    void render(Graphic2dDrawer drawer, float scale, float renderX, float renderY) {
+    boolean checkBoundary(int x, int y) {
+        return x < mRectF.right && x > mRectF.left && y < mRectF.bottom && y > mRectF.top;
+    }
+
+    @Override
+    void calculateBoundary(float scale, float renderX, float renderY){
         mRenderWidth = mWidth * Math.abs((float) Math.cos(mHorizontalDegree * Math.PI / 180))*scale;
         mRenderHeight = mHeight * Math.abs((float) Math.cos(mVerticalDegree * Math.PI / 180))*scale;
-        mRectF.left = mRenderLeft = renderX - mRenderWidth/2;
-        mRectF.top = mRenderTop = renderY - mRenderHeight/2;
-        mRectF.right = mRenderRight = mRenderLeft + mRenderWidth;
-        mRectF.bottom = mRenderBottom = mRenderTop + mRenderHeight;
+        mRectF.left = renderX - mRenderWidth/2;
+        mRectF.top = renderY - mRenderHeight/2;
+        mRectF.right = mRectF.left + mRenderWidth;
+        mRectF.bottom = mRectF.top + mRenderHeight;
+    }
+
+
+    @Override
+    void render(Graphic2dDrawer drawer) {
         drawer.drawObject(mTexture, mRectF);
     }
 }

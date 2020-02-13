@@ -25,9 +25,7 @@ public abstract class Object {
     private OnClickListener mOnClickListener;
     float mZ;
     int mX, mY;
-    private float mRenderX;
-    private float mRenderY;
-    private float mScale;
+    private boolean isInCameraRange;
 
     public Object(float z, int x, int y, boolean visibility, boolean clickable, @Nullable String id){
         mVisibility = visibility;
@@ -54,7 +52,7 @@ public abstract class Object {
     }
 
     boolean onTouch(int x, int y){
-        if(mClickable&&mScale!=0&&checkBoundary(mScale, mRenderX, mRenderY, x, y)){
+        if(mClickable&&isInCameraRange&&checkBoundary(x, y)){
             if(mOnClickListener!=null) {
                 mOnClickListener.onClick(this);
             }
@@ -65,11 +63,9 @@ public abstract class Object {
 
     /**
      * 경계선 채크 메소드.
-     * @param x
-     * @param y
      * @return x, y 가 경계선 안에 있으면 참.
      */
-    abstract boolean checkBoundary(float scale, float renderX, float mRenderY, int x, int y);
+    abstract boolean checkBoundary(int x, int y);
 
     public void setOnClickListener(OnClickListener onClickListener){
         mOnClickListener = onClickListener;
@@ -77,24 +73,31 @@ public abstract class Object {
 
     void render(Graphic2dDrawer drawer, int viewportWidth, int viewportHeight, float cameraZ, float focusedZ, int viewportX, int viewportY){
         if(mZ<cameraZ) {
-            mScale = focusedZ / (cameraZ - mZ);
-            mRenderX = (viewportWidth / 2f) - (viewportX - mX) * mScale;
-            mRenderY = (viewportHeight / 2f) - (viewportY - mY) * mScale;
+            isInCameraRange = true;
+            float scale = focusedZ / (cameraZ - mZ);
+            float renderX = (viewportWidth / 2f) - (viewportX - mX) * scale;
+            float renderY = (viewportHeight / 2f) - (viewportY - mY) * scale;
+            calculateBoundary(scale, renderX, renderY);
             if(mVisibility) {
-                render(drawer, mScale, mRenderX, mRenderY);
+                render(drawer);
             }
         }else{
-            mScale = 0;
+            isInCameraRange = false;
         }
     }
 
     /**
-     * 렌더 프레임상 x, y좌표 와 카메라 위치에 따른 스케일.
+     * 오브젝트의 경계를 계산.
      * @param scale 너비 및 높이 또는 반지름에 곱해야함.
      * @param renderX 렌더프레임상 오브젝트 중심 x.
      * @param renderY 렌더프레임상 오브젝트 중심 y.
      */
-    abstract void render(Graphic2dDrawer drawer, float scale, float renderX, float renderY);
+    abstract void calculateBoundary(float scale, float renderX, float renderY);
+
+    /**
+     * 렌더 프레임상 x, y좌표 와 카메라 위치에 따른 스케일.
+     */
+    abstract void render(Graphic2dDrawer drawer);
 
     public interface OnClickListener{
         public void onClick(Object object);

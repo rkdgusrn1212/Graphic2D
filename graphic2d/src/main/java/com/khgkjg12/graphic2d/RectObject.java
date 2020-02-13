@@ -30,7 +30,7 @@ public class RectObject extends Object {
     }
 
     @Override
-    boolean checkBoundary(float scale, float renderX, float renderY, int x, int y) {
+    boolean checkBoundary(int x, int y) {
         return x < mRenderRight && x > mRenderLeft && y < mRenderBottom && y > mRenderTop;
     }
 
@@ -49,13 +49,17 @@ public class RectObject extends Object {
     }
 
     @Override
-    void render(Graphic2dDrawer drawer, float scale, float renderX, float renderY) {
+    void calculateBoundary(float scale, float renderX, float renderY){
         mRenderWidth = mWidth * Math.abs((float) Math.cos(mHorizontalDegree * Math.PI / 180))*scale;
         mRenderHeight = mHeight * Math.abs((float) Math.cos(mVerticalDegree * Math.PI / 180))*scale;
         mRenderLeft = renderX - mRenderWidth/2;
         mRenderTop = renderY - mRenderHeight/2;
         mRenderRight = mRenderLeft + mRenderWidth;
         mRenderBottom = mRenderTop + mRenderHeight;
+    }
+
+    @Override
+    void render(Graphic2dDrawer drawer) {
         drawer.drawRect(mRenderLeft, mRenderTop, mRenderRight, mRenderBottom, mPaint);
     }
 }

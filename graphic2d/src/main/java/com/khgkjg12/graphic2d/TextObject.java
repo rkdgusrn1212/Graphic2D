@@ -14,6 +14,13 @@ public class TextObject extends Object {
     private int mTextSize;
     private Paint.FontMetrics mFontMetrics;
     private Rect mBound;
+    private float mLeft;
+    private float mRight;
+    private float mTop;
+    private float mBottom;
+    private float mRenderX;
+    private float mRenderY;
+    private float mScaledSize;
 
     public TextObject(@NonNull String text, Typeface typeface, int color, int textSize, float z, int x, int y, @Nullable String id){
         this(text, typeface, color, textSize, z, x, y, true, false, id);
@@ -51,24 +58,28 @@ public class TextObject extends Object {
         mPaint.setTextSize(textSize);
     }
 
-
     @Override
-    boolean checkBoundary(float scale, float renderX, float renderY, int x, int y) {
-        float textSize = mPaint.getTextSize();
+    void calculateBoundary(float scale, float renderX, float renderY) {
+        mRenderX = renderX;
+        mRenderY = renderY;
+        mScaledSize = mTextSize * scale;
+        mPaint.setTextSize(mScaledSize);
         mPaint.getFontMetrics(mFontMetrics);
         mPaint.getTextBounds(mText, 0, mText.length(), mBound);
         float halfWidth = mPaint.measureText(mText)/2;
-        int left = (int)(renderX+mBound.left-halfWidth);
-        int top = (int)(renderY+mBound.top-mFontMetrics.bottom+textSize/2);
-        int right = (int)(renderX+mBound.right-halfWidth);
-        int bottom = (int)(renderY+mBound.bottom-mFontMetrics.bottom+textSize/2);
-        return x < right && x >= left && y < bottom && y >= top;
+        mLeft = renderX+mBound.left-halfWidth;
+        mTop = renderY+mBound.top-mFontMetrics.bottom+mScaledSize/2;
+        mRight = renderX+mBound.right-halfWidth;
+        mBottom = renderY+mBound.bottom-mFontMetrics.bottom+mScaledSize/2;
     }
 
     @Override
-    void render(Graphic2dDrawer drawer, float scale, float renderX, float renderY) {
-        float scaledSize = mTextSize * scale;
-        mPaint.setTextSize(scaledSize);
-        drawer.drawText(mText, renderX, renderY+scaledSize/2-mFontMetrics.bottom*scale, mPaint);
+    boolean checkBoundary(int x, int y) {
+        return x < mRight && x > mLeft && y < mBottom && y > mTop;
+    }
+
+    @Override
+    void render(Graphic2dDrawer drawer) {
+        drawer.drawText(mText, mRenderX, mRenderY+mScaledSize/2-mFontMetrics.bottom, mPaint);
     }
 }

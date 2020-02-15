@@ -4,20 +4,20 @@ public class RoundRectObject extends RectObject {
 
     private float mRY, mRX;
 
-    public RoundRectObject(int color, float rX, float rY, int width, int height, float z, int x, int y, String id) {
-        super(color, width, height, z, x, y, id);
+    public RoundRectObject(int color, float rX, float rY, int width, int height, float z, int x, int y) {
+        super(color, width, height, z, x, y);
         mRX = rX;
         mRY = rY;
     }
 
-    public RoundRectObject(int color, float rX, float rY, int width, int height, float z, int x, int y, int degreeH, int degreeV, String id) {
-        super(color, width, height, z, x, y, degreeH, degreeV, id);
+    public RoundRectObject(int color, float rX, float rY, int width, int height, float z, int x, int y, int degreeH, int degreeV) {
+        super(color, width, height, z, x, y, degreeH, degreeV);
         mRX = rX;
         mRY = rY;
     }
 
-    public RoundRectObject(int color, float rX, float rY, int width, int height, float z, int x, int y, int degreeH, int degreeV, boolean visibility, boolean clickable, String id) {
-        super(color, width, height, z, x, y, degreeH, degreeV, visibility, clickable, id);
+    public RoundRectObject(int color, float rX, float rY, int width, int height, float z, int x, int y, int degreeH, int degreeV, boolean visibility, boolean clickable) {
+        super(color, width, height, z, x, y, degreeH, degreeV, visibility, clickable);
         mRX = rX;
         mRY = rY;
     }

@@ -11,16 +11,16 @@ public class RectObject extends Object {
     float mRenderWidth, mRenderHeight;
     float mRenderLeft, mRenderRight, mRenderTop, mRenderBottom;
 
-    public RectObject(int color, int width, int height, float z, int x, int y, String id){
-        this(color, width, height, z, x, y, 0, 0, true, true, id);
+    public RectObject(int color, int width, int height, float z, int x, int y){
+        this(color, width, height, z, x, y, 0, 0, true, true);
     }
 
-    public RectObject(int color, int width, int height, float z, int x, int y, int degreeH, int degreeV, String id){
-        this(color, width, height, z, x, y, degreeH, degreeV, true, true, id);
+    public RectObject(int color, int width, int height, float z, int x, int y, int degreeH, int degreeV){
+        this(color, width, height, z, x, y, degreeH, degreeV, true, true);
     }
 
-    public RectObject(int color, int width, int height, float z, int x, int y, int degreeH, int degreeV, boolean visibility, boolean clickable, String id){
-        super(z, x, y, visibility, clickable, id);
+    public RectObject(int color, int width, int height, float z, int x, int y, int degreeH, int degreeV, boolean visibility, boolean clickable){
+        super(z, x, y, visibility, clickable);
         mPaint = new Paint();
         mPaint.setColor(color);
         mWidth = width;

@@ -4,8 +4,6 @@ import android.graphics.Paint;
 import android.graphics.Rect;
 import android.graphics.Typeface;
 import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
-import android.util.Log;
 
 public class TextObject extends Object {
 
@@ -22,20 +20,20 @@ public class TextObject extends Object {
     private float mRenderY;
     private float mScaledSize;
 
-    public TextObject(@NonNull String text, Typeface typeface, int color, int textSize, float z, int x, int y, @Nullable String id){
-        this(text, typeface, color, textSize, z, x, y, true, false, id);
+    public TextObject(@NonNull String text, Typeface typeface, int color, int textSize, float z, int x, int y){
+        this(text, typeface, color, textSize, z, x, y, true, false);
     }
 
-    public TextObject(Typeface typeface, int color, int textSize, float z, int x, int y, @Nullable String id){
-        this(typeface, color, textSize, z, x, y, true, false, id);
+    public TextObject(Typeface typeface, int color, int textSize, float z, int x, int y){
+        this(typeface, color, textSize, z, x, y, true, false);
     }
 
-    public TextObject(Typeface typeface, int color, int textSize, float z, int x, int y, boolean visibility, boolean clickable, @Nullable String id) {
-        this("", typeface, color, textSize, z, x, y, visibility, clickable, id);
+    public TextObject(Typeface typeface, int color, int textSize, float z, int x, int y, boolean visibility, boolean clickable) {
+        this("", typeface, color, textSize, z, x, y, visibility, clickable);
     }
 
-    public TextObject(@NonNull String text, Typeface typeface, int color, int textSize, float z, int x, int y, boolean visibility, boolean clickable, @Nullable String id) {
-        super(z, x, y, visibility, clickable, id);
+    public TextObject(@NonNull String text, Typeface typeface, int color, int textSize, float z, int x, int y, boolean visibility, boolean clickable) {
+        super(z, x, y, visibility, clickable);
         mPaint = new Paint();
         mPaint.setColor(color);
         mPaint.setTextAlign(Paint.Align.CENTER);
@@ -77,6 +75,7 @@ public class TextObject extends Object {
     boolean checkBoundary(int x, int y) {
         return x < mRight && x > mLeft && y < mBottom && y > mTop;
     }
+
 
     @Override
     void render(Graphic2dDrawer drawer) {

@@ -15,23 +15,21 @@
  */
 package com.khgkjg12.graphic2d;
 
-
-import java.util.ArrayList;
-import java.util.List;
+import android.support.annotation.WorkerThread;
 
 public class TextureGridObject extends TextureObject implements GridObject {
 
-    Object[][] mObjectList;
-    int mRow, mColumn;
+    private Object[][] mObjectList;
+    private int mRow, mColumn;
     private OnClickItemListener mOnClickItemListener;
 
-    public TextureGridObject(Texture texture, int width, int height, int row, int column, int z, int x, int y, String id){
-        super(texture, width, height, z, x, y, 0, 0, true, true, id);
+    public TextureGridObject(Texture texture, int width, int height, int row, int column, int z, int x, int y){
+        super(texture, width, height, z, x, y, 0, 0, true, true);
         init(row, column);
     }
 
-    public TextureGridObject(Texture texture, int width, int height, int row, int column, int z, int x, int y, int degreeH, int degreeV, String id){
-        super(texture, width, height, z, x, y, degreeH, degreeV, true, true, id);
+    public TextureGridObject(Texture texture, int width, int height, int row, int column, int z, int x, int y, int degreeH, int degreeV){
+        super(texture, width, height, z, x, y, degreeH, degreeV, true, true);
         init(row, column);
     }
 
@@ -41,32 +39,13 @@ public class TextureGridObject extends TextureObject implements GridObject {
         mObjectList = new Object[row][column];
     }
 
-    public Object getObject(int row, int column){
-        return mObjectList[row][column];
-    }
-
-    public Object[][] getObjectArray(){
-        return mObjectList;
-    }
-
+    @Override
     public int getRowSize(){
         return mRow;
     }
+    @Override
     public int getColumnSize(){
         return mColumn;
-    }
-
-    @Override
-    boolean checkBoundary(int x, int y) {
-        if(super.checkBoundary(x, y)){
-            if (mOnClickItemListener != null) {
-                int column = (int)((x - mRectF.left) * mColumn / mRenderWidth);
-                int row = (int)((y - mRectF.top) * mRow / mRenderHeight);
-                mOnClickItemListener.onClickItem(this, mObjectList, row, column);
-            }
-            return true;
-        }
-        return false;
     }
 
     @Override
@@ -74,40 +53,74 @@ public class TextureGridObject extends TextureObject implements GridObject {
         mOnClickItemListener = onClickItemListener;
     }
     @Override
-    public void putObject(Object obj, int row, int column){
+    public void putObject(World world, Object obj, int row, int column){
         obj.setPosition(mX-(mWidth>>1)+mWidth*column/mColumn+((mWidth/mColumn)>>1) ,mY-(mHeight>>1)+mHeight*row/mRow+((mHeight/mRow)>>1));
         mObjectList[row][column] = obj;
+        world.putObject(obj);
     }
 
     @Override
-    public void putObject(Texture texture, int row, int column){
+    public void putObject(World world, Texture texture, int row, int column){
         int x = mX-(mWidth>>1)+mWidth*column/mColumn+((mWidth/mColumn)>>1);
         int y = mY-(mHeight>>1)+mHeight*row/mRow+((mHeight/mRow)>>1);
-        mObjectList[row][column] = new TextureObject(texture, mWidth/mColumn, mHeight/mRow, mZ, x, y, mHorizontalDegree, mVerticalDegree, true, true, null);
+        Object obj = new TextureObject(texture, mWidth/mColumn, mHeight/mRow, mZ, x, y, mHorizontalDegree, mVerticalDegree, true, true);
+        mObjectList[row][column] = obj;
+        world.putObject(obj);
     }
 
     @Override
-    public void putObject(int color, int row, int column){
+    public void putObject(World world, int color, int row, int column){
         int x = mX-(mWidth>>1)+mWidth*column/mColumn+((mWidth/mColumn)>>1);
         int y = mY-(mHeight>>1)+mHeight*row/mRow+((mHeight/mRow)>>1);
-        mObjectList[row][column] = new RectObject(color, mWidth/mColumn, mHeight/mRow, mZ, x, y, mHorizontalDegree, mVerticalDegree, true, true, null);
+        Object object = new RectObject(color, mWidth/mColumn, mHeight/mRow, mZ, x, y, mHorizontalDegree, mVerticalDegree, true, true);
+        mObjectList[row][column] = object;
+        world.putObject(object);
     }
     @Override
-    public void removeObject(int row, int column){
+    public void removeObject(World world, int row, int column){
+        world.removeObject(mObjectList[row][column]);
         mObjectList[row][column] = null;
     }
 
     @Override
-    public List<Object> getObjects(){
-        List<Object> objects = new ArrayList<Object>();
+    public void attached(World world) {
         for(int i=0; i<mRow; i++){
             for(int j=0; j<mColumn; j++){
-                Object obj = mObjectList[i][j];
-                if(obj!=null){
-                    objects.add(obj);
+                if(mObjectList[i][j]!=null){
+                    world.putObject(mObjectList[i][j]);
                 }
             }
         }
-        return objects;
     }
+
+    @Override
+    public void detached(World world) {
+        for(int i=0; i<mRow; i++){
+            for(int j=0; j<mColumn; j++){
+                if(mObjectList[i][j]!=null){
+                    world.removeObject(mObjectList[i][j]);
+                }
+            }
+        }
+    }
+
+    @Override
+    public Object getObject(int row, int column){
+        return mObjectList[row][column];
+    }
+
+    @WorkerThread
+    @Override
+    boolean onTouch(World world, int x, int y){
+        if(isInCameraRange&&checkBoundary(x, y)){
+            if (mClickable&&mOnClickItemListener != null) {
+                int column = (int)((x - mRectF.left) * mColumn / mRenderWidth);
+                int row = (int)((y - mRectF.top) * mRow / mRenderHeight);
+                return mOnClickItemListener.onClickItem(world, this, mObjectList[row][column], row, column);
+            }
+            return mClickable;
+        }
+        return false;
+    }
+
 }

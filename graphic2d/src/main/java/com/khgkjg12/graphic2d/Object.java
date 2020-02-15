@@ -15,22 +15,20 @@
  */
 package com.khgkjg12.graphic2d;
 
-import android.support.annotation.Nullable;
+import android.support.annotation.WorkerThread;
 
 public abstract class Object {
 
     private boolean mVisibility;
     boolean mClickable;
-    String mId;
     private OnClickListener mOnClickListener;
     float mZ;
     int mX, mY;
-    private boolean isInCameraRange;
+    boolean isInCameraRange;
 
-    public Object(float z, int x, int y, boolean visibility, boolean clickable, @Nullable String id){
+    public Object(float z, int x, int y, boolean visibility, boolean clickable){
         mVisibility = visibility;
         mClickable = clickable;
-        mId = id;
         mZ = z;
         mX = x;
         mY = y;
@@ -51,12 +49,13 @@ public abstract class Object {
         mClickable = clickable;
     }
 
-    boolean onTouch(int x, int y){
-        if(mClickable&&isInCameraRange&&checkBoundary(x, y)){
-            if(mOnClickListener!=null) {
-                mOnClickListener.onClick(this);
+    @WorkerThread
+    boolean onTouch(World world, int x, int y){
+        if(isInCameraRange&&checkBoundary(x, y)){
+            if(mClickable&&mOnClickListener!=null) {
+                return mOnClickListener.onClick(world, this);
             }
-            return true;
+            return mClickable;
         }
         return false;
     }
@@ -65,6 +64,7 @@ public abstract class Object {
      * 경계선 채크 메소드.
      * @return x, y 가 경계선 안에 있으면 참.
      */
+    @WorkerThread
     abstract boolean checkBoundary(int x, int y);
 
     public void setOnClickListener(OnClickListener onClickListener){
@@ -100,7 +100,8 @@ public abstract class Object {
     abstract void render(Graphic2dDrawer drawer);
 
     public interface OnClickListener{
-        public void onClick(Object object);
+        @WorkerThread
+        public boolean onClick(World world, Object object);
     }
 
     public void setZ(float z){

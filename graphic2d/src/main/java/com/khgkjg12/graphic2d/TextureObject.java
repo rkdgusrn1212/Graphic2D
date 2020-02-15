@@ -13,16 +13,16 @@ public class TextureObject extends Object {
     float mRenderWidth;
     float mRenderHeight;
 
-    public TextureObject(@NonNull Texture texture, int width, int height, float z, int x, int y, String id) {
-        this(texture, width, height, z, x, y, 0, 0, id);
+    public TextureObject(@NonNull Texture texture, int width, int height, float z, int x, int y) {
+        this(texture, width, height, z, x, y, 0, 0);
     }
 
-    public TextureObject(@NonNull Texture texture, int width, int height, float z, int x, int y, int degreeH, int degreeV, String id) {
-        this(texture, width, height, z, x, y, degreeH, degreeV, true, true, id);
+    public TextureObject(@NonNull Texture texture, int width, int height, float z, int x, int y, int degreeH, int degreeV) {
+        this(texture, width, height, z, x, y, degreeH, degreeV, true, true);
     }
 
-    public TextureObject(@NonNull Texture texture, int width, int height, float z, int x, int y, int degreeH, int degreeV, boolean visibility, boolean clickable, String id){
-        super(z, x, y, visibility, clickable, id);
+    public TextureObject(@NonNull Texture texture, int width, int height, float z, int x, int y, int degreeH, int degreeV, boolean visibility, boolean clickable){
+        super(z, x, y, visibility, clickable);
         mTexture = texture;
         mRectF = new RectF();
         mWidth = width;

@@ -13,5 +13,6 @@
         <attr name="backgroundColor" format="color"/>
         <attr name="dragToMove" format="boolean"/>
         <attr name="pinchToZoom" format="boolean"/>
+        <attr name="maxObjectCount" format="integer"/>
     </declare-styleable>
 </resources>

@@ -19,13 +19,16 @@ import android.graphics.RectF;
 import android.util.Log;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Dictionary;
 import java.util.HashMap;
 import java.util.List;
+import java.util.PriorityQueue;
 
 public class World {
 
     private int mWidth, mHeight;//0은 무한.
-    HashMap<String, Object> mObjects;
+    Object[] mObjects;
     boolean isDragging = false;
     int startX, startY;
     boolean isPressed = false;
@@ -42,8 +45,10 @@ public class World {
     private boolean mDragToMove;
     private boolean mPinchToZoom;
     private RectF mRectF;
+    private int mMaxObjectCount;
+    private int mObjectCount;
 
-    World(int width, int height, int viewportX, int viewportY, float cameraZ, float minCameraZ, float maxCameraZ, float focusedZ, int backgroundColor, boolean dragToMove, boolean pinchToZoom){
+    World(int width, int height, int viewportX, int viewportY, float cameraZ, float minCameraZ, float maxCameraZ, float focusedZ, int backgroundColor, boolean dragToMove, boolean pinchToZoom, int maxObjectCount){
         mWidth = width;
         mHeight = height;
         mViewportX = viewportX;
@@ -52,19 +57,67 @@ public class World {
         mMinCameraZ = minCameraZ;
         mMaxCameraZ = maxCameraZ;
         mFocusedZ = focusedZ;
-        mObjects = new HashMap<>();
+        mMaxObjectCount = maxObjectCount;
+        mObjectCount = 0;
+        mObjects = new Object[maxObjectCount];
         mBackgroundColor = backgroundColor;
         mDragToMove = dragToMove;
         mPinchToZoom = pinchToZoom;
         mRectF = new RectF(0, 0, mViewportWidth, mViewportHeight);
     }
 
-    public void putObject(Object obj){
-        mObjects.put(obj.mId, obj);
+    public int getMaxObjectCount(){
+        return mMaxObjectCount;
     }
 
-    public void removeObject(String id){
-        mObjects.remove(id);
+    /**
+     * 오직 콜백 메소드를 통해 전달된 World 에서만 호출해야함.
+     * @param maxObjectCount
+     */
+    public void changeMaxObjectCount(int maxObjectCount){
+        mMaxObjectCount = maxObjectCount;
+        Object[] tempObjects = mObjects;
+        mObjects = new Object[maxObjectCount];
+        System.arraycopy(tempObjects, 0, mObjects, 0, maxObjectCount);
+    }
+
+    /**
+     * 오브젝트를 z 우선순위에 맞춰서 배열에 집어넣음.
+     * @exception IndexOutOfBoundsException 배열이 가득 찬 상태에서 집어넣음.
+     * @param obj 오브젝트.
+     */
+    public void putObject(Object obj){
+        int i = 0;
+        while(i!=mObjectCount&&mObjects[i].mZ > obj.mZ){
+            i++;
+        }
+        int j = mObjectCount++;
+        while(j!=i){
+            mObjects[j] = mObjects[j-1];
+            j--;
+        }
+        mObjects[i] = obj;
+        if(obj instanceof GridObject){
+            ((GridObject) obj).attached(this);
+        }
+    }
+
+    /**
+     * world 에서 오브젝트를 제거.
+     * 호출시점에서 매개변수로 받은 제거대상이 무조건 존재하고 있음을 가정.
+     * @exception IndexOutOfBoundsException 해당 id 와 일치하는 오브젝트가 없을때 발생.
+     * @param object 삭제할 오브젝트 레퍼런스.
+     */
+    public void removeObject(Object object){
+        int i = 0;
+        while(mObjects[i++] != object);
+        if(mObjects[i-1] instanceof GridObject){
+            ((GridObject)mObjects[i-1]).detached(this);
+        }
+        while(i!=mObjectCount){
+            mObjects[i-1] = mObjects[i++];
+        }
+        mObjectCount--;
     }
 
     void setViewportSize(int viewportWidth, int viewportHeight){
@@ -82,25 +135,8 @@ public class World {
         }else{
             drawer.drawObject(mBackgroundTexture, mRectF);
         }
-        List<Object> objects =  new ArrayList<>(mObjects.values());
-        for(int i=0; i<objects.size();i++){
-            if(objects.get(i) instanceof GridObject){
-                List<Object> itemList = ((GridObject)(objects.get(i))).getObjects();
-                objects.addAll(itemList);
-            }
-        }
-        for(int i=0; i< objects.size()-1; i++){
-            for(int j=i+1; j<objects.size();j++){
-                if(objects.get(i).getZ()>objects.get(j).getZ()){
-                    Object tempObj = objects.remove(j);
-                    objects.add(j,objects.get(i));
-                    objects.remove(i);
-                    objects.add(i,tempObj);
-                }
-            }
-        }
-        for(int i=0; i<objects.size(); i++){
-            objects.get(i).render(drawer, mViewportWidth, mViewportHeight, mCameraZ, mFocusedZ, mViewportX, mViewportY);
+        for(int i=mObjectCount-1; i>=0; i--){
+            mObjects[i].render(drawer, mViewportWidth, mViewportHeight, mCameraZ, mFocusedZ, mViewportX, mViewportY);
         }
     }
 
@@ -150,8 +186,10 @@ public class World {
                     }
                 }else if(event.type == TouchHandler.TouchEvent.TOUCH_UP) {
                     if(isPressed){
-                        for(Object object : mObjects.values()){
-                            object.onTouch(event.x, event.y);
+                        for(int j=0; j< mObjectCount; j++){
+                            if(mObjects[j].onTouch(this, event.x, event.y)){
+                                break;
+                            }
                         }
                     }
                     isPressed = false;

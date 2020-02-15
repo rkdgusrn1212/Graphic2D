@@ -1,5 +1,6 @@
 # Graphic2D
 Android 2D Graphic Framework.
+안드로이드 2D 그래픽 프레임 워크. README 는 일단 영어로 작성함.
 
 # Usage
 Write .xml
@@ -44,13 +45,17 @@ Handle Click Events
 
 Change Viewport Size
 
-
     renderView.changeViewPortSize(width, height);
 
     //needed when screen size or view size changes
     //do not call with params 0: 0 -> automatically 300:300
     //0 is auto fit.
     //only works when onMeasure() is called.
+
+Update World of Objects
+
+    Use Callback methods that have World parameter.
+    ex) Renderer.updateWorld(), Object.onClick()...
 
 # Gradle Dependency
     implementation 'com.khgkjg12.graphic2d:graphic2d:1.2.2'

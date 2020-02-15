@@ -85,11 +85,11 @@ public class MainActivity extends Activity implements Graphic2dRenderView.Render
             }
             world.putObject(horLine);
         }*/
-        TextureGridObject gridObject = new TextureGridObject(background, 800, 800, 8, 8, 0, 0, 0, "board");
+        TextureGridObject gridObject = new TextureGridObject(background, 800, 800, 8, 8, 0, 0, 0);
         gridObject.setPosition(0, 0);
         gridObject.setOnClickItemListener(this);
         world.putObject(gridObject);
-        world.putObject(new TextObject("lplplp", Typeface.SANS_SERIF, Color.BLACK, 100, 0, 0, 0, true, true, null));
+        world.putObject(new TextObject("lplplp", Typeface.SANS_SERIF, Color.BLACK, 100, 0, 0, 0, true, true));
     }
 
     @Override
@@ -142,15 +142,16 @@ public class MainActivity extends Activity implements Graphic2dRenderView.Render
     }
 
     @Override
-    public void onClickItem(GridObject gridObject, Object[][] objectList, int row, int column) {
-        if(objectList[row][column]==null){
-            gridObject.putObject(new TextObject("IgIg", Typeface.SERIF, Color.BLACK, 100, 0, 100, 100, null ), row, column);
+    public boolean onClickItem(World world, GridObject gridObject, Object object, int row, int column) {
+        if(object==null){
+            gridObject.putObject(world, new TextObject("IgIg", Typeface.SERIF, Color.BLACK, 100, 0, 100, 100), row, column);
         }else{
             pop = true;
-            popObject = objectList[row][column];
+            popObject = object;
             //flip = true;
             //flipObject = objectList[row][column];
         }
+        return true;
     }
 
     @Override

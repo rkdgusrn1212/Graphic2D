@@ -21,6 +21,8 @@ import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Rect;
+import android.support.annotation.MainThread;
+import android.support.annotation.WorkerThread;
 import android.util.AttributeSet;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
@@ -51,6 +53,11 @@ public class Graphic2dRenderView extends SurfaceView implements Runnable {
         init(context, attrs, defStyle);
     }
 
+    /**
+     * onCreate에서 호출해야함.
+     * @param renderer
+     */
+    @MainThread
     public void setRenderer(Renderer renderer){
         mRenderer = renderer;
         mRenderer.loadTextures(mDrawer);
@@ -82,6 +89,7 @@ public class Graphic2dRenderView extends SurfaceView implements Runnable {
         int backgroundColor = a.getColor(R.styleable.Graphic2dRenderView_backgroundColor, Color.BLACK);
         boolean dragToMove = a.getBoolean(R.styleable.Graphic2dRenderView_dragToMove, true);
         boolean pinchToZoom = a.getBoolean(R.styleable.Graphic2dRenderView_pinchToZoom, true);
+        int maxObjectCount = a.getInt(R.styleable.Graphic2dRenderView_maxObjectCount, 256);
         a.recycle();
         if(mPreViewportHeight==0&&mPreViewportWidth==0){
             mPreViewportHeight=320;
@@ -100,7 +108,7 @@ public class Graphic2dRenderView extends SurfaceView implements Runnable {
         this.holder = getHolder();
         mDrawer = new Graphic2dDrawer(context.getApplicationContext().getAssets());
         mInput = new TouchHandler(Graphic2dRenderView.this);
-        mWorld = new World(worldWidth, worldHeight, viewportX, viewportY, cameraZ, minCameraZ, maxCameraZ, focusedZ, backgroundColor, dragToMove, pinchToZoom);
+        mWorld = new World(worldWidth, worldHeight, viewportX, viewportY, cameraZ, minCameraZ, maxCameraZ, focusedZ, backgroundColor, dragToMove, pinchToZoom, maxObjectCount);
     }
 
     @Override
@@ -201,8 +209,11 @@ public class Graphic2dRenderView extends SurfaceView implements Runnable {
     }
 
     public interface Renderer{
+        @MainThread
         public void prepareWorld(World world);
+        @WorkerThread
         public void updateWorld(float deltaTime, World world);
+        @MainThread
         public void loadTextures(Graphic2dDrawer drawer);//사용 오브젝트들의 리소스들을 다 로드함.
     }
 

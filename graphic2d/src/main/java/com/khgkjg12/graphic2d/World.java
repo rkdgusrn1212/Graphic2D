@@ -32,21 +32,21 @@ public class World {
     boolean isDragging = false;
     int startX, startY;
     boolean isPressed = false;
-    private int mViewportX;
-    private int mViewportY;
-    private int mViewportWidth;
-    private int mViewportHeight;
-    private float mCameraZ;
+    int mViewportX;
+    int mViewportY;
+    int mViewportWidth;
+    int mViewportHeight;
+    float mCameraZ;
     private float mMinCameraZ;
     private float mMaxCameraZ;
-    private float mFocusedZ;
+    float mFocusedZ;
     private int mBackgroundColor;
     private Texture mBackgroundTexture;
     private boolean mDragToMove;
     private boolean mPinchToZoom;
     private RectF mRectF;
     private int mMaxObjectCount;
-    private int mObjectCount;
+    int mObjectCount;
 
     World(int width, int height, int viewportX, int viewportY, float cameraZ, float minCameraZ, float maxCameraZ, float focusedZ, int backgroundColor, boolean dragToMove, boolean pinchToZoom, int maxObjectCount){
         mWidth = width;
@@ -84,11 +84,11 @@ public class World {
     /**
      * 오브젝트를 z 우선순위에 맞춰서 배열에 집어넣음.
      * @exception IndexOutOfBoundsException 배열이 가득 찬 상태에서 집어넣음.
-     * @param obj 오브젝트.
+     * @param object 오브젝트.
      */
-    public void putObject(Object obj){
+    public void putObject(Object object){
         int i = 0;
-        while(i!=mObjectCount&&mObjects[i].mZ > obj.mZ){
+        while(i!=mObjectCount&&mObjects[i].mZ > object.mZ){
             i++;
         }
         int j = mObjectCount++;
@@ -96,9 +96,10 @@ public class World {
             mObjects[j] = mObjects[j-1];
             j--;
         }
-        mObjects[i] = obj;
-        if(obj instanceof GridObject){
-            ((GridObject) obj).attached(this);
+        object.calculateScale(this);
+        mObjects[i] = object;
+        if(object instanceof GridObject){
+            ((GridObject) object).attached(this);
         }
     }
 
@@ -115,7 +116,8 @@ public class World {
             ((GridObject)mObjects[i-1]).detached(this);
         }
         while(i!=mObjectCount){
-            mObjects[i-1] = mObjects[i++];
+            mObjects[i-1] = mObjects[i];
+            i++;
         }
         mObjectCount--;
     }
@@ -123,6 +125,9 @@ public class World {
     void setViewportSize(int viewportWidth, int viewportHeight){
         mViewportWidth = viewportWidth;
         mViewportHeight = viewportHeight;
+        for(int i=0; i<mObjectCount; i++) {
+            mObjects[i].calculateRenderXY(this);
+        }
     }
 
     public void setBackgroundTexture(Texture texture){
@@ -136,7 +141,7 @@ public class World {
             drawer.drawObject(mBackgroundTexture, mRectF);
         }
         for(int i=mObjectCount-1; i>=0; i--){
-            mObjects[i].render(drawer, mViewportWidth, mViewportHeight, mCameraZ, mFocusedZ, mViewportX, mViewportY);
+            mObjects[i].render(drawer);
         }
     }
 
@@ -150,6 +155,9 @@ public class World {
                 mCameraZ = Math.max(mMinCameraZ, Math.min(mCameraZ, mMaxCameraZ));
                 isDragging = false;
                 isPressed = false;
+                for(int j=0; j<mObjectCount; j++){
+                    mObjects[j].calculateScale(this);
+                }
                 break;
             }else if(event.pointer == 0) {
                 float scale = mFocusedZ/mCameraZ;
@@ -167,6 +175,9 @@ public class World {
                                 mViewportY = mViewportY - deltaY;
                             } else {
                                 mViewportY = Math.max(-mHeight / 2, Math.min(mViewportY - deltaY, -mHeight / 2 + mHeight));
+                            }
+                            for(int j=0; j<mObjectCount; j++){
+                                mObjects[j].calculateRenderXY(this);
                             }
                         }
                         startX = event.x;

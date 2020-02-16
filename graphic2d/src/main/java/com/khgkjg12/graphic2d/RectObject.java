@@ -49,17 +49,17 @@ public class RectObject extends Object {
     }
 
     @Override
-    void calculateBoundary(float scale, float renderX, float renderY){
-        mRenderWidth = mWidth * Math.abs((float) Math.cos(mHorizontalDegree * Math.PI / 180))*scale;
-        mRenderHeight = mHeight * Math.abs((float) Math.cos(mVerticalDegree * Math.PI / 180))*scale;
-        mRenderLeft = renderX - mRenderWidth/2;
-        mRenderTop = renderY - mRenderHeight/2;
+    void calculateBoundary(){
+        mRenderWidth = mWidth * Math.abs((float) Math.cos(mHorizontalDegree * Math.PI / 180))*mScale;
+        mRenderHeight = mHeight * Math.abs((float) Math.cos(mVerticalDegree * Math.PI / 180))*mScale;
+        mRenderLeft = mRenderX - mRenderWidth/2;
+        mRenderTop = mRenderY - mRenderHeight/2;
         mRenderRight = mRenderLeft + mRenderWidth;
         mRenderBottom = mRenderTop + mRenderHeight;
     }
 
     @Override
-    void render(Graphic2dDrawer drawer) {
+    void draw(Graphic2dDrawer drawer) {
         drawer.drawRect(mRenderLeft, mRenderTop, mRenderRight, mRenderBottom, mPaint);
     }
 }

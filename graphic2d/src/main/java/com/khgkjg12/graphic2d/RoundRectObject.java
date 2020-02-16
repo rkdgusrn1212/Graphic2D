@@ -23,7 +23,7 @@ public class RoundRectObject extends RectObject {
     }
 
     @Override
-    void render(Graphic2dDrawer drawer) {
+    void draw(Graphic2dDrawer drawer) {
         drawer.drawRoundRect(mRenderLeft, mRenderTop, mRenderRight, mRenderBottom, mRX, mRY, super.mPaint);
     }
 }

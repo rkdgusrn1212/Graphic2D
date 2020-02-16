@@ -41,18 +41,18 @@ public class TextureObject extends Object {
     }
 
     @Override
-    void calculateBoundary(float scale, float renderX, float renderY){
-        mRenderWidth = mWidth * Math.abs((float) Math.cos(mHorizontalDegree * Math.PI / 180))*scale;
-        mRenderHeight = mHeight * Math.abs((float) Math.cos(mVerticalDegree * Math.PI / 180))*scale;
-        mRectF.left = renderX - mRenderWidth/2;
-        mRectF.top = renderY - mRenderHeight/2;
+    void calculateBoundary(){
+        mRenderWidth = mWidth * Math.abs((float) Math.cos(mHorizontalDegree * Math.PI / 180))*mScale;
+        mRenderHeight = mHeight * Math.abs((float) Math.cos(mVerticalDegree * Math.PI / 180))*mScale;
+        mRectF.left =  mRenderX - mRenderWidth/2;
+        mRectF.top = mRenderY - mRenderHeight/2;
         mRectF.right = mRectF.left + mRenderWidth;
         mRectF.bottom = mRectF.top + mRenderHeight;
     }
 
 
     @Override
-    void render(Graphic2dDrawer drawer) {
+    void draw(Graphic2dDrawer drawer) {
         drawer.drawObject(mTexture, mRectF);
     }
 }

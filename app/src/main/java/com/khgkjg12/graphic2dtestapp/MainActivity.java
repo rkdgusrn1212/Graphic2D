@@ -86,7 +86,6 @@ public class MainActivity extends Activity implements Graphic2dRenderView.Render
             world.putObject(horLine);
         }*/
         TextureGridObject gridObject = new TextureGridObject(background, 800, 800, 8, 8, 0, 0, 0);
-        gridObject.setPosition(0, 0);
         gridObject.setOnClickItemListener(this);
         world.putObject(gridObject);
         world.putObject(new TextObject("lplplp", Typeface.SANS_SERIF, Color.BLACK, 100, 0, 0, 0, true, true));
@@ -114,11 +113,11 @@ public class MainActivity extends Activity implements Graphic2dRenderView.Render
             startTime+=deltaTime;
             if(startTime>=2){
                 pop = false;
-                popObject.setZ(0);
+                popObject.moveZ(world, 0);
                 popObject = null;
                 startTime = 0;
             }else{
-                popObject.setZ(98*startTime-0.5f*98*startTime*startTime);
+                popObject.moveZ(world,98*startTime-0.5f*98*startTime*startTime);
             }
         }
     }

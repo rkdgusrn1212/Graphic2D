@@ -54,7 +54,7 @@ public class TextureGridObject extends TextureObject implements GridObject {
     }
     @Override
     public void putObject(World world, Object obj, int row, int column){
-        obj.setPosition(mX-(mWidth>>1)+mWidth*column/mColumn+((mWidth/mColumn)>>1) ,mY-(mHeight>>1)+mHeight*row/mRow+((mHeight/mRow)>>1));
+        world.moveObjectXY(obj,mX-(mWidth>>1)+mWidth*column/mColumn+((mWidth/mColumn)>>1) ,mY-(mHeight>>1)+mHeight*row/mRow+((mHeight/mRow)>>1));
         mObjectList[row][column] = obj;
         world.putObject(obj);
     }
@@ -112,7 +112,7 @@ public class TextureGridObject extends TextureObject implements GridObject {
     @WorkerThread
     @Override
     boolean onTouch(World world, int x, int y){
-        if(isInCameraRange&&checkBoundary(x, y)){
+        if(mIsInCameraRange&&checkBoundary(x, y)){
             if (mClickable&&mOnClickItemListener != null) {
                 int column = (int)((x - mRectF.left) * mColumn / mRenderWidth);
                 int row = (int)((y - mRectF.top) * mRow / mRenderHeight);

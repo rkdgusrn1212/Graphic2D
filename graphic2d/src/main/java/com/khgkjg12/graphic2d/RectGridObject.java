@@ -75,7 +75,7 @@ public class RectGridObject extends RectObject implements GridObject {
 
     @Override
     public void putObject(World world, Object obj, int row, int column){
-        obj.,mX-(mWidth>>1)+mWidth*column/mColumn+((mWidth/mColumn)>>1) ,mY-(mHeight>>1)+mHeight*row/mRow+((mHeight/mRow)>>1));
+        obj.moveXY(world,mX-(mWidth>>1)+mWidth*column/mColumn+((mWidth/mColumn)>>1) ,mY-(mHeight>>1)+mHeight*row/mRow+((mHeight/mRow)>>1));
         mObjectList[row][column] = obj;
         world.putObject(obj);
     }

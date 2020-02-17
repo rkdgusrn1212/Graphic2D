@@ -173,26 +173,39 @@ public class Graphic2dRenderView extends SurfaceView implements Runnable {
     public void run() {
         Rect dstRect = new Rect();
         long startTime = System.nanoTime();
-        while(running) {
-            if(!holder.getSurface().isValid())
-                continue;
+        if(android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O){
+            while(running) {
+                if(!holder.getSurface().isValid())
+                    continue;
 
-            float deltaTime = (System.nanoTime()-startTime) / 1000000000.0f;
-            startTime = System.nanoTime();
+                float deltaTime = (System.nanoTime()-startTime) / 1000000000.0f;
+                startTime = System.nanoTime();
+                mRenderer.updateWorld(deltaTime, mWorld);
+                mWorld.render(mDrawer);
+                mWorld.onTouch(mInput);
+                Canvas canvas = holder.lockHardwareCanvas();
 
-            mRenderer.updateWorld(deltaTime, mWorld);
-            mWorld.render(mDrawer);
-            mWorld.onTouch(mInput);
-
-            Canvas canvas;
-            if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
-                canvas = holder.lockHardwareCanvas();
-            }else{
-                canvas = holder.lockCanvas();
+                canvas.getClipBounds(dstRect);
+                canvas.drawBitmap(mDrawer.getFrameBuffer(), null, dstRect, null);
+                holder.unlockCanvasAndPost(canvas);
             }
-            canvas.getClipBounds(dstRect);
-            canvas.drawBitmap(mDrawer.getFrameBuffer(), null, dstRect, null);
-            holder.unlockCanvasAndPost(canvas);
+        }else{
+            while(running) {
+                if(!holder.getSurface().isValid())
+                    continue;
+
+                float deltaTime = (System.nanoTime()-startTime) / 1000000000.0f;
+                startTime = System.nanoTime();
+
+                mRenderer.updateWorld(deltaTime, mWorld);
+                mWorld.render(mDrawer);
+                mWorld.onTouch(mInput);
+
+                Canvas canvas = holder.lockCanvas();
+                canvas.getClipBounds(dstRect);
+                canvas.drawBitmap(mDrawer.getFrameBuffer(), null, dstRect, null);
+                holder.unlockCanvasAndPost(canvas);
+            }
         }
     }
 

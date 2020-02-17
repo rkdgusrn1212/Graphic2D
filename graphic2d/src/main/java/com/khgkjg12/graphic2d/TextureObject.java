@@ -1,6 +1,5 @@
 package com.khgkjg12.graphic2d;
 
-import android.graphics.Color;
 import android.graphics.RectF;
 import android.support.annotation.NonNull;
 

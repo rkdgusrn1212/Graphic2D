@@ -88,7 +88,17 @@ public class MainActivity extends Activity implements Graphic2dRenderView.Render
         TextureGridObject gridObject = new TextureGridObject(background, 800, 800, 8, 8, 0, 0, 0);
         gridObject.setOnClickItemListener(this);
         world.putObject(gridObject);
-        world.putObject(new TextObject("lplplp", Typeface.SANS_SERIF, Color.BLACK, 100, 0, 0, 0, true, true));
+        /*for(int i=0;i<8;i++){
+            for(int j=0; j<8; j++) {
+                gridObject.putObject(world, new TextObject("lplplp", Typeface.SANS_SERIF, Color.BLACK, 100, 0, 0, 0, true, true), i, j);
+            }
+        }
+
+        for(int i=0;i<8;i++){
+            for(int j=0; j<8; j++) {
+                world.putObject(new TextObject("lplplp", Typeface.SANS_SERIF, Color.BLACK, 100, 1, i*100, j*100, true, true));
+            }
+        }*/
     }
 
     @Override
@@ -104,8 +114,8 @@ public class MainActivity extends Activity implements Graphic2dRenderView.Render
         }*/
         count++;
         timeAcc += deltaTime;
-        if(count == 50){
-            Log.d("frame_rate", 50/timeAcc+"fps");
+        if(count == 100){
+            Log.d("frame_rate", 100/timeAcc+"fps");
             count = 0;
             timeAcc = 0;
         }

@@ -38,11 +38,11 @@ public abstract class Object {
     }
 
     //객체를 물리적 상태를 변화.
-    public void setVisibility(boolean visible){
+    public void setVisibility(World world, boolean visible){
         mVisibility = visible;
     }
 
-    public void setClickable(boolean clickable){
+    public void setClickable(World world, boolean clickable){
         mClickable = clickable;
     }
 

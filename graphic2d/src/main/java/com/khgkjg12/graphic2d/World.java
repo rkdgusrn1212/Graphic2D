@@ -16,14 +16,7 @@
 package com.khgkjg12.graphic2d;
 
 import android.graphics.RectF;
-import android.util.Log;
-
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Dictionary;
-import java.util.HashMap;
 import java.util.List;
-import java.util.PriorityQueue;
 
 public class World {
 
@@ -214,5 +207,13 @@ public class World {
 
     void setDragToMove(boolean dragToMove){
         mDragToMove = dragToMove;
+    }
+
+    public void moveCameraXY(int x, int y){
+        mViewportX = x;
+        mViewportY = y;
+        for(int j=0; j<mObjectCount; j++){
+            mObjects[j].calculateRenderXY(this);
+        }
     }
 }

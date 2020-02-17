@@ -2,6 +2,7 @@ package com.khgkjg12.graphic2d;
 
 import android.graphics.RectF;
 import android.support.annotation.NonNull;
+import android.support.annotation.WorkerThread;
 
 public class TextureObject extends Object {
     private Texture mTexture;
@@ -12,16 +13,16 @@ public class TextureObject extends Object {
     float mRenderWidth;
     float mRenderHeight;
 
-    public TextureObject(@NonNull Texture texture, int width, int height, float z, int x, int y) {
-        this(texture, width, height, z, x, y, 0, 0);
+    public TextureObject(@NonNull Texture texture, int width, int height, float z, int x, int y, OnClickListener onClickListener) {
+        this(texture, width, height, z, x, y, 0, 0, onClickListener);
     }
 
-    public TextureObject(@NonNull Texture texture, int width, int height, float z, int x, int y, int degreeH, int degreeV) {
-        this(texture, width, height, z, x, y, degreeH, degreeV, true, true);
+    public TextureObject(@NonNull Texture texture, int width, int height, float z, int x, int y, int degreeH, int degreeV, OnClickListener onClickListener) {
+        this(texture, width, height, z, x, y, degreeH, degreeV, true, true, onClickListener);
     }
 
-    public TextureObject(@NonNull Texture texture, int width, int height, float z, int x, int y, int degreeH, int degreeV, boolean visibility, boolean clickable){
-        super(z, x, y, visibility, clickable);
+    public TextureObject(@NonNull Texture texture, int width, int height, float z, int x, int y, int degreeH, int degreeV, boolean visibility, boolean clickable, OnClickListener onClickListener){
+        super(z, x, y, visibility, clickable, onClickListener);
         mTexture = texture;
         mRectF = new RectF();
         mWidth = width;
@@ -30,6 +31,11 @@ public class TextureObject extends Object {
         mVerticalDegree = degreeV%360;
     }
 
+    /**
+     * World 콜백에서만 호출.
+     * @param texture
+     */
+    @WorkerThread
     public void setTexture(@NonNull Texture texture){
         mTexture = texture;
     }
@@ -39,6 +45,19 @@ public class TextureObject extends Object {
         return x < mRectF.right && x > mRectF.left && y < mRectF.bottom && y > mRectF.top;
     }
 
+    @WorkerThread
+    public void setHorizontalFlip(World world, int degree){
+        mVerticalDegree = 0;
+        mHorizontalDegree = degree%360;
+        calculateRenderXY(world);
+    }
+
+    @WorkerThread
+    public void setVerticalFlip(World world, int degree){
+        mHorizontalDegree = 0;
+        mVerticalDegree = degree%360;
+        calculateRenderXY(world);
+    }
     @Override
     void calculateBoundary(){
         mRenderWidth = mWidth * Math.abs((float) Math.cos(mHorizontalDegree * Math.PI / 180))*mScale;

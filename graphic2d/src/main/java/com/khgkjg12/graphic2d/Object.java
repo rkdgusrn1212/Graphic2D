@@ -29,20 +29,42 @@ public abstract class Object {
     float mRenderX;
     float mRenderY;
 
-    public Object(float z, int x, int y, boolean visibility, boolean clickable){
+    public Object(float z, int x, int y, boolean visibility, boolean clickable, OnClickListener onClickListener){
         mVisibility = visibility;
         mClickable = clickable;
         mZ = z;
         mX = x;
         mY = y;
+        mOnClickListener = onClickListener;
     }
 
-    //객체를 물리적 상태를 변화.
-    public void setVisibility(World world, boolean visible){
+    public float getZ(){
+        return mZ;
+    }
+
+    public int getX(){
+        return mX;
+    }
+
+    public int getY(){
+        return mY;
+    }
+
+    /**
+     * World의 콜백 메서드에서만 사용.
+     * @param visible
+     */
+    @WorkerThread
+    public void setVisibility(boolean visible){
         mVisibility = visible;
     }
 
-    public void setClickable(World world, boolean clickable){
+    /**
+     * World의 콜백 메서드에서만 사용.
+     * @param clickable
+     */
+    @WorkerThread
+    public void setClickable(boolean clickable){
         mClickable = clickable;
     }
 
@@ -61,8 +83,10 @@ public abstract class Object {
      * 경계선 채크 메소드.
      * @return x, y 가 경계선 안에 있으면 참.
      */
+    @WorkerThread
     abstract boolean checkBoundary(int x, int y);
 
+    @WorkerThread
     public void setOnClickListener(OnClickListener onClickListener){
         mOnClickListener = onClickListener;
     }
@@ -77,6 +101,7 @@ public abstract class Object {
     /**
      * 오브젝트의 경계를 계산.
      */
+    @WorkerThread
     abstract void calculateBoundary();
 
     /**
@@ -90,15 +115,12 @@ public abstract class Object {
         public boolean onClick(World world, Object object);
     }
 
-    public float getZ(){
-        return mZ;
-    }
-
     /**
      * @exception IndexOutOfBoundsException 해당 오브젝트 없음.
      * @param world
      * @param z 새 z 좌표.
      */
+    @WorkerThread
     public void moveZ(World world, float z){
         if(z>=mZ){
             int i=0;
@@ -137,12 +159,14 @@ public abstract class Object {
         calculateScale(world);
     }
 
+    @WorkerThread
     public void moveXY(World world, int x, int y){
         mX = x;
         mY = y;
         calculateRenderXY(world);
     }
 
+    @WorkerThread
     void calculateScale(World world){
         if(mZ<world.mCameraZ) {
             mIsInCameraRange = true;
@@ -153,6 +177,7 @@ public abstract class Object {
         }
     }
 
+    @WorkerThread
     void calculateRenderXY(World world){
         mRenderX = (world.mViewportWidth / 2f) - (world.mViewportX - mX) * mScale;
         mRenderY = (world.mViewportHeight / 2f) - (world.mViewportY - mY) * mScale;

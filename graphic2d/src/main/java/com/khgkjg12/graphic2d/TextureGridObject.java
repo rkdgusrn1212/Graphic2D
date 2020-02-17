@@ -23,20 +23,16 @@ public class TextureGridObject extends TextureObject implements GridObject {
     private int mRow, mColumn;
     private OnClickItemListener mOnClickItemListener;
 
-    public TextureGridObject(Texture texture, int width, int height, int row, int column, int z, int x, int y){
-        super(texture, width, height, z, x, y, 0, 0, true, true);
-        init(row, column);
+    public TextureGridObject(Texture texture, int width, int height, int row, int column, int z, int x, int y, OnClickItemListener onClickItemListener){
+        this(texture, width, height, row, column, z, x, y, 0, 0, onClickItemListener);
     }
 
-    public TextureGridObject(Texture texture, int width, int height, int row, int column, int z, int x, int y, int degreeH, int degreeV){
-        super(texture, width, height, z, x, y, degreeH, degreeV, true, true);
-        init(row, column);
-    }
-
-    private void init(int row, int column){
+    public TextureGridObject(Texture texture, int width, int height, int row, int column, int z, int x, int y, int degreeH, int degreeV, OnClickItemListener onClickItemListener){
+        super(texture, width, height, z, x, y, degreeH, degreeV, true, true,null);
         mColumn = column;
         mRow = row;
         mObjectList = new Object[row][column];
+        mOnClickItemListener = onClickItemListener;
     }
 
     @Override
@@ -49,10 +45,12 @@ public class TextureGridObject extends TextureObject implements GridObject {
     }
 
     @Override
+    @WorkerThread
     public void setOnClickItemListener(OnClickItemListener onClickItemListener){
         mOnClickItemListener = onClickItemListener;
     }
     @Override
+    @WorkerThread
     public void putObject(World world, Object obj, int row, int column){
         obj.moveXY(world,mX-(mWidth>>1)+mWidth*column/mColumn+((mWidth/mColumn)>>1) ,mY-(mHeight>>1)+mHeight*row/mRow+((mHeight/mRow)>>1));
         mObjectList[row][column] = obj;
@@ -60,29 +58,33 @@ public class TextureGridObject extends TextureObject implements GridObject {
     }
 
     @Override
+    @WorkerThread
     public void putObject(World world, Texture texture, int row, int column){
         int x = mX-(mWidth>>1)+mWidth*column/mColumn+((mWidth/mColumn)>>1);
         int y = mY-(mHeight>>1)+mHeight*row/mRow+((mHeight/mRow)>>1);
-        Object obj = new TextureObject(texture, mWidth/mColumn, mHeight/mRow, mZ, x, y, mHorizontalDegree, mVerticalDegree, true, true);
+        Object obj = new TextureObject(texture, mWidth/mColumn, mHeight/mRow, mZ, x, y, mHorizontalDegree, mVerticalDegree, true, true, null);
         mObjectList[row][column] = obj;
         world.putObject(obj);
     }
 
     @Override
+    @WorkerThread
     public void putObject(World world, int color, int row, int column){
         int x = mX-(mWidth>>1)+mWidth*column/mColumn+((mWidth/mColumn)>>1);
         int y = mY-(mHeight>>1)+mHeight*row/mRow+((mHeight/mRow)>>1);
-        Object object = new RectObject(color, mWidth/mColumn, mHeight/mRow, mZ, x, y, mHorizontalDegree, mVerticalDegree, true, true);
+        Object object = new RectObject(color, mWidth/mColumn, mHeight/mRow, mZ, x, y, mHorizontalDegree, mVerticalDegree, true, true, null);
         mObjectList[row][column] = object;
         world.putObject(object);
     }
     @Override
+    @WorkerThread
     public void removeObject(World world, int row, int column){
         world.removeObject(mObjectList[row][column]);
         mObjectList[row][column] = null;
     }
 
     @Override
+    @WorkerThread
     public void attached(World world) {
         for(int i=0; i<mRow; i++){
             for(int j=0; j<mColumn; j++){
@@ -94,6 +96,7 @@ public class TextureGridObject extends TextureObject implements GridObject {
     }
 
     @Override
+    @WorkerThread
     public void detached(World world) {
         for(int i=0; i<mRow; i++){
             for(int j=0; j<mColumn; j++){

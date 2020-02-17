@@ -37,6 +37,7 @@ public class Graphic2dRenderView extends SurfaceView implements Runnable {
     private int mViewportWidth, mViewportHeight;
     private int mPreViewportWidth, mPreViewportHeight;
     private World mWorld;
+    private boolean mInit;
 
     public Graphic2dRenderView(Context context) {
         super(context);
@@ -162,15 +163,22 @@ public class Graphic2dRenderView extends SurfaceView implements Runnable {
         mInput.setScale((float)mViewportWidth/width, (float)mViewportHeight/height);
         mDrawer.setFrameBuffer(mViewportWidth, mViewportHeight, Bitmap.Config.RGB_565);
         mWorld.setViewportSize(mViewportWidth, mViewportHeight);
+        mInit = true;
+        resume();
     }
 
+    @MainThread
     public void resume() {
-        running = true;
-        renderThread = new Thread(this);
-        renderThread.start();
+        if(mInit) {
+            running = true;
+            renderThread = new Thread(this);
+            renderThread.start();
+        }
     }
 
+    @WorkerThread
     public void run() {
+        mWorld.init();
         Rect dstRect = new Rect();
         long startTime = System.nanoTime();
         if(android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O){

@@ -29,30 +29,24 @@ public class RectGridObject extends RectObject implements GridObject {
     private OnClickItemListener mOnClickItemListener;
 
 
-    public RectGridObject(int width, int height, int row, int column, int z, int x, int y){
-        super(Color.TRANSPARENT, width, height, z, x, y, 0, 0, false, true);
-        init(row, column);
+    public RectGridObject(int width, int height, int row, int column, int z, int x, int y, OnClickItemListener onClickItemListener){
+        this(Color.TRANSPARENT, width, height, row, column, z, x, y, 0, 0, onClickItemListener);
     }
 
-    public RectGridObject(int color, int width, int height, int row, int column, int z, int x, int y){
-        super(color, width, height, z, x, y, 0, 0, true, true);
-        init(row, column);
+    public RectGridObject(int color, int width, int height, int row, int column, int z, int x, int y, OnClickItemListener onClickItemListener){
+        this(color, width, height, row, column, z, x, y, 0, 0, onClickItemListener);
     }
 
-    public RectGridObject(int width, int height, int row, int column, int z, int x, int y, int degreeH, int degreeV){
-        super(Color.TRANSPARENT, width, height, z, x, y, degreeH, degreeV, false, true);
-        init(row, column);
+    public RectGridObject(int width, int height, int row, int column, int z, int x, int y, int degreeH, int degreeV, OnClickItemListener onClickItemListener){
+        this(Color.TRANSPARENT, width, height, row, column, z, x, y, degreeH, degreeV, onClickItemListener);
     }
 
-    public RectGridObject(int color, int width, int height, int row, int column, int z, int x, int y, int degreeH, int degreeV){
-        super(color, width, height, z, x, y, degreeH, degreeV, true, true);
-        init(row, column);
-    }
-
-    private void init(int row, int column){
+    public RectGridObject(int color, int width, int height, int row, int column, int z, int x, int y, int degreeH, int degreeV, OnClickItemListener onClickItemListener){
+        super(color, width, height, z, x, y, degreeH, degreeV, true, true, null);
         mColumn = column;
         mRow = row;
         mObjectList = new Object[row][column];
+        mOnClickItemListener = onClickItemListener;
     }
 
     @Override
@@ -69,11 +63,13 @@ public class RectGridObject extends RectObject implements GridObject {
     }
 
     @Override
+    @WorkerThread
     public void setOnClickItemListener(OnClickItemListener onClickItemListener){
         mOnClickItemListener = onClickItemListener;
     }
 
     @Override
+    @WorkerThread
     public void putObject(World world, Object obj, int row, int column){
         obj.moveXY(world,mX-(mWidth>>1)+mWidth*column/mColumn+((mWidth/mColumn)>>1) ,mY-(mHeight>>1)+mHeight*row/mRow+((mHeight/mRow)>>1));
         mObjectList[row][column] = obj;
@@ -81,29 +77,33 @@ public class RectGridObject extends RectObject implements GridObject {
     }
 
     @Override
+    @WorkerThread
     public void putObject(World world, Texture texture, int row, int column){
         int x = mX-(mWidth>>1)+mWidth*column/mColumn+((mWidth/mColumn)>>1);
         int y = mY-(mHeight>>1)+mHeight*row/mRow+((mHeight/mRow)>>1);
-        Object obj = new TextureObject(texture, mWidth/mColumn, mHeight/mRow, mZ, x, y, mHorizontalDegree, mVerticalDegree, true, true);
+        Object obj = new TextureObject(texture, mWidth/mColumn, mHeight/mRow, mZ, x, y, mHorizontalDegree, mVerticalDegree, true, true, null);
         mObjectList[row][column] = obj;
         world.putObject(obj);
     }
 
     @Override
+    @WorkerThread
     public void putObject(World world, int color, int row, int column){
         int x = mX-(mWidth>>1)+mWidth*column/mColumn+((mWidth/mColumn)>>1);
         int y = mY-(mHeight>>1)+mHeight*row/mRow+((mHeight/mRow)>>1);
-        Object obj = new RectObject(color, mWidth/mColumn, mHeight/mRow, mZ, x, y, mHorizontalDegree, mVerticalDegree, true, true);
+        Object obj = new RectObject(color, mWidth/mColumn, mHeight/mRow, mZ, x, y, mHorizontalDegree, mVerticalDegree, true, true, null);
         mObjectList[row][column] = obj;
         world.putObject(obj);
     }
     @Override
+    @WorkerThread
     public void removeObject(World world, int row, int column){
         world.removeObject(mObjectList[row][column]);
         mObjectList[row][column] = null;
     }
 
     @Override
+    @WorkerThread
     public void attached(World world) {
         for(int i=0; i<mRow; i++){
             for(int j=0; j<mColumn; j++){
@@ -115,6 +115,7 @@ public class RectGridObject extends RectObject implements GridObject {
     }
 
     @Override
+    @WorkerThread
     public void detached(World world) {
         for(int i=0; i<mRow; i++){
             for(int j=0; j<mColumn; j++){

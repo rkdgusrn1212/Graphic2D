@@ -16,6 +16,9 @@
 package com.khgkjg12.graphic2d;
 
 import android.graphics.RectF;
+import android.support.annotation.MainThread;
+import android.support.annotation.WorkerThread;
+
 import java.util.List;
 
 public class World {
@@ -41,6 +44,7 @@ public class World {
     private int mMaxObjectCount;
     int mObjectCount;
 
+
     World(int width, int height, int viewportX, int viewportY, float cameraZ, float minCameraZ, float maxCameraZ, float focusedZ, int backgroundColor, boolean dragToMove, boolean pinchToZoom, int maxObjectCount){
         mWidth = width;
         mHeight = height;
@@ -56,7 +60,6 @@ public class World {
         mBackgroundColor = backgroundColor;
         mDragToMove = dragToMove;
         mPinchToZoom = pinchToZoom;
-        mRectF = new RectF(0, 0, mViewportWidth, mViewportHeight);
     }
 
     public int getMaxObjectCount(){
@@ -67,6 +70,7 @@ public class World {
      * 오직 콜백 메소드를 통해 전달된 World 에서만 호출해야함.
      * @param maxObjectCount
      */
+    @WorkerThread
     public void changeMaxObjectCount(int maxObjectCount){
         mMaxObjectCount = maxObjectCount;
         Object[] tempObjects = mObjects;
@@ -115,18 +119,26 @@ public class World {
         mObjectCount--;
     }
 
+    @MainThread
     void setViewportSize(int viewportWidth, int viewportHeight){
         mViewportWidth = viewportWidth;
         mViewportHeight = viewportHeight;
+        mRectF = new RectF(0, 0, mViewportWidth, mViewportHeight);
+    }
+
+    @WorkerThread
+    void init(){
         for(int i=0; i<mObjectCount; i++) {
             mObjects[i].calculateRenderXY(this);
         }
     }
 
+    @WorkerThread
     public void setBackgroundTexture(Texture texture){
         mBackgroundTexture = texture;
     }
 
+    @WorkerThread
     void render(Graphic2dDrawer drawer){
         if(mBackgroundTexture==null){
             drawer.clear(mBackgroundColor);
@@ -138,6 +150,7 @@ public class World {
         }
     }
 
+    @WorkerThread
     void onTouch(TouchHandler touchHandler){
         List<TouchHandler.TouchEvent> touchEvents = touchHandler.getTouchEvents();
         int len = touchEvents.size();
@@ -201,14 +214,17 @@ public class World {
             }
         }
     }
+    @WorkerThread
     void setPinchToZoom(boolean pinchToZoom){
         mPinchToZoom = pinchToZoom;
     }
 
+    @WorkerThread
     void setDragToMove(boolean dragToMove){
         mDragToMove = dragToMove;
     }
 
+    @WorkerThread
     public void moveCameraXY(int x, int y){
         mViewportX = x;
         mViewportY = y;

@@ -16,6 +16,7 @@
 package com.khgkjg12.graphic2d;
 
 import android.support.annotation.Nullable;
+import android.support.annotation.WorkerThread;
 
 import java.util.List;
 
@@ -33,6 +34,7 @@ public interface GridObject {
      * @param row
      * @param column
      */
+    @WorkerThread
     void putObject(World world, Object obj, int row, int column);
 
     /**
@@ -42,6 +44,7 @@ public interface GridObject {
      * @param row
      * @param column
      */
+    @WorkerThread
     void putObject(World world, Texture texture, int row, int column);
 
     /**
@@ -51,6 +54,7 @@ public interface GridObject {
      * @param row
      * @param column
      */
+    @WorkerThread
     void putObject(World world, int color, int row, int column);
 
     /**
@@ -59,16 +63,19 @@ public interface GridObject {
      * @param row
      * @param column
      */
+    @WorkerThread
     void removeObject(World world, int row, int column);
     /**
      * Only Use in Callback Method that has World Parameter.
      * @param world from Callback Method Parameter.
      * */
+    @WorkerThread
     void attached(World world);
     /**
      * Only Use in Callback Method that has World Parameter.
      * @param world from Callback Method Parameter.
      * */
+    @WorkerThread
     void detached(World world);
 
     interface OnClickItemListener{
@@ -80,8 +87,10 @@ public interface GridObject {
          * @param column
          * @return 터치이벤트의 소멸 여부. true 는 소멸, false 는 전달.
          */
+        @WorkerThread
         boolean onClickItem(World world, GridObject gridObject, @Nullable Object object, int row, int column);
     }
 
+    @WorkerThread
     void setOnClickItemListener(OnClickItemListener onClickItemListener);
 }

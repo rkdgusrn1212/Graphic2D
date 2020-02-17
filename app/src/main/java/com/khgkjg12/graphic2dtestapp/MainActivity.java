@@ -24,6 +24,7 @@ import android.util.Log;
 
 import com.khgkjg12.graphic2d.GridObject;
 import com.khgkjg12.graphic2d.Object;
+import com.khgkjg12.graphic2d.RectGridObject;
 import com.khgkjg12.graphic2d.RoundRectObject;
 import com.khgkjg12.graphic2d.TextObject;
 import com.khgkjg12.graphic2d.Texture;
@@ -56,6 +57,7 @@ public class MainActivity extends Activity implements Graphic2dRenderView.Render
     private Object popObject = null;
     private float timeAcc = 0;
     private int count = 0;
+    TextureGridObject gridObject;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -85,8 +87,7 @@ public class MainActivity extends Activity implements Graphic2dRenderView.Render
             }
             world.putObject(horLine);
         }*/
-        TextureGridObject gridObject = new TextureGridObject(background, 800, 800, 8, 8, 0, 0, 0);
-        gridObject.setOnClickItemListener(this);
+        TextureGridObject gridObject = new TextureGridObject(background, 800, 800, 8, 8, 0, 0, 0, this);
         world.putObject(gridObject);
         /*for(int i=0;i<8;i++){
             for(int j=0; j<8; j++) {
@@ -153,7 +154,7 @@ public class MainActivity extends Activity implements Graphic2dRenderView.Render
     @Override
     public boolean onClickItem(World world, GridObject gridObject, Object object, int row, int column) {
         if(object==null){
-            gridObject.putObject(world, new TextObject("IgIg", Typeface.SERIF, Color.BLACK, 100, 0, 100, 100), row, column);
+            gridObject.putObject(world, new TextObject("IgIg", Typeface.SERIF, Color.BLACK, 100, 0, 100, 100, null), row, column);
         }else{
             pop = true;
             popObject = object;

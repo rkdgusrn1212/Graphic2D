@@ -38,6 +38,7 @@ public class Graphic2dRenderView extends SurfaceView implements Runnable {
     private int mPreViewportWidth, mPreViewportHeight;
     private World mWorld;
     private boolean mInit;
+    private boolean mIsPrepareWorld;
 
     public Graphic2dRenderView(Context context) {
         super(context);
@@ -62,10 +63,11 @@ public class Graphic2dRenderView extends SurfaceView implements Runnable {
     public void setRenderer(Renderer renderer){
         mRenderer = renderer;
         mRenderer.loadTextures(mDrawer);
-        mRenderer.prepareWorld(mWorld);
     }
 
     private void init(Context context, AttributeSet attrs, int defStyle) {
+        mInit = false;
+        mIsPrepareWorld = false;
         // Load attributes
         final TypedArray a = getContext().obtainStyledAttributes(
                 attrs, R.styleable.Graphic2dRenderView, defStyle, 0);
@@ -178,7 +180,10 @@ public class Graphic2dRenderView extends SurfaceView implements Runnable {
 
     @WorkerThread
     public void run() {
-        mWorld.init();
+        if(!mIsPrepareWorld) {
+            mRenderer.prepareWorld(mWorld);
+            mIsPrepareWorld = true;
+        }
         Rect dstRect = new Rect();
         long startTime = System.nanoTime();
         if(android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O){
@@ -230,7 +235,7 @@ public class Graphic2dRenderView extends SurfaceView implements Runnable {
     }
 
     public interface Renderer{
-        @MainThread
+        @WorkerThread
         public void prepareWorld(World world);
         @WorkerThread
         public void updateWorld(float deltaTime, World world);

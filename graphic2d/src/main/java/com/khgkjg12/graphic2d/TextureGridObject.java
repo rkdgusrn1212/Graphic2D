@@ -15,6 +15,8 @@
  */
 package com.khgkjg12.graphic2d;
 
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.annotation.WorkerThread;
 
 public class TextureGridObject extends TextureObject implements GridObject {
@@ -23,15 +25,29 @@ public class TextureGridObject extends TextureObject implements GridObject {
     private int mRow, mColumn;
     private OnClickItemListener mOnClickItemListener;
 
-    public TextureGridObject(Texture texture, int width, int height, int row, int column, int z, int x, int y, OnClickItemListener onClickItemListener){
+    public TextureGridObject(@NonNull Texture texture, int width, int height, int row, int column, int z, int x, int y, @Nullable OnClickItemListener onClickItemListener){
         this(texture, width, height, row, column, z, x, y, 0, 0, onClickItemListener);
     }
 
-    public TextureGridObject(Texture texture, int width, int height, int row, int column, int z, int x, int y, int degreeH, int degreeV, OnClickItemListener onClickItemListener){
+    /**
+     * @exception ArrayIndexOutOfBoundsException parameter objects's size does not match parameter row x parameter column.
+     * @param texture background texture.
+     * @param width total grid width.
+     * @param height total grid height.
+     * @param row the number of row in grid.
+     * @param column the number of column in grid.
+     * @param z z coordinate of center of grid.
+     * @param x x coordinate of center of grid.
+     * @param y y coordinate of center of grid.
+     * @param degreeH horizontal degree of grid.
+     * @param degreeV vertical degree of grid.
+     * @param onClickItemListener Item click event callback.
+     */
+    public TextureGridObject(@NonNull Texture texture, int width, int height, int row, int column, int z, int x, int y, int degreeH, int degreeV, @Nullable OnClickItemListener onClickItemListener){
         super(texture, width, height, z, x, y, degreeH, degreeV, true, true,null);
         mColumn = column;
         mRow = row;
-        mObjectList = new Object[row][column];
+        mObjectList = new Object[mRow][mColumn];
         mOnClickItemListener = onClickItemListener;
     }
 
@@ -49,9 +65,16 @@ public class TextureGridObject extends TextureObject implements GridObject {
     public void setOnClickItemListener(OnClickItemListener onClickItemListener){
         mOnClickItemListener = onClickItemListener;
     }
+
     @Override
     @WorkerThread
-    public void putObject(World world, Object obj, int row, int column){
+    public void putObject(@NonNull World world, @NonNull Object obj, int row, int column){
+        mObjectList[row][column] = obj;
+        world.putObject(obj);
+    }
+    @Override
+    @WorkerThread
+    public void putObjectAndAdjust(@NonNull World world, @NonNull Object obj, int row, int column){
         obj.moveXY(world,mX-(mWidth>>1)+mWidth*column/mColumn+((mWidth/mColumn)>>1) ,mY-(mHeight>>1)+mHeight*row/mRow+((mHeight/mRow)>>1));
         mObjectList[row][column] = obj;
         world.putObject(obj);
@@ -59,20 +82,59 @@ public class TextureGridObject extends TextureObject implements GridObject {
 
     @Override
     @WorkerThread
-    public void putObject(World world, Texture texture, int row, int column){
+    public void createAndPutTextureObject(@NonNull World world, @NonNull Texture texture, int padding, int row, int column){
         int x = mX-(mWidth>>1)+mWidth*column/mColumn+((mWidth/mColumn)>>1);
         int y = mY-(mHeight>>1)+mHeight*row/mRow+((mHeight/mRow)>>1);
-        Object obj = new TextureObject(texture, mWidth/mColumn, mHeight/mRow, mZ, x, y, mHorizontalDegree, mVerticalDegree, true, true, null);
+        Object obj = new TextureObject(texture, mWidth/mColumn-padding*2, mHeight/mRow-padding*2, mZ, x, y, mHorizontalDegree, mVerticalDegree, true, true, null);
         mObjectList[row][column] = obj;
         world.putObject(obj);
     }
 
     @Override
     @WorkerThread
-    public void putObject(World world, int color, int row, int column){
+    public void createAndPutRectObject(@NonNull World world, int color, int padding, int row, int column){
         int x = mX-(mWidth>>1)+mWidth*column/mColumn+((mWidth/mColumn)>>1);
         int y = mY-(mHeight>>1)+mHeight*row/mRow+((mHeight/mRow)>>1);
-        Object object = new RectObject(color, mWidth/mColumn, mHeight/mRow, mZ, x, y, mHorizontalDegree, mVerticalDegree, true, true, null);
+        Object object = new RectObject(color, mWidth/mColumn-padding*2, mHeight/mRow-padding*2, mZ, x, y, mHorizontalDegree, mVerticalDegree, true, true, null);
+        mObjectList[row][column] = object;
+        world.putObject(object);
+    }
+
+    @Override
+    @WorkerThread
+    public void createAndPutRoundRectObject(@NonNull World world, int color, float rX, float rY, int padding, int row, int column){
+        int x = mX-(mWidth>>1)+mWidth*column/mColumn+((mWidth/mColumn)>>1);
+        int y = mY-(mHeight>>1)+mHeight*row/mRow+((mHeight/mRow)>>1);
+        Object object = new RoundRectObject(color, rX, rY,mWidth/mColumn-padding*2, mHeight/mRow-padding*2, mZ, x, y, mHorizontalDegree, mVerticalDegree, true, true, null);
+        mObjectList[row][column] = object;
+        world.putObject(object);
+    }
+    @Override
+    @WorkerThread
+    public void createAndPutTextureObject(@NonNull World world, @NonNull Texture texture, int width, int height, int row, int column){
+        int x = mX-(mWidth>>1)+mWidth*column/mColumn+((mWidth/mColumn)>>1);
+        int y = mY-(mHeight>>1)+mHeight*row/mRow+((mHeight/mRow)>>1);
+        Object obj = new TextureObject(texture, width, height, mZ, x, y, mHorizontalDegree, mVerticalDegree, true, true, null);
+        mObjectList[row][column] = obj;
+        world.putObject(obj);
+    }
+
+    @Override
+    @WorkerThread
+    public void createAndPutRectObject(@NonNull World world, int color, int width, int height, int row, int column){
+        int x = mX-(mWidth>>1)+mWidth*column/mColumn+((mWidth/mColumn)>>1);
+        int y = mY-(mHeight>>1)+mHeight*row/mRow+((mHeight/mRow)>>1);
+        Object object = new RectObject(color, width, height, mZ, x, y, mHorizontalDegree, mVerticalDegree, true, true, null);
+        mObjectList[row][column] = object;
+        world.putObject(object);
+    }
+
+    @Override
+    @WorkerThread
+    public void createAndPutRoundRectObject(@NonNull World world, int color, float rX, float rY, int row, int width, int height, int column){
+        int x = mX-(mWidth>>1)+mWidth*column/mColumn+((mWidth/mColumn)>>1);
+        int y = mY-(mHeight>>1)+mHeight*row/mRow+((mHeight/mRow)>>1);
+        Object object = new RoundRectObject(color, rX, rY,width, height, mZ, x, y, mHorizontalDegree, mVerticalDegree, true, true, null);
         mObjectList[row][column] = object;
         world.putObject(object);
     }

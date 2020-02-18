@@ -15,10 +15,9 @@
  */
 package com.khgkjg12.graphic2d;
 
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.annotation.WorkerThread;
-
-import java.util.List;
 
 public interface GridObject {
 
@@ -28,6 +27,16 @@ public interface GridObject {
     int getColumnSize();
 
     /**
+     * put object without position adjustment.
+     * @param world
+     * @param obj
+     * @param row
+     * @param column
+     */
+    @WorkerThread
+    void putObject(@NonNull World world, @NonNull Object obj, int row, int column);
+
+    /**
      * Only Use in Callback Method that has World Parameter.
      * @param world from Callback Method Parameter.
      * @param obj
@@ -35,27 +44,42 @@ public interface GridObject {
      * @param column
      */
     @WorkerThread
-    void putObject(World world, Object obj, int row, int column);
+    void putObjectAndAdjust(@NonNull World world, @NonNull Object obj, int row, int column);
 
     /**
      * Only Use in Callback Method that has World Parameter.
      * @param world from Callback Method Parameter.
      * @param texture
+     * @param padding
      * @param row
      * @param column
      */
     @WorkerThread
-    void putObject(World world, Texture texture, int row, int column);
+    void createAndPutTextureObject(@NonNull World world,@NonNull Texture texture, int padding, int row, int column);
+
+    @WorkerThread
+    void createAndPutTextureObject(@NonNull World world,@NonNull Texture texture, int width, int height, int row, int column);
 
     /**
      * Only Use in Callback Method that has World Parameter.
      * @param world from Callback Method Parameter.
      * @param color
+     * @param padding
      * @param row
      * @param column
      */
     @WorkerThread
-    void putObject(World world, int color, int row, int column);
+    void createAndPutRectObject(@NonNull World world, int color, int padding, int row, int column);
+
+    @WorkerThread
+    void createAndPutRoundRectObject(@NonNull World world, int color, float rX, float rY, int row, int padding, int column);
+
+
+    @WorkerThread
+    void createAndPutRectObject(@NonNull World world, int color, int width, int height, int row, int column);
+
+    @WorkerThread
+    void createAndPutRoundRectObject(@NonNull World world, int color, float rX, float rY, int width, int height, int row, int column);
 
     /**
      * Only Use in Callback Method that has World Parameter.

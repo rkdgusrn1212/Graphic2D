@@ -83,6 +83,7 @@ public class World {
      * @exception IndexOutOfBoundsException 배열이 가득 찬 상태에서 집어넣음.
      * @param object 오브젝트.
      */
+    @WorkerThread
     public void putObject(Object object){
         int i = 0;
         while(i!=mObjectCount&&mObjects[i].mZ > object.mZ){
@@ -106,6 +107,7 @@ public class World {
      * @exception IndexOutOfBoundsException 해당 id 와 일치하는 오브젝트가 없을때 발생.
      * @param object 삭제할 오브젝트 레퍼런스.
      */
+    @WorkerThread
     public void removeObject(Object object){
         int i = 0;
         while(mObjects[i++] != object);
@@ -124,13 +126,6 @@ public class World {
         mViewportWidth = viewportWidth;
         mViewportHeight = viewportHeight;
         mRectF = new RectF(0, 0, mViewportWidth, mViewportHeight);
-    }
-
-    @WorkerThread
-    void init(){
-        for(int i=0; i<mObjectCount; i++) {
-            mObjects[i].calculateRenderXY(this);
-        }
     }
 
     @WorkerThread

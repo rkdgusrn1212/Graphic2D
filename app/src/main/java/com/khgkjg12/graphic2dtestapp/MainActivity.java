@@ -25,6 +25,7 @@ import android.util.Log;
 import com.khgkjg12.graphic2d.GridObject;
 import com.khgkjg12.graphic2d.Object;
 import com.khgkjg12.graphic2d.RectGridObject;
+import com.khgkjg12.graphic2d.RoundRectGridObject;
 import com.khgkjg12.graphic2d.RoundRectObject;
 import com.khgkjg12.graphic2d.TextObject;
 import com.khgkjg12.graphic2d.Texture;
@@ -87,7 +88,12 @@ public class MainActivity extends Activity implements Graphic2dRenderView.Render
             }
             world.putObject(horLine);
         }*/
-        TextureGridObject gridObject = new TextureGridObject(background, 800, 800, 8, 8, 0, 0, 0, this);
+        RoundRectGridObject gridObject = new RoundRectGridObject(Color.BLUE, 20, 10,800, 800, 8, 8, 0, 0, 0, this);
+        for(int i=0; i<8; i++) {
+            for(int j=0; j<8; j++) {
+                gridObject.createAndPutRoundRectObject(world, Color.YELLOW, 20, 20, 10, i, j);
+            }
+        }
         world.putObject(gridObject);
         /*for(int i=0;i<8;i++){
             for(int j=0; j<8; j++) {

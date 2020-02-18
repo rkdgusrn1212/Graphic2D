@@ -91,7 +91,7 @@ public class MainActivity extends Activity implements Graphic2dRenderView.Render
         RoundRectGridObject gridObject = new RoundRectGridObject(Color.BLUE, 20, 10,800, 800, 8, 8, 0, 0, 0, this);
         for(int i=0; i<8; i++) {
             for(int j=0; j<8; j++) {
-                gridObject.createAndPutRoundRectObject(world, Color.YELLOW, 20, 20, 10, i, j);
+                gridObject.createAndPutRoundRectObject(Color.YELLOW, 20, 20, 10, i, j);
             }
         }
         world.putObject(gridObject);
@@ -160,7 +160,7 @@ public class MainActivity extends Activity implements Graphic2dRenderView.Render
     @Override
     public boolean onClickItem(World world, GridObject gridObject, Object object, int row, int column) {
         if(object==null){
-            gridObject.putObject(world, new TextObject("IgIg", Typeface.SERIF, Color.BLACK, 100, 0, 100, 100, null), row, column);
+            gridObject.putObject(new TextObject("IgIg", Typeface.SERIF, Color.BLACK, 100, 0, 100, 100, null), row, column);
         }else{
             pop = true;
             popObject = object;

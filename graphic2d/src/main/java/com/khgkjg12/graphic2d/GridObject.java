@@ -28,67 +28,62 @@ public interface GridObject {
 
     /**
      * put object without position adjustment.
-     * @param world
      * @param obj
      * @param row
      * @param column
      */
     @WorkerThread
-    void putObject(@NonNull World world, @NonNull Object obj, int row, int column);
+    void putObject(@NonNull Object obj, int row, int column);
 
     /**
      * Only Use in Callback Method that has World Parameter.
-     * @param world from Callback Method Parameter.
      * @param obj
      * @param row
      * @param column
      */
     @WorkerThread
-    void putObjectAndAdjust(@NonNull World world, @NonNull Object obj, int row, int column);
+    void putObjectAndAdjust(@NonNull Object obj, int row, int column);
 
     /**
      * Only Use in Callback Method that has World Parameter.
-     * @param world from Callback Method Parameter.
      * @param texture
      * @param padding
      * @param row
      * @param column
      */
     @WorkerThread
-    void createAndPutTextureObject(@NonNull World world,@NonNull Texture texture, int padding, int row, int column);
+    void createAndPutTextureObject(@NonNull Texture texture, int padding, int row, int column);
 
     @WorkerThread
-    void createAndPutTextureObject(@NonNull World world,@NonNull Texture texture, int width, int height, int row, int column);
+    void createAndPutTextureObject(@NonNull Texture texture, int width, int height, int row, int column);
 
     /**
      * Only Use in Callback Method that has World Parameter.
-     * @param world from Callback Method Parameter.
      * @param color
      * @param padding
      * @param row
      * @param column
      */
     @WorkerThread
-    void createAndPutRectObject(@NonNull World world, int color, int padding, int row, int column);
+    void createAndPutRectObject(int color, int padding, int row, int column);
 
     @WorkerThread
-    void createAndPutRoundRectObject(@NonNull World world, int color, float rX, float rY, int row, int padding, int column);
+    void createAndPutRoundRectObject(int color, float rX, float rY, int row, int padding, int column);
 
 
     @WorkerThread
-    void createAndPutRectObject(@NonNull World world, int color, int width, int height, int row, int column);
+    void createAndPutRectObject(int color, int width, int height, int row, int column);
 
     @WorkerThread
-    void createAndPutRoundRectObject(@NonNull World world, int color, float rX, float rY, int width, int height, int row, int column);
+    void createAndPutRoundRectObject(int color, float rX, float rY, int width, int height, int row, int column);
 
     /**
      * Only Use in Callback Method that has World Parameter.
-     * @param world from Callback Method Parameter.
      * @param row
      * @param column
      */
     @WorkerThread
-    void removeObject(World world, int row, int column);
+    void removeObject(int row, int column);
     /**
      * Only Use in Callback Method that has World Parameter.
      * @param world from Callback Method Parameter.

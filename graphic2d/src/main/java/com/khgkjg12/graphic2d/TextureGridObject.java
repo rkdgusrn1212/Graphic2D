@@ -24,6 +24,7 @@ public class TextureGridObject extends TextureObject implements GridObject {
     private Object[][] mObjectList;
     private int mRow, mColumn;
     private OnClickItemListener mOnClickItemListener;
+    private World mWorld;
 
     public TextureGridObject(@NonNull Texture texture, int width, int height, int row, int column, int z, int x, int y, @Nullable OnClickItemListener onClickItemListener){
         this(texture, width, height, row, column, z, x, y, 0, 0, onClickItemListener);
@@ -49,6 +50,7 @@ public class TextureGridObject extends TextureObject implements GridObject {
         mRow = row;
         mObjectList = new Object[mRow][mColumn];
         mOnClickItemListener = onClickItemListener;
+        mWorld = null;
     }
 
     @Override
@@ -68,80 +70,101 @@ public class TextureGridObject extends TextureObject implements GridObject {
 
     @Override
     @WorkerThread
-    public void putObject(@NonNull World world, @NonNull Object obj, int row, int column){
+    public void putObject(@NonNull Object obj, int row, int column){
         mObjectList[row][column] = obj;
-        world.putObject(obj);
+        if(mWorld != null) {
+            mWorld.putObject(obj);
+        }
     }
     @Override
     @WorkerThread
-    public void putObjectAndAdjust(@NonNull World world, @NonNull Object obj, int row, int column){
-        obj.moveXY(world,mX-(mWidth>>1)+mWidth*column/mColumn+((mWidth/mColumn)>>1) ,mY-(mHeight>>1)+mHeight*row/mRow+((mHeight/mRow)>>1));
+    public void putObjectAndAdjust(@NonNull Object obj, int row, int column){
+        obj.mX = mX-(mWidth>>1)+mWidth*column/mColumn+((mWidth/mColumn)>>1);
+        obj.mY = mY-(mHeight>>1)+mHeight*row/mRow+((mHeight/mRow)>>1);
+        obj.mZ = mZ;
         mObjectList[row][column] = obj;
-        world.putObject(obj);
+        if(mWorld!=null) {
+            mWorld.putObject(obj);
+            mObjectList[row][column].calculateScale(mWorld);
+        }
     }
 
     @Override
     @WorkerThread
-    public void createAndPutTextureObject(@NonNull World world, @NonNull Texture texture, int padding, int row, int column){
+    public void createAndPutTextureObject(@NonNull Texture texture, int padding, int row, int column){
         int x = mX-(mWidth>>1)+mWidth*column/mColumn+((mWidth/mColumn)>>1);
         int y = mY-(mHeight>>1)+mHeight*row/mRow+((mHeight/mRow)>>1);
         Object obj = new TextureObject(texture, mWidth/mColumn-padding*2, mHeight/mRow-padding*2, mZ, x, y, mHorizontalDegree, mVerticalDegree, true, true, null);
         mObjectList[row][column] = obj;
-        world.putObject(obj);
+        if (mWorld != null){
+            mWorld.putObject(obj);
+        }
     }
 
     @Override
     @WorkerThread
-    public void createAndPutRectObject(@NonNull World world, int color, int padding, int row, int column){
+    public void createAndPutRectObject(int color, int padding, int row, int column){
         int x = mX-(mWidth>>1)+mWidth*column/mColumn+((mWidth/mColumn)>>1);
         int y = mY-(mHeight>>1)+mHeight*row/mRow+((mHeight/mRow)>>1);
         Object object = new RectObject(color, mWidth/mColumn-padding*2, mHeight/mRow-padding*2, mZ, x, y, mHorizontalDegree, mVerticalDegree, true, true, null);
         mObjectList[row][column] = object;
-        world.putObject(object);
+        if(mWorld!=null){
+            mWorld.putObject(object);
+        }
     }
 
     @Override
     @WorkerThread
-    public void createAndPutRoundRectObject(@NonNull World world, int color, float rX, float rY, int padding, int row, int column){
+    public void createAndPutRoundRectObject(int color, float rX, float rY, int padding, int row, int column){
         int x = mX-(mWidth>>1)+mWidth*column/mColumn+((mWidth/mColumn)>>1);
         int y = mY-(mHeight>>1)+mHeight*row/mRow+((mHeight/mRow)>>1);
         Object object = new RoundRectObject(color, rX, rY,mWidth/mColumn-padding*2, mHeight/mRow-padding*2, mZ, x, y, mHorizontalDegree, mVerticalDegree, true, true, null);
         mObjectList[row][column] = object;
-        world.putObject(object);
+        if(mWorld != null){
+            mWorld.putObject(object);
+        }
     }
     @Override
     @WorkerThread
-    public void createAndPutTextureObject(@NonNull World world, @NonNull Texture texture, int width, int height, int row, int column){
+    public void createAndPutTextureObject(@NonNull Texture texture, int width, int height, int row, int column){
         int x = mX-(mWidth>>1)+mWidth*column/mColumn+((mWidth/mColumn)>>1);
         int y = mY-(mHeight>>1)+mHeight*row/mRow+((mHeight/mRow)>>1);
         Object obj = new TextureObject(texture, width, height, mZ, x, y, mHorizontalDegree, mVerticalDegree, true, true, null);
         mObjectList[row][column] = obj;
-        world.putObject(obj);
+        if(mWorld != null) {
+            mWorld.putObject(obj);
+        }
     }
 
     @Override
     @WorkerThread
-    public void createAndPutRectObject(@NonNull World world, int color, int width, int height, int row, int column){
+    public void createAndPutRectObject(int color, int width, int height, int row, int column){
         int x = mX-(mWidth>>1)+mWidth*column/mColumn+((mWidth/mColumn)>>1);
         int y = mY-(mHeight>>1)+mHeight*row/mRow+((mHeight/mRow)>>1);
         Object object = new RectObject(color, width, height, mZ, x, y, mHorizontalDegree, mVerticalDegree, true, true, null);
         mObjectList[row][column] = object;
-        world.putObject(object);
+        if(mWorld != null) {
+            mWorld.putObject(object);
+        }
     }
 
     @Override
     @WorkerThread
-    public void createAndPutRoundRectObject(@NonNull World world, int color, float rX, float rY, int row, int width, int height, int column){
+    public void createAndPutRoundRectObject(int color, float rX, float rY, int row, int width, int height, int column){
         int x = mX-(mWidth>>1)+mWidth*column/mColumn+((mWidth/mColumn)>>1);
         int y = mY-(mHeight>>1)+mHeight*row/mRow+((mHeight/mRow)>>1);
         Object object = new RoundRectObject(color, rX, rY,width, height, mZ, x, y, mHorizontalDegree, mVerticalDegree, true, true, null);
         mObjectList[row][column] = object;
-        world.putObject(object);
+        if(mWorld!=null) {
+            mWorld.putObject(object);
+        }
     }
     @Override
     @WorkerThread
-    public void removeObject(World world, int row, int column){
-        world.removeObject(mObjectList[row][column]);
+    public void removeObject(int row, int column){
+        if(mWorld!=null) {
+            mWorld.removeObject(mObjectList[row][column]);
+        }
         mObjectList[row][column] = null;
     }
 
@@ -155,6 +178,7 @@ public class TextureGridObject extends TextureObject implements GridObject {
                 }
             }
         }
+        mWorld = world;
     }
 
     @Override
@@ -167,6 +191,7 @@ public class TextureGridObject extends TextureObject implements GridObject {
                 }
             }
         }
+        mWorld = null;
     }
 
     @Override

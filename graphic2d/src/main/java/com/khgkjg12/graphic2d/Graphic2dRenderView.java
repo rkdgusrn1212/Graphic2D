@@ -37,7 +37,6 @@ public class Graphic2dRenderView extends SurfaceView implements Runnable, Surfac
     private int mViewportWidth, mViewportHeight;
     private int mPreViewportWidth, mPreViewportHeight;
     private World mWorld;
-    private boolean mInit;
     private boolean mIsPrepareWorld;
 
     public Graphic2dRenderView(Context context) {
@@ -66,7 +65,6 @@ public class Graphic2dRenderView extends SurfaceView implements Runnable, Surfac
     }
 
     private void init(Context context, AttributeSet attrs, int defStyle) {
-        mInit = false;
         mIsPrepareWorld = false;
         // Load attributes
         final TypedArray a = getContext().obtainStyledAttributes(
@@ -115,60 +113,6 @@ public class Graphic2dRenderView extends SurfaceView implements Runnable, Surfac
         mWorld = new World(worldWidth, worldHeight, viewportX, viewportY, cameraZ, minCameraZ, maxCameraZ, focusedZ, backgroundColor, dragToMove, pinchToZoom, maxObjectCount);
     }
 
-    /*
-    @Override
-    protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
-        int width = MeasureSpec.getSize(widthMeasureSpec);
-        int height = MeasureSpec.getSize(heightMeasureSpec);
-        int widthMode = MeasureSpec.getMode(widthMeasureSpec);
-        int heightMode = MeasureSpec.getMode(heightMeasureSpec);
-
-        if (heightMode == MeasureSpec.AT_MOST && widthMode != MeasureSpec.AT_MOST) {
-            if(mPreViewportWidth==0){
-                mViewportWidth = mPreViewportHeight;
-                mViewportHeight = mPreViewportHeight;
-            }else if(mPreViewportHeight == 0){
-                mViewportWidth = mPreViewportWidth;
-                mViewportHeight = mPreViewportWidth;
-            }
-            height = width * mViewportHeight / mViewportWidth;
-        } else if (heightMode != MeasureSpec.AT_MOST && widthMode == MeasureSpec.AT_MOST) {
-            if(mPreViewportWidth==0){
-                mViewportWidth = mPreViewportHeight;
-                mViewportHeight = mPreViewportHeight;
-            }else if(mPreViewportHeight == 0){
-                mViewportWidth = mPreViewportWidth;
-                mViewportHeight = mPreViewportWidth;
-            }
-            width = height * mViewportWidth / mViewportHeight;
-        } else if (heightMode == MeasureSpec.AT_MOST && widthMode == MeasureSpec.AT_MOST) {
-            if(mPreViewportWidth==0){
-                mViewportWidth = mPreViewportHeight;
-                mViewportHeight = mPreViewportHeight;
-            }else if(mPreViewportHeight == 0){
-                mViewportWidth = mPreViewportWidth;
-                mViewportHeight = mPreViewportWidth;
-            }
-            height = mViewportHeight;
-            width = mViewportWidth;
-        }else{
-            if(mPreViewportHeight==0){
-                mViewportHeight = mPreViewportWidth*height/width;
-                mViewportWidth = mPreViewportWidth;
-            }else if(mPreViewportWidth==0){
-                mViewportWidth = mPreViewportHeight*width/height;
-                mViewportHeight= mPreViewportHeight;
-            }else{
-                mViewportWidth = mPreViewportWidth;
-                mViewportHeight = mPreViewportHeight;
-            }
-        }
-        setMeasuredDimension(width,height);
-        mInput.setScale((float)mViewportWidth/width, (float)mViewportHeight/height);
-        mDrawer.setFrameBuffer(mViewportWidth, mViewportHeight, Bitmap.Config.RGB_565);
-        mWorld.setViewportSize(mViewportWidth, mViewportHeight);
-    }*/
-
     @MainThread
     public void resume() {
         running = true;
@@ -186,25 +130,21 @@ public class Graphic2dRenderView extends SurfaceView implements Runnable, Surfac
         long startTime = System.nanoTime();
         if(android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O){
             while(running) {
-                if(!holder.getSurface().isValid())
-                    continue;
-
                 float deltaTime = (System.nanoTime()-startTime) / 1000000000.0f;
                 startTime = System.nanoTime();
                 mRenderer.updateWorld(deltaTime, mWorld);
                 mWorld.render(mDrawer);
                 mWorld.onTouch(mInput);
                 Canvas canvas = holder.lockHardwareCanvas();
-
+                if(canvas==null){
+                    continue;
+                }
                 canvas.getClipBounds(dstRect);
                 canvas.drawBitmap(mDrawer.getFrameBuffer(), null, dstRect, null);
                 holder.unlockCanvasAndPost(canvas);
             }
         }else{
             while(running) {
-                if(!holder.getSurface().isValid())
-                    continue;
-
                 float deltaTime = (System.nanoTime()-startTime) / 1000000000.0f;
                 startTime = System.nanoTime();
 
@@ -213,6 +153,9 @@ public class Graphic2dRenderView extends SurfaceView implements Runnable, Surfac
                 mWorld.onTouch(mInput);
 
                 Canvas canvas = holder.lockCanvas();
+                if(canvas==null){
+                    continue;
+                }
                 canvas.getClipBounds(dstRect);
                 canvas.drawBitmap(mDrawer.getFrameBuffer(), null, dstRect, null);
                 holder.unlockCanvasAndPost(canvas);
@@ -220,6 +163,7 @@ public class Graphic2dRenderView extends SurfaceView implements Runnable, Surfac
         }
     }
 
+    @MainThread
     public void pause() {
         running = false;
         while(true) {
@@ -239,22 +183,25 @@ public class Graphic2dRenderView extends SurfaceView implements Runnable, Surfac
 
     @Override
     public void surfaceChanged(SurfaceHolder holder, int format, int width, int height) {
+        if(running){
+            pause();
+        }
         if(mPreViewportWidth==0){
-            mViewportWidth = mPreViewportHeight;
             mViewportHeight = mPreViewportHeight;
+            mViewportWidth = mViewportHeight * width / height;
         } else if(mPreViewportHeight == 0){
             mViewportWidth = mPreViewportWidth;
-            mViewportHeight = mPreViewportWidth;
+            mViewportHeight = mViewportWidth * height / width;
         }
-        height = width * mViewportHeight / mViewportWidth;
         mInput.setScale((float)mViewportWidth/width, (float)mViewportHeight/height);
         mDrawer.setFrameBuffer(mViewportWidth, mViewportHeight, Bitmap.Config.RGB_565);
         mWorld.setViewportSize(mViewportWidth, mViewportHeight);
+        resume();
     }
 
     @Override
     public void surfaceDestroyed(SurfaceHolder holder) {
-
+        pause();
     }
 
     public interface Renderer{

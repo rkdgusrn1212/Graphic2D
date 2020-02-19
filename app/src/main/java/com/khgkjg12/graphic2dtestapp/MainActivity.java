@@ -88,12 +88,12 @@ public class MainActivity extends Activity implements Graphic2dRenderView.Render
             }
             world.putObject(horLine);
         }*/
-        RoundRectGridObject gridObject = new RoundRectGridObject(Color.BLUE, 20, 10,800, 800, 8, 8, 0, 0, 0, this);
-        for(int i=0; i<8; i++) {
+        TextureGridObject gridObject = new TextureGridObject(background,800, 800, 8, 8, 0, 0, 0, this);
+        /*for(int i=0; i<8; i++) {
             for(int j=0; j<8; j++) {
                 gridObject.createAndPutRoundRectObject(Color.YELLOW, 20, 20, 10, i, j);
             }
-        }
+        }*/
         world.putObject(gridObject);
         /*for(int i=0;i<8;i++){
             for(int j=0; j<8; j++) {
@@ -145,17 +145,19 @@ public class MainActivity extends Activity implements Graphic2dRenderView.Render
         blackStone = graphic2dDrawer.newTexture("black_stone.png", Texture.Format.ARGB8888);
     }
 
-    @Override
+
+    /*@Override
     public void onResume() {
         super.onResume();
         renderView.resume();
-    }
+    }*/
 
+    /*
     @Override
     public void onPause() {
         super.onPause();
         renderView.pause();
-    }
+    }*/
 
     @Override
     public boolean onClickItem(World world, GridObject gridObject, Object object, int row, int column) {

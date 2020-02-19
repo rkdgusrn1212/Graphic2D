@@ -27,7 +27,7 @@ import android.util.AttributeSet;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 
-public class Graphic2dRenderView extends SurfaceView implements Runnable {
+public class Graphic2dRenderView extends SurfaceView implements Runnable, SurfaceHolder.Callback {
     Thread renderThread = null;
     SurfaceHolder holder;
     volatile boolean running = false;
@@ -109,11 +109,13 @@ public class Graphic2dRenderView extends SurfaceView implements Runnable {
             viewportY = worldHeight/2;
         }
         this.holder = getHolder();
+        this.holder.addCallback(this);
         mDrawer = new Graphic2dDrawer(context.getApplicationContext().getAssets());
         mInput = new TouchHandler(Graphic2dRenderView.this);
         mWorld = new World(worldWidth, worldHeight, viewportX, viewportY, cameraZ, minCameraZ, maxCameraZ, focusedZ, backgroundColor, dragToMove, pinchToZoom, maxObjectCount);
     }
 
+    /*
     @Override
     protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
         int width = MeasureSpec.getSize(widthMeasureSpec);
@@ -165,17 +167,13 @@ public class Graphic2dRenderView extends SurfaceView implements Runnable {
         mInput.setScale((float)mViewportWidth/width, (float)mViewportHeight/height);
         mDrawer.setFrameBuffer(mViewportWidth, mViewportHeight, Bitmap.Config.RGB_565);
         mWorld.setViewportSize(mViewportWidth, mViewportHeight);
-        mInit = true;
-        resume();
-    }
+    }*/
 
     @MainThread
     public void resume() {
-        if(mInit) {
-            running = true;
-            renderThread = new Thread(this);
-            renderThread.start();
-        }
+        running = true;
+        renderThread = new Thread(this);
+        renderThread.start();
     }
 
     @WorkerThread
@@ -232,6 +230,31 @@ public class Graphic2dRenderView extends SurfaceView implements Runnable {
                 // retry
             }
         }
+    }
+
+    @Override
+    public void surfaceCreated(SurfaceHolder holder) {
+
+    }
+
+    @Override
+    public void surfaceChanged(SurfaceHolder holder, int format, int width, int height) {
+        if(mPreViewportWidth==0){
+            mViewportWidth = mPreViewportHeight;
+            mViewportHeight = mPreViewportHeight;
+        } else if(mPreViewportHeight == 0){
+            mViewportWidth = mPreViewportWidth;
+            mViewportHeight = mPreViewportWidth;
+        }
+        height = width * mViewportHeight / mViewportWidth;
+        mInput.setScale((float)mViewportWidth/width, (float)mViewportHeight/height);
+        mDrawer.setFrameBuffer(mViewportWidth, mViewportHeight, Bitmap.Config.RGB_565);
+        mWorld.setViewportSize(mViewportWidth, mViewportHeight);
+    }
+
+    @Override
+    public void surfaceDestroyed(SurfaceHolder holder) {
+
     }
 
     public interface Renderer{

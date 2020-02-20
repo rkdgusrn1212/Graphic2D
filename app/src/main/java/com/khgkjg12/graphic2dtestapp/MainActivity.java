@@ -162,7 +162,7 @@ public class MainActivity extends Activity implements Graphic2dRenderView.Render
     @Override
     public boolean onClickItem(World world, GridObject gridObject, Object object, int row, int column) {
         if(object==null){
-            gridObject.putObject(new TextObject("IgIg", Typeface.SERIF, Color.BLACK, 100, 0, 100, 100, null), row, column);
+            gridObject.putObjectAndAdjust(new TextObject("IgIg", Typeface.SERIF, Color.BLACK, 100, 0, 100, 100, null), row, column);
         }else{
             pop = true;
             popObject = object;
@@ -175,9 +175,9 @@ public class MainActivity extends Activity implements Graphic2dRenderView.Render
     @Override
     public void onConfigurationChanged(Configuration newConfig) {
         if(newConfig.orientation==Configuration.ORIENTATION_LANDSCAPE){
-            renderView.changeViewPortSize(0, 801 );
+            renderView.changeViewPortSize(0, 800 );
         }else{
-            renderView.changeViewPortSize(801, 0 );
+            renderView.changeViewPortSize(800, 0 );
         }
         super.onConfigurationChanged(newConfig);
     }

@@ -50,7 +50,7 @@ Change Viewport Size
     //needed when screen size or view size changes
     //do not call with params 0: 0 -> automatically 300:300
     //0 is auto fit.
-    //only works when onMeasure() is called.
+    //only works after surfaceChanged();
 
 Update World of Objects
 

@@ -37,7 +37,7 @@ public class Graphic2dRenderView extends SurfaceView implements Runnable, Surfac
     private int mViewportWidth, mViewportHeight;
     private int mPreViewportWidth, mPreViewportHeight;
     private World mWorld;
-    private boolean mIsPrepareWorld;
+    private boolean mIsWorldInitiated;
 
     public Graphic2dRenderView(Context context) {
         super(context);
@@ -65,7 +65,7 @@ public class Graphic2dRenderView extends SurfaceView implements Runnable, Surfac
     }
 
     private void init(Context context, AttributeSet attrs, int defStyle) {
-        mIsPrepareWorld = false;
+        mIsWorldInitiated = false;
         // Load attributes
         final TypedArray a = getContext().obtainStyledAttributes(
                 attrs, R.styleable.Graphic2dRenderView, defStyle, 0);
@@ -122,9 +122,10 @@ public class Graphic2dRenderView extends SurfaceView implements Runnable, Surfac
 
     @WorkerThread
     public void run() {
-        if(!mIsPrepareWorld) {
+        mWorld.setViewportSize(mViewportWidth, mViewportHeight);
+        if(!mIsWorldInitiated) {
             mRenderer.prepareWorld(mWorld);
-            mIsPrepareWorld = true;
+            mIsWorldInitiated = true;
         }
         Rect dstRect = new Rect();
         long startTime = System.nanoTime();
@@ -195,7 +196,6 @@ public class Graphic2dRenderView extends SurfaceView implements Runnable, Surfac
         }
         mInput.setScale((float)mViewportWidth/width, (float)mViewportHeight/height);
         mDrawer.setFrameBuffer(mViewportWidth, mViewportHeight, Bitmap.Config.RGB_565);
-        mWorld.setViewportSize(mViewportWidth, mViewportHeight);
         resume();
     }
 

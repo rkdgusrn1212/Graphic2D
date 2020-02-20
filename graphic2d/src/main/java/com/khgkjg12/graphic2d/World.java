@@ -121,11 +121,19 @@ public class World {
         mObjectCount--;
     }
 
-    @MainThread
+    @WorkerThread
     void setViewportSize(int viewportWidth, int viewportHeight){
         mViewportWidth = viewportWidth;
         mViewportHeight = viewportHeight;
         mRectF = new RectF(0, 0, mViewportWidth, mViewportHeight);
+        calculateObjectXY();
+    }
+
+    @WorkerThread
+    private void calculateObjectXY(){
+        for(int i=0;i<mObjectCount; i++){
+            mObjects[i].calculateRenderXY(this);
+        }
     }
 
     @WorkerThread
@@ -177,9 +185,7 @@ public class World {
                             } else {
                                 mViewportY = Math.max(-mHeight / 2, Math.min(mViewportY - deltaY, -mHeight / 2 + mHeight));
                             }
-                            for(int j=0; j<mObjectCount; j++){
-                                mObjects[j].calculateRenderXY(this);
-                            }
+                            calculateObjectXY();
                         }
                         startX = event.x;
                         startY = event.y;

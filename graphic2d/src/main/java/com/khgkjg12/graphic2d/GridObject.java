@@ -19,83 +19,126 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.annotation.WorkerThread;
 
-public interface GridObject {
+public class GridObject extends Object implements Object.OnClickListener {
+    private Object[][] mObjectList;
+    private int mRow, mColumn;
+    private OnClickItemListener mOnClickItemListener;
+    private World mWorld;
+    private int mWidth;
+    private int mHeight;
 
-    Object getObject(int row, int column);
+    public GridObject(float z, int x, int y, int width, int height, int row, int column, @Nullable OnClickItemListener onClickItemListener){
+        super(z, x, y, false, false, null);
+        mWidth = width;
+        mHeight = height;
+        mRow = row;
+        mColumn = column;
+        mOnClickItemListener = onClickItemListener;
+        mObjectList = new Object[mRow][mColumn];
+    }
 
-    int getRowSize();
-    int getColumnSize();
+    public Object getObject(int row, int column){
+        return mObjectList[row][column];
+    }
 
-    /**
-     * put object without position adjustment.
-     * @param obj
-     * @param row
-     * @param column
-     */
-    @WorkerThread
-    void putObject(@NonNull Object obj, int row, int column);
+    public int getRowSize(){
+        return mRow;
+    }
 
-    /**
-     * Only Use in Callback Method that has World Parameter.
-     * @param obj
-     * @param row
-     * @param column
-     */
-    @WorkerThread
-    void putObjectAndAdjust(@NonNull Object obj, int row, int column);
-
-    /**
-     * Only Use in Callback Method that has World Parameter.
-     * @param texture
-     * @param padding
-     * @param row
-     * @param column
-     */
-    @WorkerThread
-    void createAndPutTextureObject(@NonNull Texture texture, int padding, int row, int column);
+    public int getColumnSize(){
+        return mColumn;
+    }
 
     @WorkerThread
-    void createAndPutTextureObject(@NonNull Texture texture, int width, int height, int row, int column);
-
-    /**
-     * Only Use in Callback Method that has World Parameter.
-     * @param color
-     * @param padding
-     * @param row
-     * @param column
-     */
-    @WorkerThread
-    void createAndPutRectObject(int color, int padding, int row, int column);
+    public void setOnClickItemListener(OnClickItemListener onClickItemListener){
+        mOnClickItemListener = onClickItemListener;
+    }
 
     @WorkerThread
-    void createAndPutRoundRectObject(int color, float rX, float rY, int row, int padding, int column);
+    public void putObject(@NonNull Object obj, int row, int column){
+        obj.setOnClickListener(this);
+        mObjectList[row][column] = obj;
+        if(mWorld != null) {
+            mWorld.putObject(obj);
+        }
+    }
+
+    @WorkerThread
+    public void removeObject(int row, int column){
+        if(mWorld!=null) {
+            mWorld.removeObject(mObjectList[row][column]);
+        }
+        mObjectList[row][column] = null;
+    }
+
+    @WorkerThread
+    void attached(World world) {
+        for(int i=0; i<mRow; i++){
+            for(int j=0; j<mColumn; j++){
+                if(mObjectList[i][j]!=null){
+                    world.putObject(mObjectList[i][j]);
+                }
+            }
+        }
+        mWorld = world;
+    }
+
+    @WorkerThread
+    void detached(World world) {
+        for(int i=0; i<mRow; i++){
+            for(int j=0; j<mColumn; j++){
+                if(mObjectList[i][j]!=null){
+                    world.removeObject(mObjectList[i][j]);
+                }
+            }
+        }
+        mWorld = null;
+    }
+
+    @WorkerThread
+    @Override
+    boolean onTouch(World world, int x, int y){
+        return false;
+    }
+
+    @Override
+    boolean checkBoundary(int x, int y) {
+        return false;
+    }
+
+    @Override
+    void calculateBoundary() {}
 
 
     @WorkerThread
-    void createAndPutRectObject(int color, int width, int height, int row, int column);
+    public void moveXY(World world, int x, int y){
+        int deltaX = x-mX;
+        int deltaY = y-mY;
+        mX = x;
+        mY = y;
+        for(int i=0; i<mRow; i++){
+            for(int j=0; j< mColumn; j++){
+                mObjectList[i][j].mX+=deltaX;
+                mObjectList[i][j].mY+=deltaY;
+                mObjectList[i][j].calculateRenderXY(world);
+            }
+        }
+    }
 
-    @WorkerThread
-    void createAndPutRoundRectObject(int color, float rX, float rY, int width, int height, int row, int column);
+    @Override
+    void draw(Graphic2dDrawer drawer) { }
 
-    /**
-     * Only Use in Callback Method that has World Parameter.
-     * @param row
-     * @param column
-     */
-    @WorkerThread
-    void removeObject(int row, int column);
-    /**
-     * Only Use in Callback Method that has World Parameter.
-     * @param world from Callback Method Parameter.
-     * */
-    @WorkerThread
-    void attached(World world);
-    /**
-     * Only Use in Callback Method that has World Parameter.
-     * @param world from Callback Method Parameter.
-     * */
-    @WorkerThread
-    void detached(World world);
+    @Override
+    public boolean onClick(World world, Object object) {
+        for(int i=0; i<mRow; i++){
+            for(int j =0; j<mColumn; j++){
+                if(mObjectList[i][j]==object){
+                    return mOnClickItemListener.onClickItem(world, this, object, i, j);
+                }
+            }
+        }
+        return false;
+    }
 
     interface OnClickItemListener{
         /**
@@ -109,7 +152,4 @@ public interface GridObject {
         @WorkerThread
         boolean onClickItem(World world, GridObject gridObject, @Nullable Object object, int row, int column);
     }
-
-    @WorkerThread
-    void setOnClickItemListener(OnClickItemListener onClickItemListener);
 }

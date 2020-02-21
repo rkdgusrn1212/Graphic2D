@@ -24,15 +24,10 @@ import android.util.Log;
 
 import com.khgkjg12.graphic2d.GridObject;
 import com.khgkjg12.graphic2d.Object;
-import com.khgkjg12.graphic2d.RectGridObject;
-import com.khgkjg12.graphic2d.RoundRectGridObject;
-import com.khgkjg12.graphic2d.RoundRectObject;
 import com.khgkjg12.graphic2d.TextObject;
 import com.khgkjg12.graphic2d.Texture;
 import com.khgkjg12.graphic2d.Graphic2dDrawer;
 import com.khgkjg12.graphic2d.Graphic2dRenderView;
-import com.khgkjg12.graphic2d.TextureGridObject;
-import com.khgkjg12.graphic2d.TextureObject;
 import com.khgkjg12.graphic2d.World;
 
 import static android.view.WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON;

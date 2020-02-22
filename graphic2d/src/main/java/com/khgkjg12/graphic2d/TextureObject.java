@@ -13,15 +13,7 @@ public class TextureObject extends Object {
     float mRenderWidth;
     float mRenderHeight;
 
-    public TextureObject(@NonNull Texture texture, int width, int height, float z, int x, int y, OnClickListener onClickListener) {
-        this(texture, width, height, z, x, y, 0, 0, onClickListener);
-    }
-
-    public TextureObject(@NonNull Texture texture, int width, int height, float z, int x, int y, int degreeH, int degreeV, OnClickListener onClickListener) {
-        this(texture, width, height, z, x, y, degreeH, degreeV, true, true, onClickListener);
-    }
-
-    public TextureObject(@NonNull Texture texture, int width, int height, float z, int x, int y, int degreeH, int degreeV, boolean visibility, boolean clickable, OnClickListener onClickListener){
+    public TextureObject(float z, int x, int y, boolean visibility, boolean clickable, OnClickListener onClickListener, int width, int height, int degreeH, int degreeV, @NonNull Texture texture){
         super(z, x, y, visibility, clickable, onClickListener);
         mTexture = texture;
         mRectF = new RectF();

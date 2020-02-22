@@ -19,19 +19,7 @@ public class TextObject extends Object {
     private float mBottom;
     private float mScaledSize;
 
-    public TextObject(@NonNull String text, Typeface typeface, int color, int textSize, float z, int x, int y, OnClickListener onClickListener){
-        this(text, typeface, color, textSize, z, x, y, true, false, onClickListener);
-    }
-
-    public TextObject(Typeface typeface, int color, int textSize, float z, int x, int y, OnClickListener onClickListener){
-        this(typeface, color, textSize, z, x, y, true, false, onClickListener);
-    }
-
-    public TextObject(Typeface typeface, int color, int textSize, float z, int x, int y, boolean visibility, boolean clickable, OnClickListener onClickListener) {
-        this("", typeface, color, textSize, z, x, y, visibility, clickable, onClickListener);
-    }
-
-    public TextObject(@NonNull String text, Typeface typeface, int color, int textSize, float z, int x, int y, boolean visibility, boolean clickable, OnClickListener onClickListener) {
+    public TextObject(float z, int x, int y, boolean visibility, boolean clickable, OnClickListener onClickListener, @NonNull String text, int textSize, @NonNull Typeface typeface, int color) {
         super(z, x, y, visibility, clickable, onClickListener);
         mPaint = new Paint();
         mPaint.setColor(color);
@@ -43,6 +31,25 @@ public class TextObject extends Object {
         mFontMetrics = new Paint.FontMetrics();
     }
 
+    @WorkerThread
+    public void setTypeface(@NonNull Typeface Typeface){
+        mPaint.setTypeface(Typeface);
+        calculateBoundary();
+    }
+
+    public Typeface getTypeface(){
+        return mPaint.getTypeface();
+    }
+
+    @WorkerThread
+    public void setTextSize(int textSize){
+        mTextSize = textSize;
+        calculateBoundary();
+    }
+
+    public int getTextSize(){
+        return mTextSize;
+    }
     /**
      * world 콜백에서 호출.
      * @param text
@@ -53,6 +60,10 @@ public class TextObject extends Object {
         calculateBoundary();
     }
 
+    public String getText(){
+        return mText;
+    }
+
     /**
      * world 콜백에서 호출.
      * @param color
@@ -60,6 +71,10 @@ public class TextObject extends Object {
     @WorkerThread
     public void setColor(int color){
         mPaint.setColor(color);
+    }
+
+    public int getColor(){
+        return mPaint.getColor();
     }
 
     @WorkerThread

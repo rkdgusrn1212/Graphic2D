@@ -6,16 +6,8 @@ public class RoundRectObject extends RectObject {
 
     private float mRY, mRX;
 
-    public RoundRectObject(int color, float rX, float rY, int width, int height, float z, int x, int y, OnClickListener onClickListener) {
-        this(color, rX, rY, width, height, z, x, y, 0, 0, true, true, onClickListener);
-    }
-
-    public RoundRectObject(int color, float rX, float rY, int width, int height, float z, int x, int y, int degreeH, int degreeV, OnClickListener onClickListener) {
-        this(color, rX, rY, width, height, z, x, y, degreeH, degreeV, true, true, onClickListener);
-    }
-
-    public RoundRectObject(int color, float rX, float rY, int width, int height, float z, int x, int y, int degreeH, int degreeV, boolean visibility, boolean clickable, OnClickListener onClickListener) {
-        super(color, width, height, z, x, y, degreeH, degreeV, visibility, clickable, onClickListener);
+    public RoundRectObject(float z, int x, int y,  boolean visibility, boolean clickable, OnClickListener onClickListener, int width, int height, int degreeH, int degreeV, int color, float rX, float rY) {
+        super(z, x, y, visibility, clickable, onClickListener, width, height, degreeH, degreeV, color);
         mRX = rX;
         mRY = rY;
     }

@@ -12,15 +12,7 @@ public class RectObject extends Object {
     float mRenderWidth, mRenderHeight;
     float mRenderLeft, mRenderRight, mRenderTop, mRenderBottom;
 
-    public RectObject(int color, int width, int height, float z, int x, int y, OnClickListener onClickListener){
-        this(color, width, height, z, x, y, 0, 0, true, true, onClickListener);
-    }
-
-    public RectObject(int color, int width, int height, float z, int x, int y, int degreeH, int degreeV, OnClickListener onClickListener){
-        this(color, width, height, z, x, y, degreeH, degreeV, true, true, onClickListener);
-    }
-
-    public RectObject(int color, int width, int height, float z, int x, int y, int degreeH, int degreeV, boolean visibility, boolean clickable, OnClickListener onClickListener){
+    public RectObject(float z, int x, int y, boolean visibility, boolean clickable, OnClickListener onClickListener, int width, int height, int degreeH, int degreeV, int color){
         super(z, x, y, visibility, clickable, onClickListener);
         mPaint = new Paint();
         mPaint.setColor(color);

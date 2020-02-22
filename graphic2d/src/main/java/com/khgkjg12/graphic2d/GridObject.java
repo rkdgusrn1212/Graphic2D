@@ -33,8 +33,19 @@ public class GridObject extends Object implements Object.OnClickListener {
     private float mRenderTop;
     private float mRenderBottom;
 
-    public GridObject(float z, int x, int y, int width, int height, int row, int column, @Nullable OnClickItemListener onClickItemListener){
-        super(z, x, y, false, true, null);
+    /**
+     * @param z z-coordinate.
+     * @param x x-coordinate.
+     * @param y y-coordinate.
+     * @param clickable 오직 그리드 평면에 대한 터치 이벤트. 즉, onClickGrid{@link OnClickItemListener} 호출 여부.
+     * @param width  x-axis length.
+     * @param height y-axis length.
+     * @param row number of rows.
+     * @param column number of columns.
+     * @param onClickItemListener touch event callback {@link OnClickItemListener}
+     */
+    public GridObject(float z, int x, int y, boolean clickable, int width, int height, int row, int column, @Nullable OnClickItemListener onClickItemListener){
+        super(z, x, y, false, clickable, null);
         mWidth = width;
         mHeight = height;
         mRow = row;

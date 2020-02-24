@@ -114,7 +114,7 @@ public class GridObject extends Object implements Object.OnClickListener {
     @WorkerThread
     @Override
     boolean checkBoundary(int x, int y) {
-        if(x < mRenderRight && x > mRenderLeft && y < mRenderBottom && y > mRenderTop){
+        if(mOnClickItemListener!=null&&x < mRenderRight && x > mRenderLeft && y < mRenderBottom && y > mRenderTop){
             int column = (int)((x - mRenderLeft) * mColumn / mRenderWidth);
             int row = (int)((y - mRenderTop) * mRow / mRenderHeight);
             return mOnClickItemListener.onClickGrid(mWorld, this, mObjectList[row][column], row, column);
@@ -155,10 +155,12 @@ public class GridObject extends Object implements Object.OnClickListener {
 
     @Override
     public boolean onClick(World world, Object object) {
-        for(int i=0; i<mRow; i++){
-            for(int j =0; j<mColumn; j++){
-                if(mObjectList[i][j]==object){
-                    return mOnClickItemListener.onClickItem(world, this, object, i, j);
+        if(mOnClickItemListener!=null) {
+            for (int i = 0; i < mRow; i++) {
+                for (int j = 0; j < mColumn; j++) {
+                    if (mObjectList[i][j] == object) {
+                        return mOnClickItemListener.onClickItem(world, this, object, i, j);
+                    }
                 }
             }
         }
@@ -175,7 +177,7 @@ public class GridObject extends Object implements Object.OnClickListener {
          * @return 터치이벤트의 소멸 여부. true 는 소멸, false 는 전달.
          */
         @WorkerThread
-        boolean onClickItem(World world, GridObject gridObject, @Nullable Object object, int row, int column);
+        boolean onClickItem(World world, GridObject gridObject, Object object, int row, int column);
 
         @WorkerThread
         boolean onClickGrid(World world, GridObject gridObject, @Nullable Object object, int row, int column);

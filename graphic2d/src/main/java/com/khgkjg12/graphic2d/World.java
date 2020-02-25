@@ -111,14 +111,14 @@ public class World {
     public void removeObject(Object object){
         int i = 0;
         while(mObjects[i++] != object);
-        if(mObjects[i-1] instanceof GridObject){
-            ((GridObject)mObjects[i-1]).detached(this);
-        }
         while(i!=mObjectCount){
             mObjects[i-1] = mObjects[i];
             i++;
         }
         mObjectCount--;
+        if(object instanceof GridObject){
+            ((GridObject)object).detached(this);
+        }
     }
 
     @WorkerThread

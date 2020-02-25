@@ -43,6 +43,7 @@ public class World {
     private RectF mRectF;
     private int mMaxObjectCount;
     int mObjectCount;
+    private OnClickWorldListener mOnClickWorldListener;
 
 
     World(int width, int height, int viewportX, int viewportY, float cameraZ, float minCameraZ, float maxCameraZ, float focusedZ, int backgroundColor, boolean dragToMove, boolean pinchToZoom, int maxObjectCount){
@@ -60,6 +61,7 @@ public class World {
         mBackgroundColor = backgroundColor;
         mDragToMove = dragToMove;
         mPinchToZoom = pinchToZoom;
+        mOnClickWorldListener = null;
     }
 
     public int getMaxObjectCount(){
@@ -204,9 +206,23 @@ public class World {
                     }
                 }else if(event.type == TouchHandler.TouchEvent.TOUCH_UP) {
                     if(isPressed){
-                        for(int j=0; j< mObjectCount; j++){
-                            if(mObjects[j].onTouch(this, event.x, event.y)){
-                                break;
+                        if(mOnClickWorldListener!=null){
+                            if(!mOnClickWorldListener.onClickViewport(this, event.x, event.y)) {
+                                int j;
+                                for (j = 0; j < mObjectCount; j++) {
+                                    if (mObjects[j].onTouch(this, event.x, event.y)) {
+                                        break;
+                                    }
+                                }
+                                if (j == mObjectCount) {
+                                    mOnClickWorldListener.onClickBackground(this, event.x, event.y);
+                                }
+                            }
+                        }else{
+                            for (int j = 0; j < mObjectCount; j++) {
+                                if (mObjects[j].onTouch(this, event.x, event.y)) {
+                                    break;
+                                }
                             }
                         }
                     }
@@ -232,5 +248,14 @@ public class World {
         for(int j=0; j<mObjectCount; j++){
             mObjects[j].calculateRenderXY(this);
         }
+    }
+
+    public interface OnClickWorldListener{
+        void onClickBackground(World world, int x, int y);
+        boolean onClickViewport(World world, int x, int y);
+    }
+
+    public void setOnClickWorldListener(OnClickWorldListener onClickWorldListener){
+        mOnClickWorldListener = onClickWorldListener;
     }
 }

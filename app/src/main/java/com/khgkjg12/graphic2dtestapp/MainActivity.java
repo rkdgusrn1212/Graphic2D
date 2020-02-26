@@ -138,7 +138,7 @@ public class MainActivity extends Activity implements Graphic2dRenderView.Render
     @Override
     public boolean onClickItem(World world, GridObject gridObject, Object object, int row, int column) {
         pop = true;
-        popObject = object;
+        popObject = gridObject;
         //flip = true;
         //flipObject = objectList[row][column];
         return true;

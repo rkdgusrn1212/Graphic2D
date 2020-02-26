@@ -16,7 +16,7 @@
 package com.khgkjg12.graphic2d;
 
 import android.graphics.RectF;
-import android.support.annotation.MainThread;
+import android.support.annotation.NonNull;
 import android.support.annotation.WorkerThread;
 
 import java.util.List;
@@ -86,7 +86,7 @@ public class World {
      * @param object 오브젝트.
      */
     @WorkerThread
-    public void putObject(Object object){
+    public void putObject(@NonNull Object object){
         int i = 0;
         while(i!=mObjectCount&&mObjects[i].mZ > object.mZ){
             i++;
@@ -110,7 +110,7 @@ public class World {
      * @param object 삭제할 오브젝트 레퍼런스.
      */
     @WorkerThread
-    public void removeObject(Object object){
+    public void removeObject(@NonNull Object object){
         int i = 0;
         while(mObjects[i++] != object);
         while(i!=mObjectCount){
@@ -251,7 +251,9 @@ public class World {
     }
 
     public interface OnClickWorldListener{
+        @WorkerThread
         void onClickBackground(World world, int x, int y);
+        @WorkerThread
         boolean onClickViewport(World world, int x, int y);
     }
 

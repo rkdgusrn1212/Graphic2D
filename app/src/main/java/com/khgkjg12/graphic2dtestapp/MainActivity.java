@@ -83,7 +83,7 @@ public class MainActivity extends Activity implements Graphic2dRenderView.Render
             }
             world.putObject(horLine);
         }*/
-        gridObject = new GridObject(0,0,0,true,800, 800, 8, 8,this);
+        gridObject = new GridObject(0,0,0,true, true, 800, 800, 8, 8,this);
         world.putObject(gridObject);
         /*for(int i=0;i<8;i++){
             for(int j=0; j<8; j++) {

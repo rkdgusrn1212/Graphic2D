@@ -15,11 +15,10 @@
  */
 package com.khgkjg12.graphic2d;
 
-import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.annotation.WorkerThread;
 
-public class GridObject extends Object implements Object.OnClickListener {
+public class GridObject extends Object implements Object.OnClickListener, Group {
     private Object[][] mObjectList;
     private int mRow, mColumn;
     private OnClickItemListener mOnClickItemListener;
@@ -32,19 +31,21 @@ public class GridObject extends Object implements Object.OnClickListener {
     private float mRenderRight;
     private float mRenderTop;
     private float mRenderBottom;
+    private boolean mItemClickable;
 
     /**
      * @param z z-coordinate.
      * @param x x-coordinate.
      * @param y y-coordinate.
-     * @param clickable 오직 그리드 평면에 대한 터치 이벤트. 즉, onClickGrid{@link OnClickItemListener} 호출 여부.
+     * @param clickable 그리드 onClickGrid{@link OnClickItemListener} 호출 여부.
+     * @param itemClickable 그리드 onClickItem 호출여부.
      * @param width  x-axis length.
      * @param height y-axis length.
      * @param row number of rows.
      * @param column number of columns.
      * @param onClickItemListener touch event callback {@link OnClickItemListener}
      */
-    public GridObject(float z, int x, int y, boolean clickable, int width, int height, int row, int column, @Nullable OnClickItemListener onClickItemListener){
+    public GridObject(float z, int x, int y, boolean clickable, boolean itemClickable, int width, int height, int row, int column, @Nullable OnClickItemListener onClickItemListener){
         super(z, x, y, false, clickable, null);
         mWidth = width;
         mHeight = height;
@@ -52,7 +53,14 @@ public class GridObject extends Object implements Object.OnClickListener {
         mColumn = column;
         mOnClickItemListener = onClickItemListener;
         mObjectList = new Object[mRow][mColumn];
+        mItemClickable = itemClickable;
     }
+
+    @WorkerThread
+    public void setItemClickable(boolean itemClickable) {
+        mItemClickable = itemClickable;
+    }
+
     public Object getObject(int row, int column){
         return mObjectList[row][column];
     }
@@ -71,20 +79,19 @@ public class GridObject extends Object implements Object.OnClickListener {
     }
 
     @WorkerThread
-    public void putObject(@NonNull Object obj, int row, int column){
-        obj.setOnClickListener(this);
+    public void putObject(Object obj, int row, int column){
+        if(mObjectList[row][column]!=null) {
+            if(mWorld!=null){
+                mWorld.removeObject(mObjectList[row][column]);
+            }
+        }
+        if(obj!=null) {
+            obj.setOnClickListener(this);
+            if (mWorld != null) {
+                mWorld.putObject(obj);
+            }
+        }
         mObjectList[row][column] = obj;
-        if(mWorld != null) {
-            mWorld.putObject(obj);
-        }
-    }
-
-    @WorkerThread
-    public void removeObject(int row, int column){
-        if(mWorld!=null) {
-            mWorld.removeObject(mObjectList[row][column]);
-        }
-        mObjectList[row][column] = null;
     }
 
     @WorkerThread
@@ -138,16 +145,30 @@ public class GridObject extends Object implements Object.OnClickListener {
     public void moveXY(World world, int x, int y){
         int deltaX = x-mX;
         int deltaY = y-mY;
-        mX = x;
-        mY = y;
         for(int i=0; i<mRow; i++){
             for(int j=0; j< mColumn; j++){
-                mObjectList[i][j].mX+=deltaX;
-                mObjectList[i][j].mY+=deltaY;
-                mObjectList[i][j].calculateRenderXY(world);
+                if(mObjectList[i][j]!=null) {
+                    mObjectList[i][j].mX += deltaX;
+                    mObjectList[i][j].mY += deltaY;
+                    mObjectList[i][j].calculateRenderXY(world);
+                }
             }
         }
-        calculateBoundary();
+        super.moveXY(world, x, y);
+    }
+
+    @Override
+    public void moveZ(World world, float z) {
+        float deltaZ = z-mZ;
+        for(int i=0; i<mRow; i++){
+            for(int j=0; j<mColumn; j++){
+                if(mObjectList[i][j]!=null){
+                    mObjectList[i][j].mZ+=deltaZ;
+                    mObjectList[i][j].calculateScale(world);
+                }
+            }
+        }
+        super.moveZ(world, z);
     }
 
     @Override
@@ -155,7 +176,7 @@ public class GridObject extends Object implements Object.OnClickListener {
 
     @Override
     public boolean onClick(World world, Object object) {
-        if(mOnClickItemListener!=null) {
+        if(mItemClickable&&mOnClickItemListener!=null) {
             for (int i = 0; i < mRow; i++) {
                 for (int j = 0; j < mColumn; j++) {
                     if (mObjectList[i][j] == object) {

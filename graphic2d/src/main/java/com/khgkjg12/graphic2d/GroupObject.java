@@ -4,7 +4,7 @@ import android.support.annotation.IntRange;
 import android.support.annotation.Nullable;
 import android.support.annotation.WorkerThread;
 
-public class GroupObject extends Object implements Object.OnClickListener {
+public class GroupObject extends Object implements Object.OnClickListener, Group{
     private Object[] mObjectList;
     private int mGroupSize;
     private OnClickGroupListener mOnClickGroupListener;
@@ -58,12 +58,11 @@ public class GroupObject extends Object implements Object.OnClickListener {
             if (mWorld != null) {
                 mWorld.removeObject(mObjectList[idx]);
             }
-        } else {
-            if (obj != null) {
-                obj.setOnClickListener(this);
-                if (mWorld != null) {
-                    mWorld.putObject(obj);
-                }
+        }
+        if (obj != null) {
+            obj.setOnClickListener(this);
+            if (mWorld != null) {
+                mWorld.putObject(obj);
             }
         }
         mObjectList[idx] = obj;

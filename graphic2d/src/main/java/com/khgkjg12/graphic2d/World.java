@@ -98,7 +98,7 @@ public class World {
         }
         object.calculateScale(this);
         mObjects[i] = object;
-        if(object instanceof GridObject){
+        if(object instanceof Group){
             ((GridObject) object).attached(this);
         }
     }
@@ -118,7 +118,7 @@ public class World {
             i++;
         }
         mObjectCount--;
-        if(object instanceof GridObject){
+        if(object instanceof Group){
             ((GridObject)object).detached(this);
         }
     }

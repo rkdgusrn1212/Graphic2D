@@ -24,7 +24,6 @@ import android.util.Log;
 
 import com.khgkjg12.graphic2d.GridObject;
 import com.khgkjg12.graphic2d.Object;
-import com.khgkjg12.graphic2d.RectObject;
 import com.khgkjg12.graphic2d.TextObject;
 import com.khgkjg12.graphic2d.Texture;
 import com.khgkjg12.graphic2d.Graphic2dDrawer;

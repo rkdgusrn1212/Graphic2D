@@ -176,21 +176,19 @@ public class GridObject extends Object implements Object.OnClickListener, Group 
 
     @Override
     public boolean onClick(World world, Object object) {
-        if(mItemClickable&& mOnClickGridListener !=null) {
-            for (int i = 0; i < mRow; i++) {
-                for (int j = 0; j < mColumn; j++) {
-                    if (mObjectList[i][j] == object) {
-                        if(!mOnClickGridListener.onClickItem(world, this, object, i,j)) {
-                            if(mOnClickListener!=null) {
-                                return mOnClickListener.onClick(world, this);
-                            }else{
-                                return false;
-                            }
-                        }else {
-                            return true;
+        if(mItemClickable){
+            if(mOnClickGridListener!=null){
+                for (int i = 0; i < mRow; i++) {
+                    for (int j = 0; j < mColumn; j++) {
+                        if (mObjectList[i][j] == object) {
+                            if(mOnClickGridListener.onClickItem(world, this, object, i,j)) return true;
+                            break;
                         }
                     }
                 }
+            }
+            if(mOnClickListener!=null){
+                return mOnClickListener.onClick(world, this);
             }
         }
         return false;

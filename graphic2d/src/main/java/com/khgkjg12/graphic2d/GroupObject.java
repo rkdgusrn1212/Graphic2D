@@ -122,19 +122,18 @@ public class GroupObject extends Object implements Object.OnClickListener, Group
     @WorkerThread
     @Override
     public boolean onClick(World world, Object object) {
-        if(mClickable&&mOnClickGroupListener!=null) {
-            for (int i = 0; i < mGroupSize; i++) {
-                if (mObjectList[i] == object) {
-                    if(!mOnClickGroupListener.onClickGroup(world, this, object, i)) {
-                        if(mOnClickListener!=null) {
-                            return mOnClickListener.onClick(world, this);
-                        }else{
-                            return false;
+        if(mClickable){
+            if(mOnClickGroupListener!=null){
+                for (int i = 0; i < mGroupSize; i++) {
+                    if (mObjectList[i] == object) {
+                        if(mOnClickGroupListener.onClickGroup(world, this, object, i)) {
+                            return true;
                         }
-                    }else {
-                        return true;
                     }
                 }
+            }
+            if(mOnClickListener!=null) {
+                return mOnClickListener.onClick(world, this);
             }
         }
         return false;

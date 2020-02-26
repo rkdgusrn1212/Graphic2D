@@ -129,6 +129,7 @@ public class GroupObject extends Object implements Object.OnClickListener, Group
                         if(mOnClickGroupListener.onClickGroup(world, this, object, i)) {
                             return true;
                         }
+                        break;
                     }
                 }
             }

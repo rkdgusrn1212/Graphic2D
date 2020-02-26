@@ -95,7 +95,7 @@ public class GridObject extends Object implements Object.OnClickListener, Group 
     }
 
     @WorkerThread
-    void attached(World world) {
+    public void attached(World world) {
         for(int i=0; i<mRow; i++){
             for(int j=0; j<mColumn; j++){
                 if(mObjectList[i][j]!=null){
@@ -107,7 +107,7 @@ public class GridObject extends Object implements Object.OnClickListener, Group 
     }
 
     @WorkerThread
-    void detached(World world) {
+    public void detached(World world) {
         for(int i=0; i<mRow; i++){
             for(int j=0; j<mColumn; j++){
                 if(mObjectList[i][j]!=null){

@@ -69,7 +69,7 @@ public class GroupObject extends Object implements Object.OnClickListener, Group
     }
 
     @WorkerThread
-    void attached(World world) {
+    public void attached(World world) {
         for (int i = 0; i < mGroupSize; i++) {
             if(mObjectList[i]!=null) {
                 world.putObject(mObjectList[i]);
@@ -79,7 +79,7 @@ public class GroupObject extends Object implements Object.OnClickListener, Group
     }
 
     @WorkerThread
-    void detached(World world) {
+    public void detached(World world) {
         for (int i = 0; i < mGroupSize; i++) {
             if(mObjectList[i]!=null) {
                 world.removeObject(mObjectList[i]);

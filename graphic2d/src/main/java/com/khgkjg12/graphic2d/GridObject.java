@@ -21,7 +21,7 @@ import android.support.annotation.WorkerThread;
 public class GridObject extends Object implements Object.OnClickListener, Group {
     private Object[][] mObjectList;
     private int mRow, mColumn;
-    private OnClickItemListener mOnClickItemListener;
+    private OnClickGridListener mOnClickGridListener;
     private World mWorld;
     private int mWidth;
     private int mHeight;
@@ -37,21 +37,21 @@ public class GridObject extends Object implements Object.OnClickListener, Group 
      * @param z z-coordinate.
      * @param x x-coordinate.
      * @param y y-coordinate.
-     * @param clickable 그리드 onClickGrid{@link OnClickItemListener} 호출 여부.
+     * @param clickable 그리드 onClickGrid{@link OnClickGridListener} 호출 여부.
      * @param itemClickable 그리드 onClickItem 호출여부.
      * @param width  x-axis length.
      * @param height y-axis length.
      * @param row number of rows.
      * @param column number of columns.
-     * @param onClickItemListener touch event callback {@link OnClickItemListener}
+     * @param onClickGridListener touch event callback {@link OnClickGridListener}
      */
-    public GridObject(float z, int x, int y, boolean clickable, boolean itemClickable, int width, int height, int row, int column, @Nullable OnClickItemListener onClickItemListener){
+    public GridObject(float z, int x, int y, boolean clickable, boolean itemClickable, int width, int height, int row, int column, @Nullable OnClickGridListener onClickGridListener){
         super(z, x, y, false, clickable, null);
         mWidth = width;
         mHeight = height;
         mRow = row;
         mColumn = column;
-        mOnClickItemListener = onClickItemListener;
+        mOnClickGridListener = onClickGridListener;
         mObjectList = new Object[mRow][mColumn];
         mItemClickable = itemClickable;
     }
@@ -74,8 +74,8 @@ public class GridObject extends Object implements Object.OnClickListener, Group 
     }
 
     @WorkerThread
-    public void setOnClickItemListener(OnClickItemListener onClickItemListener){
-        mOnClickItemListener = onClickItemListener;
+    public void setOnClickItemListener(OnClickGridListener onClickGridListener){
+        mOnClickGridListener = onClickGridListener;
     }
 
     @WorkerThread
@@ -121,10 +121,10 @@ public class GridObject extends Object implements Object.OnClickListener, Group 
     @WorkerThread
     @Override
     boolean checkBoundary(int x, int y) {
-        if(mOnClickItemListener!=null&&x < mRenderRight && x > mRenderLeft && y < mRenderBottom && y > mRenderTop){
+        if(mOnClickGridListener !=null&&x < mRenderRight && x > mRenderLeft && y < mRenderBottom && y > mRenderTop){
             int column = (int)((x - mRenderLeft) * mColumn / mRenderWidth);
             int row = (int)((y - mRenderTop) * mRow / mRenderHeight);
-            return mOnClickItemListener.onClickGrid(mWorld, this, mObjectList[row][column], row, column);
+            return mOnClickGridListener.onClickGrid(mWorld, this, mObjectList[row][column], row, column);
         }else{
             return false;
         }
@@ -176,11 +176,19 @@ public class GridObject extends Object implements Object.OnClickListener, Group 
 
     @Override
     public boolean onClick(World world, Object object) {
-        if(mItemClickable&&mOnClickItemListener!=null) {
+        if(mItemClickable&& mOnClickGridListener !=null) {
             for (int i = 0; i < mRow; i++) {
                 for (int j = 0; j < mColumn; j++) {
                     if (mObjectList[i][j] == object) {
-                        return mOnClickItemListener.onClickItem(world, this, object, i, j);
+                        if(!mOnClickGridListener.onClickItem(world, this, object, i,j)) {
+                            if(mOnClickListener!=null) {
+                                return mOnClickListener.onClick(world, this);
+                            }else{
+                                return false;
+                            }
+                        }else {
+                            return true;
+                        }
                     }
                 }
             }
@@ -188,7 +196,7 @@ public class GridObject extends Object implements Object.OnClickListener, Group 
         return false;
     }
 
-    public interface OnClickItemListener{
+    public interface OnClickGridListener {
         /**
          * 해당 그리드의 셀에 들어있는 오브젝트를 콜벡함수를 통해 반환.
          * @param gridObject

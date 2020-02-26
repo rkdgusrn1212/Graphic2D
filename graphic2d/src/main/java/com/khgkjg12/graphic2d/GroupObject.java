@@ -42,7 +42,7 @@ public class GroupObject extends Object implements Object.OnClickListener, Group
     }
 
     @WorkerThread
-    public void setOnClickItemListener(OnClickGroupListener onClickGroupListener) {
+    public void setOnClickGroupListener(OnClickGroupListener onClickGroupListener) {
         mOnClickGroupListener = onClickGroupListener;
     }
 
@@ -125,7 +125,15 @@ public class GroupObject extends Object implements Object.OnClickListener, Group
         if(mClickable&&mOnClickGroupListener!=null) {
             for (int i = 0; i < mGroupSize; i++) {
                 if (mObjectList[i] == object) {
-                    return mOnClickGroupListener.onClickGroup(world, this, object, i);
+                    if(!mOnClickGroupListener.onClickGroup(world, this, object, i)) {
+                        if(mOnClickListener!=null) {
+                            return mOnClickListener.onClick(world, this);
+                        }else{
+                            return false;
+                        }
+                    }else {
+                        return true;
+                    }
                 }
             }
         }

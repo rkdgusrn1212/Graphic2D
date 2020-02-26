@@ -41,7 +41,7 @@ import static android.view.WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON;
  * 2D오브젝트의 클릭: 검은 돌과 하얀돌을 클릭하면 해당 객체에 지정된 클릭 리스너가 실행됨. 클릭시 효과음도 설정;
  */
 
-public class MainActivity extends Activity implements Graphic2dRenderView.Renderer, GridObject.OnClickItemListener {
+public class MainActivity extends Activity implements Graphic2dRenderView.Renderer, GridObject.OnClickGridListener {
 
     public static Texture background;
     public static Texture blackStone;

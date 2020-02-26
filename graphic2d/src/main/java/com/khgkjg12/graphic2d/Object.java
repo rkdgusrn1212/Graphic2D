@@ -21,7 +21,7 @@ public abstract class Object {
 
     private boolean mVisibility;
     boolean mClickable;
-    private OnClickListener mOnClickListener;
+    OnClickListener mOnClickListener;
     float mZ;
     int mX, mY;
     boolean mIsInCameraRange;

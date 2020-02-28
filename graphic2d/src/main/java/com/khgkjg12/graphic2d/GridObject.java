@@ -18,7 +18,7 @@ package com.khgkjg12.graphic2d;
 import android.support.annotation.Nullable;
 import android.support.annotation.WorkerThread;
 
-public class GridObject extends Object implements Object.OnClickListener, Group {
+public class GridObject extends Object implements Group {
     private Object[][] mObjectList;
     private int mRow, mColumn;
     private OnClickGridListener mOnClickGridListener;
@@ -32,6 +32,7 @@ public class GridObject extends Object implements Object.OnClickListener, Group 
     private float mRenderTop;
     private float mRenderBottom;
     private boolean mItemClickable;
+    private InnerItemListener mInnerItemListener;
 
     /**
      * @param z z-coordinate.
@@ -54,6 +55,7 @@ public class GridObject extends Object implements Object.OnClickListener, Group 
         mOnClickGridListener = onClickGridListener;
         mObjectList = new Object[mRow][mColumn];
         mItemClickable = itemClickable;
+        mInnerItemListener = new InnerItemListener();
     }
 
     @WorkerThread
@@ -86,7 +88,7 @@ public class GridObject extends Object implements Object.OnClickListener, Group 
             }
         }
         if(obj!=null) {
-            obj.setOnClickListener(this);
+            obj.setOnClickListener(mInnerItemListener);
             if (mWorld != null) {
                 mWorld.putObject(obj);
             }
@@ -174,24 +176,26 @@ public class GridObject extends Object implements Object.OnClickListener, Group 
     @Override
     void draw(Graphic2dDrawer drawer) { }
 
-    @Override
-    public boolean onClick(World world, Object object) {
-        if(mItemClickable){
-            if(mOnClickGridListener!=null){
-                for (int i = 0; i < mRow; i++) {
-                    for (int j = 0; j < mColumn; j++) {
-                        if (mObjectList[i][j] == object) {
-                            if(mOnClickGridListener.onClickItem(world, this, object, i,j)) return true;
-                            break;
+    class InnerItemListener implements OnClickListener{
+
+        @Override
+        public void onClick(World world, Object object) {
+            if(mItemClickable){
+                if(mOnClickGridListener!=null){
+                    for (int i = 0; i < mRow; i++) {
+                        for (int j = 0; j < mColumn; j++) {
+                            if (mObjectList[i][j] == object) {
+                                mOnClickGridListener.onClickItem(world, GridObject.this, object, i,j);
+                                break;
+                            }
                         }
                     }
                 }
-            }
-            if(mOnClickListener!=null){
-                return mOnClickListener.onClick(world, this);
+                if(mOnClickListener!=null){
+                    mOnClickListener.onClick(world, GridObject.this);
+                }
             }
         }
-        return false;
     }
 
     public interface OnClickGridListener {

@@ -205,11 +205,17 @@ public class World {
                         }
                     }
                 }else if(event.type == TouchHandler.TouchEvent.TOUCH_DRAGGED){//pressed인 오브젝트중 영역일치 아닌 것들은 모두 onTouchCancel 호출
-                    if (Math.abs(event.x - startX) > 50 || Math.abs(event.y - startY) > 50) {
-                        isDragging = true;
-                    }
+                    boolean flag = true;
                     for (int j = 0; j < mObjectCount; j++) {
-                        mObjects[j].checkDrag(this, event.x, event.y);
+                        if(mObjects[j].checkDrag(this, event.x, event.y)){
+                            flag = false;
+                            break;
+                        }
+                    }
+                    if(flag){
+                        if (Math.abs(event.x - startX) > 50 || Math.abs(event.y - startY) > 50) {
+                            isDragging = true;
+                        }
                     }
                 }else if(event.type == TouchHandler.TouchEvent.TOUCH_UP) {//pressed인 오브젝트중 영역일치 아닌 것들은 모두 onTouchCancel 호출. 영역 일치하면 onClick 호출.
                     if(isPressed){

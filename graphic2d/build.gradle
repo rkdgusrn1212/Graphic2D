@@ -10,8 +10,8 @@ android {
     defaultConfig {
         minSdkVersion 15
         targetSdkVersion 26
-        versionCode 31
-        versionName "4.5"
+        versionCode 32
+        versionName "4.6"
     }
 
     buildTypes {
@@ -32,7 +32,7 @@ publish{
     userOrg = 'rkdgusrn1212'
     groupId = 'com.khgkjg12.graphic2d'
     artifactId = 'graphic2d'
-    publishVersion = '1.4.2'
+    publishVersion = '1.4.3'
     licences = ['Apache-2.0']
     desc = 'Android 2D Graphic Library using SurfaceView.'
     website = 'https://github.com/rkdgusrn1212/graphic2d'

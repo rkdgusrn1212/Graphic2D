@@ -4,11 +4,12 @@ import android.support.annotation.IntRange;
 import android.support.annotation.Nullable;
 import android.support.annotation.WorkerThread;
 
-public class GroupObject extends Object implements Object.OnClickListener, Group{
+public class GroupObject extends Object implements Group{
     private Object[] mObjectList;
     private int mGroupSize;
     private OnClickGroupListener mOnClickGroupListener;
     private World mWorld;
+    private InnerItemListener mInnerItemListener;
 
     /**
      * @param z                    그룹 기준 z-coordinate.
@@ -23,6 +24,7 @@ public class GroupObject extends Object implements Object.OnClickListener, Group
         mOnClickGroupListener = onClickGroupListener;
         mGroupSize = groupSize;
         mObjectList = new Object[mGroupSize];
+        mInnerItemListener = new InnerItemListener();
     }
 
     public Object getObject(int idx) {
@@ -60,7 +62,7 @@ public class GroupObject extends Object implements Object.OnClickListener, Group
             }
         }
         if (obj != null) {
-            obj.setOnClickListener(this);
+            obj.setOnClickListener(mInnerItemListener);
             if (mWorld != null) {
                 mWorld.putObject(obj);
             }
@@ -114,30 +116,29 @@ public class GroupObject extends Object implements Object.OnClickListener, Group
             }
         }
     }
-
     @Override
     void draw(Graphic2dDrawer drawer) {
     }
 
-    @WorkerThread
-    @Override
-    public boolean onClick(World world, Object object) {
-        if(mClickable){
-            if(mOnClickGroupListener!=null){
-                for (int i = 0; i < mGroupSize; i++) {
-                    if (mObjectList[i] == object) {
-                        if(mOnClickGroupListener.onClickGroup(world, this, object, i)) {
-                            return true;
+
+    class InnerItemListener implements OnClickListener{
+        @WorkerThread
+        @Override
+        public void onClick(World world, Object object) {
+            if(mClickable){
+                if(mOnClickGroupListener!=null){
+                    for (int i = 0; i < mGroupSize; i++) {
+                        if (mObjectList[i] == object) {
+                            mOnClickGroupListener.onClickGroup(world, GroupObject.this, object, i);
+                            break;
                         }
-                        break;
                     }
                 }
-            }
-            if(mOnClickListener!=null) {
-                return mOnClickListener.onClick(world, this);
+                if(mOnClickListener!=null) {
+                    mOnClickListener.onClick(world, GroupObject.this);
+                }
             }
         }
-        return false;
     }
 
     public interface OnClickGroupListener {

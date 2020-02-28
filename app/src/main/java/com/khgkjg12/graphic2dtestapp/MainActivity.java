@@ -147,6 +147,7 @@ public class MainActivity extends Activity implements Graphic2dRenderView.Render
     @Override
     public boolean onClickGrid(World world, GridObject gridObject, Object object, int row, int column) {
         gridObject.putObject(new TextObject( gridObject.getZ(), gridObject.getColumnX(column),gridObject.getRowY(row), true , true,null, "IgIg", 100, Typeface.SERIF, Color.WHITE), row, column);
+        gridObject.getObject(row, column).setDraggable(true);
         return true;
     }
 

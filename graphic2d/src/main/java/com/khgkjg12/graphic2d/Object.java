@@ -255,9 +255,9 @@ public abstract class Object {
     @WorkerThread
     boolean checkDrag(World world, int x, int y){
         if(mIsPressed){
-            if(mDraggable&&mIsInCameraRange&&checkBoundary(x, y)){
-                onTouchDrag(world, x, y);
-                return true;
+            if(mIsInCameraRange&&checkBoundary(x, y)){
+                if(mDraggable) onTouchDrag(world, x, y);
+                return mDraggable;
             }else{
                 mIsPressed = false;
                 onTouchCancel(world, x, y);

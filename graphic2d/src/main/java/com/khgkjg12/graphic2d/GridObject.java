@@ -123,12 +123,16 @@ public class GridObject extends Object implements Group {
     @WorkerThread
     @Override
     boolean checkBoundary(int x, int y) {
-        if(mOnClickGridListener !=null&&x < mRenderRight && x > mRenderLeft && y < mRenderBottom && y > mRenderTop){
+        return x < mRenderRight && x > mRenderLeft && y < mRenderBottom && y > mRenderTop;
+    }
+
+    @Override
+    void onTouchUp(World world, int x, int y) {
+        super.onTouchUp(world, x, y);
+        if(mOnClickGridListener !=null){
             int column = (int)((x - mRenderLeft) * mColumn / mRenderWidth);
             int row = (int)((y - mRenderTop) * mRow / mRenderHeight);
-            return mOnClickGridListener.onClickGrid(mWorld, this, mObjectList[row][column], row, column);
-        }else{
-            return false;
+            mOnClickGridListener.onClickGrid(mWorld, this, mObjectList[row][column], row, column);
         }
     }
 
@@ -178,6 +182,7 @@ public class GridObject extends Object implements Group {
 
     class InnerItemListener implements OnClickListener{
 
+        @WorkerThread
         @Override
         public void onClick(World world, Object object) {
             if(mItemClickable){

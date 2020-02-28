@@ -263,7 +263,6 @@ public class GridObject extends Object implements Group {
          * @param object
          * @param row
          * @param column
-         * @return 터치이벤트의 소멸 여부. true 는 소멸, false 는 전달.
          */
         @WorkerThread
         void onClickItem(World world, GridObject gridObject, Object object, int row, int column);

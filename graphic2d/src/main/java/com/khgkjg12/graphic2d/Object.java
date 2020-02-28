@@ -28,6 +28,12 @@ public abstract class Object {
     float mScale;
     float mRenderX;
     float mRenderY;
+    private OnTouchListener mOnTouchListener;
+    private boolean mIsPressed;
+    private boolean mIsDragged;
+    private boolean mConsumeTouchEvent;
+    private int mPressedX;
+    private int mPressedY;
 
     public Object(float z, int x, int y, boolean visibility, boolean clickable, OnClickListener onClickListener){
         mVisibility = visibility;
@@ -36,6 +42,18 @@ public abstract class Object {
         mX = x;
         mY = y;
         mOnClickListener = onClickListener;
+        mIsPressed = false;
+        mIsDragged = false;
+        mConsumeTouchEvent = true;
+    }
+
+    @WorkerThread
+    public void setConsumeTouchEvent(boolean consumeTouchEvent){
+        mConsumeTouchEvent = consumeTouchEvent;
+    }
+
+    public boolean getConsumeTouchEvent(){
+        return mConsumeTouchEvent;
     }
 
     public float getZ(){
@@ -69,14 +87,8 @@ public abstract class Object {
     }
 
     @WorkerThread
-    boolean onTouch(World world, int x, int y){
-        if(mIsInCameraRange&&checkBoundary(x, y)){
-            if(mClickable&&mOnClickListener!=null) {
-                return mOnClickListener.onClick(world, this);
-            }
-            return mClickable;
-        }
-        return false;
+    void onClick(World world){
+        if(mOnClickListener!=null) mOnClickListener.onClick(world, this);
     }
 
     /**
@@ -89,6 +101,11 @@ public abstract class Object {
     @WorkerThread
     public void setOnClickListener(OnClickListener onClickListener){
         mOnClickListener = onClickListener;
+    }
+
+    @WorkerThread
+    public void setOnTouchListener(OnTouchListener onTouchListener){
+        mOnTouchListener = onTouchListener;
     }
 
     @WorkerThread
@@ -112,7 +129,7 @@ public abstract class Object {
 
     public interface OnClickListener{
         @WorkerThread
-        public boolean onClick(World world, Object object);
+        void onClick(World world, Object object);
     }
 
     /**
@@ -184,4 +201,69 @@ public abstract class Object {
         calculateBoundary();
     }
 
+    public interface OnTouchListener{
+        @WorkerThread
+        void onTouchDown(World world, Object object);
+        @WorkerThread
+        void onTouchUp(World world, Object object);
+        @WorkerThread
+        void onTouchCancel(World world, Object object);
+    }
+
+    @WorkerThread
+    boolean checkTouchDown(World world, int x, int y){
+        if(mIsInCameraRange&&checkBoundary(x, y)){
+            if(mClickable) {
+                mIsPressed = true;
+                mPressedX = x;
+                mPressedY = y;
+                onTouchDown(world, x, y);
+                return mConsumeTouchEvent;
+            }
+        }
+        return false;
+    }
+
+    @WorkerThread
+    void onTouchDown(World world, int x, int y){
+        if(mOnTouchListener!=null){
+            mOnTouchListener.onTouchDown(world, this, x, y);
+        }
+    }
+
+    @WorkerThread
+    void checkTouchUp(World world, int x, int y){
+        if(mIsPressed){
+            if(mIsInCameraRange&&checkBoundary(x, y)){
+                mIsPressed = false;
+                onTouchUp(world);
+                onClick(world);
+            }else{
+                mIsPressed = false;
+                onTouchCancel(world);
+            }
+        }
+    }
+
+    @WorkerThread
+    void checkDrag(World world, int x, int y){
+        if(mIsPressed){
+            if(mIsInCameraRange&&checkBoundary(x, y)){
+
+            }else{
+                mIsPressed = false;
+                onTouchCancel(world);
+            }
+        }
+    }
+
+    @WorkerThread
+    void onTouchUp(World world){
+        if(mOnTouchListener!=null) mOnTouchListener.onTouchUp(world, this);
+    }
+
+    @WorkerThread
+    void onTouchCancel(World world){
+        if(mOnTouchListener!=null) mOnTouchListener.onTouchCancel(world, this);
+    }
 }

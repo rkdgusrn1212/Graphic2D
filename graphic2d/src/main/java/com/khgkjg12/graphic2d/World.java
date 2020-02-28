@@ -194,39 +194,35 @@ public class World {
                     }else{
                         isDragging = false;
                     }
-                }else if(event.type == TouchHandler.TouchEvent.TOUCH_DOWN) {
+                }else if(event.type == TouchHandler.TouchEvent.TOUCH_DOWN) {//onTouchDown 호출 및 영역 일치하면 pressed 로 바꿈.
                     startX = event.x;
                     startY = event.y;
                     isPressed = true;
-                }else if(event.type == TouchHandler.TouchEvent.TOUCH_DRAGGED){
-                    if(isPressed) {
-                        if (Math.abs(event.x - startX) > 50 || Math.abs(event.y - startY) > 50) {
-                            isDragging = true;
+                    for (int j = 0; j < mObjectCount; j++) {
+                        if (mObjects[j].checkTouchDown(this, event.x, event.y)) {
+                            isPressed = false;
+                            break;
                         }
                     }
-                }else if(event.type == TouchHandler.TouchEvent.TOUCH_UP) {
+                }else if(event.type == TouchHandler.TouchEvent.TOUCH_DRAGGED){//pressed인 오브젝트중 영역일치 아닌 것들은 모두 onTouchCancel 호출
+                    if (Math.abs(event.x - startX) > 50 || Math.abs(event.y - startY) > 50) {
+                        isDragging = true;
+                    }
+                    for (int j = 0; j < mObjectCount; j++) {
+                        mObjects[j].checkDrag(this, event.x, event.y);
+                    }
+                }else if(event.type == TouchHandler.TouchEvent.TOUCH_UP) {//pressed인 오브젝트중 영역일치 아닌 것들은 모두 onTouchCancel 호출. 영역 일치하면 onClick 호출.
                     if(isPressed){
                         if(mOnClickWorldListener!=null){
                             if(!mOnClickWorldListener.onClickViewport(this, event.x, event.y)) {
-                                int j;
-                                for (j = 0; j < mObjectCount; j++) {
-                                    if (mObjects[j].onTouch(this, event.x, event.y)) {
-                                        break;
-                                    }
-                                }
-                                if (j == mObjectCount) {
-                                    mOnClickWorldListener.onClickBackground(this, event.x, event.y);
-                                }
-                            }
-                        }else{
-                            for (int j = 0; j < mObjectCount; j++) {
-                                if (mObjects[j].onTouch(this, event.x, event.y)) {
-                                    break;
-                                }
+                                mOnClickWorldListener.onClickBackground(this, event.x, event.y);
                             }
                         }
                     }
                     isPressed = false;
+                    for (int j = 0; j < mObjectCount; j++) {
+                        mObjects[j].checkTouchUp(this, event.x, event.y);
+                    }
                 }
             }
         }

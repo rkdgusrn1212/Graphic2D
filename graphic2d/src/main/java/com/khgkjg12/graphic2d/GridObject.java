@@ -17,6 +17,9 @@ package com.khgkjg12.graphic2d;
 
 import android.support.annotation.Nullable;
 import android.support.annotation.WorkerThread;
+import android.util.Log;
+
+import java.util.PriorityQueue;
 
 public class GridObject extends Object implements Group {
     private Object[][] mObjectList;
@@ -33,6 +36,10 @@ public class GridObject extends Object implements Group {
     private float mRenderBottom;
     private boolean mItemClickable;
     private InnerItemListener mInnerItemListener;
+    private int mPressedRow;
+    private int mPressedColumn;
+    private boolean mGridPressed;
+    private OnTouchGridListener mOnTouchGridListener;
 
     /**
      * @param z z-coordinate.
@@ -56,6 +63,13 @@ public class GridObject extends Object implements Group {
         mObjectList = new Object[mRow][mColumn];
         mItemClickable = itemClickable;
         mInnerItemListener = new InnerItemListener();
+        mGridPressed = false;
+        mOnTouchGridListener = null;
+    }
+
+    @WorkerThread
+    public void setOnTouchGridListener(@Nullable OnTouchGridListener onTouchGridListener){
+        mOnTouchGridListener = onTouchGridListener;
     }
 
     @WorkerThread
@@ -126,14 +140,53 @@ public class GridObject extends Object implements Group {
         return x < mRenderRight && x > mRenderLeft && y < mRenderBottom && y > mRenderTop;
     }
 
+    @WorkerThread
     @Override
-    void onTouchUp(World world, int x, int y) {
-        super.onTouchUp(world, x, y);
-        if(mOnClickGridListener !=null){
-            int column = (int)((x - mRenderLeft) * mColumn / mRenderWidth);
-            int row = (int)((y - mRenderTop) * mRow / mRenderHeight);
-            mOnClickGridListener.onClickGrid(mWorld, this, mObjectList[row][column], row, column);
+    public void onTouchDown(World world, int x, int y) {
+        super.onTouchDown(world, x, y);
+        mPressedColumn = (int)((x - mRenderLeft) * mColumn / mRenderWidth);
+        mPressedRow = (int)((y - mRenderTop) * mRow / mRenderHeight);
+        mGridPressed = true;
+        onTouchGridDown(world, x, y, mPressedRow, mPressedColumn);
+    }
+
+    @WorkerThread
+    @Override
+    public void onTouchDrag(World world, int x, int y) {
+        super.onTouchDrag(world, x, y);
+        if(mGridPressed) {
+            int column = (int) ((x - mRenderLeft) * mColumn / mRenderWidth);
+            int row = (int) ((y - mRenderTop) * mRow / mRenderHeight);
+            if (column != mPressedColumn || row != mPressedRow) {
+                mGridPressed = false;
+                onTouchGridCancel(world, x, y, row, column);
+            } else {
+                onTouchGridDrag(world, x, y, row, column);
+            }
         }
+    }
+
+    @WorkerThread
+    @Override
+    public void onTouchUp(World world, int x, int y) {
+        super.onTouchUp(world, x, y);
+        if(mGridPressed) {
+            mGridPressed =false;
+            int column = (int) ((x - mRenderLeft) * mColumn / mRenderWidth);
+            int row = (int) ((y - mRenderTop) * mRow / mRenderHeight);
+            if (column == mPressedColumn && row == mPressedRow) {
+                onTouchGridUp(world, x, y, row, column);
+                onClickGrid(world, row, column);
+            } else {
+                onTouchGridCancel(world, x, y, row, column);
+            }
+        }
+    }
+
+    @WorkerThread
+    public void onClickGrid(World world, int row, int column){
+        if (mOnClickGridListener != null)
+            mOnClickGridListener.onClickGrid(world, this, mObjectList[row][column], row, column);
     }
 
     @Override
@@ -213,10 +266,50 @@ public class GridObject extends Object implements Group {
          * @return 터치이벤트의 소멸 여부. true 는 소멸, false 는 전달.
          */
         @WorkerThread
-        boolean onClickItem(World world, GridObject gridObject, Object object, int row, int column);
+        void onClickItem(World world, GridObject gridObject, Object object, int row, int column);
 
         @WorkerThread
-        boolean onClickGrid(World world, GridObject gridObject, @Nullable Object object, int row, int column);
+        void onClickGrid(World world, GridObject gridObject, @Nullable Object object, int row, int column);
+    }
+
+    public interface OnTouchGridListener{
+        @WorkerThread
+        void onTouchGridDown(World world, Object object, int x, int y, int row, int column);
+        @WorkerThread
+        void onTouchGridUp(World world, Object object, int x, int y, int row, int column);
+        @WorkerThread
+        void onTouchGridCancel(World world, Object object, int x, int y, int row, int column);
+        @WorkerThread
+        void onTouchGridDrag(World world, Object object, int x, int y, int row, int column);
+    }
+
+    @WorkerThread
+    public void onTouchGridDown(World world, int x, int y, int row, int column){
+        Log.d("test", "onTouchDown::"+x+":"+y);
+        if(mOnTouchGridListener!=null){
+            mOnTouchGridListener.onTouchGridDown(world, this, x, y, row, column);
+        }
+    }
+    @WorkerThread
+    public void onTouchGridDrag(World world, int x, int y, int row, int column){
+        Log.d("test", "onTouchDrag::"+x+":"+y);
+        if(mOnTouchGridListener!=null){
+            mOnTouchGridListener.onTouchGridDrag(world, this, x, y, row, column);
+        }
+    }
+    @WorkerThread
+    public void onTouchGridUp(World world, int x, int y, int row, int column){
+        Log.d("test", "onTouchUp::"+x+":"+y);
+        if(mOnTouchGridListener!=null){
+            mOnTouchGridListener.onTouchGridUp(world, this, x, y, row, column);
+        }
+    }
+    @WorkerThread
+    public void onTouchGridCancel(World world, int x, int y, int row, int column){
+        Log.d("test", "onTouchCancel::"+x+":"+y);
+        if(mOnTouchGridListener!=null){
+            mOnTouchGridListener.onTouchGridCancel(world, this, x, y, row, column);
+        }
     }
 
     /**

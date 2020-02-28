@@ -15,6 +15,7 @@
  */
 package com.khgkjg12.graphic2d;
 
+import android.support.annotation.Nullable;
 import android.support.annotation.WorkerThread;
 
 public abstract class Object {
@@ -31,7 +32,7 @@ public abstract class Object {
     private OnTouchListener mOnTouchListener;
     private boolean mIsPressed;
     private boolean mConsumeTouchEvent;
-    private boolean mDraggable;
+    private boolean mConsumeDragEvent;
 
     public Object(float z, int x, int y, boolean visibility, boolean clickable, OnClickListener onClickListener){
         mVisibility = visibility;
@@ -42,16 +43,16 @@ public abstract class Object {
         mOnClickListener = onClickListener;
         mIsPressed = false;
         mConsumeTouchEvent = true;
-        mDraggable = false;
+        mConsumeDragEvent = false;
     }
 
     @WorkerThread
-    public void setDraggable(boolean draggable){
-        mDraggable = draggable;
+    public void setConsumeDragEvent(boolean consumeDragEvent){
+        mConsumeDragEvent = consumeDragEvent;
     }
 
-    public boolean getDraggable(){
-        return mDraggable;
+    public boolean getConsumeDragEvent(){
+        return mConsumeDragEvent;
     }
 
     @WorkerThread
@@ -94,7 +95,7 @@ public abstract class Object {
     }
 
     @WorkerThread
-    void onClick(World world){
+    public void onClick(World world){
         if(mOnClickListener!=null) mOnClickListener.onClick(world, this);
     }
 
@@ -106,12 +107,12 @@ public abstract class Object {
     abstract boolean checkBoundary(int x, int y);
 
     @WorkerThread
-    public void setOnClickListener(OnClickListener onClickListener){
+    public void setOnClickListener(@Nullable OnClickListener onClickListener){
         mOnClickListener = onClickListener;
     }
 
     @WorkerThread
-    public void setOnTouchListener(OnTouchListener onTouchListener){
+    public void setOnTouchListener(@Nullable OnTouchListener onTouchListener){
         mOnTouchListener = onTouchListener;
     }
 
@@ -232,21 +233,28 @@ public abstract class Object {
     }
 
     @WorkerThread
-    void onTouchDown(World world, int x, int y){
+   public void onTouchDown(World world, int x, int y){
         if(mOnTouchListener!=null){
             mOnTouchListener.onTouchDown(world, this, x, y);
         }
     }
 
     @WorkerThread
+    void checkTouchCancel(World world, int x, int y){
+        if(mIsPressed){
+            mIsPressed = false;
+            onTouchCancel(world, x, y);
+        }
+    }
+
+    @WorkerThread
     void checkTouchUp(World world, int x, int y){
         if(mIsPressed){
+            mIsPressed = false;
             if(mIsInCameraRange&&checkBoundary(x, y)){
-                mIsPressed = false;
                 onTouchUp(world, x, y);
                 onClick(world);
             }else{
-                mIsPressed = false;
                 onTouchCancel(world, x, y);
             }
         }
@@ -256,8 +264,8 @@ public abstract class Object {
     boolean checkDrag(World world, int x, int y){
         if(mIsPressed){
             if(mIsInCameraRange&&checkBoundary(x, y)){
-                if(mDraggable) onTouchDrag(world, x, y);
-                return mDraggable;
+                onTouchDrag(world, x, y);
+                return mConsumeDragEvent;
             }else{
                 mIsPressed = false;
                 onTouchCancel(world, x, y);
@@ -267,17 +275,17 @@ public abstract class Object {
     }
 
     @WorkerThread
-    void onTouchDrag(World world, int x, int y){
+    public void onTouchDrag(World world, int x, int y){
         if(mOnTouchListener!=null) mOnTouchListener.onTouchDrag(world, this, x, y);
     }
 
     @WorkerThread
-    void onTouchUp(World world, int x, int y){
+    public void onTouchUp(World world, int x, int y){
         if(mOnTouchListener!=null) mOnTouchListener.onTouchUp(world, this, x, y);
     }
 
     @WorkerThread
-    void onTouchCancel(World world, int x, int y){
+    public void onTouchCancel(World world, int x, int y){
         if(mOnTouchListener!=null) mOnTouchListener.onTouchCancel(world, this, x, y);
     }
 }

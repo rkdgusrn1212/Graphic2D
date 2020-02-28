@@ -136,19 +136,16 @@ public class MainActivity extends Activity implements Graphic2dRenderView.Render
     }
 
     @Override
-    public boolean onClickItem(World world, GridObject gridObject, Object object, int row, int column) {
+    public void onClickItem(World world, GridObject gridObject, Object object, int row, int column) {
         pop = true;
         popObject = gridObject;
         //flip = true;
         //flipObject = objectList[row][column];
-        return true;
     }
 
     @Override
-    public boolean onClickGrid(World world, GridObject gridObject, Object object, int row, int column) {
+    public void onClickGrid(World world, GridObject gridObject, Object object, int row, int column) {
         gridObject.putObject(new TextObject( gridObject.getZ(), gridObject.getColumnX(column),gridObject.getRowY(row), true , true,null, "IgIg", 100, Typeface.SERIF, Color.WHITE), row, column);
-        gridObject.getObject(row, column).setDraggable(true);
-        return true;
     }
 
     @Override

@@ -18,7 +18,6 @@ package com.khgkjg12.graphic2d;
 import android.graphics.RectF;
 import android.support.annotation.NonNull;
 import android.support.annotation.WorkerThread;
-
 import java.util.List;
 
 public class World {
@@ -205,27 +204,30 @@ public class World {
                         }
                     }
                 }else if(event.type == TouchHandler.TouchEvent.TOUCH_DRAGGED){//pressed인 오브젝트중 영역일치 아닌 것들은 모두 onTouchCancel 호출
-                    boolean flag = true;
-                    for (int j = 0; j < mObjectCount; j++) {
+                    int j=0;
+                    for (; j < mObjectCount; j++) {
                         if(mObjects[j].checkDrag(this, event.x, event.y)){
-                            flag = false;
+                            isPressed = false;
                             break;
                         }
                     }
-                    if(flag){
+                    for(; j<mObjectCount; j++){
+                        mObjects[j].checkTouchCancel(this, event.x, event.y);
+                    }
+                    if(isPressed){
                         if (Math.abs(event.x - startX) > 50 || Math.abs(event.y - startY) > 50) {
                             isDragging = true;
                         }
                     }
                 }else if(event.type == TouchHandler.TouchEvent.TOUCH_UP) {//pressed인 오브젝트중 영역일치 아닌 것들은 모두 onTouchCancel 호출. 영역 일치하면 onClick 호출.
-                    if(isPressed){
-                        if(mOnClickWorldListener!=null){
-                            if(!mOnClickWorldListener.onClickViewport(this, event.x, event.y)) {
+                    if(isPressed) {
+                        if (mOnClickWorldListener != null) {
+                            if (!mOnClickWorldListener.onClickViewport(this, event.x, event.y)) {
                                 mOnClickWorldListener.onClickBackground(this, event.x, event.y);
                             }
                         }
+                        isPressed = false;
                     }
-                    isPressed = false;
                     for (int j = 0; j < mObjectCount; j++) {
                         mObjects[j].checkTouchUp(this, event.x, event.y);
                     }

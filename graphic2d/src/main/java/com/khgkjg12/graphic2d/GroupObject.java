@@ -10,6 +10,8 @@ public class GroupObject extends Object implements Group{
     private OnClickGroupListener mOnClickGroupListener;
     private World mWorld;
     private InnerItemListener mInnerItemListener;
+    private boolean mGroupPressed;
+    private boolean mClickable;
 
     /**
      * @param z                    그룹 기준 z-coordinate.
@@ -20,11 +22,13 @@ public class GroupObject extends Object implements Group{
      * @param onClickGroupListener touch event callback {@link com.khgkjg12.graphic2d.GroupObject.OnClickGroupListener}
      */
     public GroupObject(float z, int x, int y, boolean clickable, int groupSize, @Nullable OnClickGroupListener onClickGroupListener) {
-        super(z, x, y, false, clickable, null);
+        super(z, x, y, false, false, null);
         mOnClickGroupListener = onClickGroupListener;
         mGroupSize = groupSize;
         mObjectList = new Object[mGroupSize];
         mInnerItemListener = new InnerItemListener();
+        mGroupPressed = false;
+        mClickable = clickable;
     }
 
     public Object getObject(int idx) {
@@ -62,7 +66,7 @@ public class GroupObject extends Object implements Group{
             }
         }
         if (obj != null) {
-            obj.setOnClickListener(mInnerItemListener);
+            obj.setChildListener(mInnerItemListener);
             if (mWorld != null) {
                 mWorld.putObject(obj);
             }
@@ -121,22 +125,49 @@ public class GroupObject extends Object implements Group{
     }
 
 
-    class InnerItemListener implements OnClickListener{
+    class InnerItemListener implements ChildListener{
         @WorkerThread
         @Override
         public void onClick(World world, Object object) {
             if(mClickable){
-                if(mOnClickGroupListener!=null){
-                    for (int i = 0; i < mGroupSize; i++) {
-                        if (mObjectList[i] == object) {
+                GroupObject.this.onClick(world);
+                if(mOnClickGroupListener!=null)
+                    for(int i=0;i<mGroupSize; i++){
+                        if(mObjectList[i] == object){
                             mOnClickGroupListener.onClickGroup(world, GroupObject.this, object, i);
-                            break;
                         }
                     }
-                }
-                if(mOnClickListener!=null) {
-                    mOnClickListener.onClick(world, GroupObject.this);
-                }
+            }
+        }
+
+        @Override
+        public void onTouchDown(World world, Object object, int x, int y) {
+            if(mClickable){
+                mGroupPressed = true;
+                GroupObject.this.onTouchDown(world, x, y);
+            }
+        }
+
+        @Override
+        public void onTouchUp(World world, Object object, int x, int y) {
+            if(mGroupPressed){
+                mGroupPressed = false;
+                GroupObject.this.onTouchUp(world, x, y);
+            }
+        }
+
+        @Override
+        public void onTouchCancel(World world, Object object) {
+            if(mGroupPressed){
+                mGroupPressed = false;
+                GroupObject.this.onTouchCancel(world);
+            }
+        }
+
+        @Override
+        public void onTouchDrag(World world, Object object, int x, int y) {
+            if(mGroupPressed){
+                GroupObject.this.onTouchDrag(world, x, y);
             }
         }
     }

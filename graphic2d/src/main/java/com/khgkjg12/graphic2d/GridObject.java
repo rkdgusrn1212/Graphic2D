@@ -40,6 +40,7 @@ public class GridObject extends Object implements Group {
     private int mPressedColumn;
     private boolean mGridPressed;
     private OnTouchGridListener mOnTouchGridListener;
+    private Object mEventObject;
 
     /**
      * @param z z-coordinate.
@@ -102,7 +103,7 @@ public class GridObject extends Object implements Group {
             }
         }
         if(obj!=null) {
-            obj.setOnClickListener(mInnerItemListener);
+            obj.setChildListener(mInnerItemListener);
             if (mWorld != null) {
                 mWorld.putObject(obj);
             }
@@ -233,12 +234,18 @@ public class GridObject extends Object implements Group {
     @Override
     void draw(Graphic2dDrawer drawer) { }
 
-    class InnerItemListener implements OnClickListener{
+    class InnerItemListener implements ChildListener {
 
         @WorkerThread
         @Override
         public void onClick(World world, Object object) {
-            if(mItemClickable){
+            mEventObject = object;
+            GridObject.this.onClick(world);
+
+        }
+        /*
+        * if(mItemClickable){
+                GridObject.this.onClick(world);
                 if(mOnClickGridListener!=null){
                     for (int i = 0; i < mRow; i++) {
                         for (int j = 0; j < mColumn; j++) {
@@ -249,10 +256,30 @@ public class GridObject extends Object implements Group {
                         }
                     }
                 }
-                if(mOnClickListener!=null){
-                    mOnClickListener.onClick(world, GridObject.this);
-                }
-            }
+            }*/
+
+        @Override
+        public void onTouchDown(World world, Object object, int x, int y) {
+            mEventObject = object;
+            GridObject.this.onTouchDown(world, x, y);
+        }
+
+        @Override
+        public void onTouchUp(World world, Object object, int x, int y) {
+            mEventObject = object;
+            GridObject.this.onTouchUp(world, x, y);
+        }
+
+        @Override
+        public void onTouchCancel(World world, Object object) {
+            mEventObject = object;
+            GridObject.this.onTouchCancel(world);
+        }
+
+        @Override
+        public void onTouchDrag(World world, Object object, int x, int y) {
+            mEventObject = object;
+            GridObject.this.onTouchDrag(world, x, y);
         }
     }
 
@@ -273,39 +300,35 @@ public class GridObject extends Object implements Group {
 
     public interface OnTouchGridListener{
         @WorkerThread
-        void onTouchGridDown(World world, Object object, int x, int y, int row, int column);
+        void onTouchGridDown(World world, GridObject gridObject, int x, int y, int row, int column);
         @WorkerThread
-        void onTouchGridUp(World world, Object object, int x, int y, int row, int column);
+        void onTouchGridUp(World world, GridObject gridObject, int x, int y, int row, int column);
         @WorkerThread
-        void onTouchGridCancel(World world, Object object, int x, int y, int row, int column);
+        void onTouchGridCancel(World world, GridObject gridObject, int x, int y, int row, int column);
         @WorkerThread
-        void onTouchGridDrag(World world, Object object, int x, int y, int row, int column);
+        void onTouchGridDrag(World world, GridObject gridObject, int x, int y, int row, int column);
     }
 
     @WorkerThread
     public void onTouchGridDown(World world, int x, int y, int row, int column){
-        Log.d("test", "onTouchDown::"+x+":"+y);
         if(mOnTouchGridListener!=null){
             mOnTouchGridListener.onTouchGridDown(world, this, x, y, row, column);
         }
     }
     @WorkerThread
     public void onTouchGridDrag(World world, int x, int y, int row, int column){
-        Log.d("test", "onTouchDrag::"+x+":"+y);
         if(mOnTouchGridListener!=null){
             mOnTouchGridListener.onTouchGridDrag(world, this, x, y, row, column);
         }
     }
     @WorkerThread
     public void onTouchGridUp(World world, int x, int y, int row, int column){
-        Log.d("test", "onTouchUp::"+x+":"+y);
         if(mOnTouchGridListener!=null){
             mOnTouchGridListener.onTouchGridUp(world, this, x, y, row, column);
         }
     }
     @WorkerThread
     public void onTouchGridCancel(World world, int x, int y, int row, int column){
-        Log.d("test", "onTouchCancel::"+x+":"+y);
         if(mOnTouchGridListener!=null){
             mOnTouchGridListener.onTouchGridCancel(world, this, x, y, row, column);
         }

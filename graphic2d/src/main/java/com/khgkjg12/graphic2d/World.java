@@ -212,7 +212,7 @@ public class World {
                         }
                     }
                     for(; j<mObjectCount; j++){
-                        mObjects[j].checkTouchCancel(this, event.x, event.y);
+                        mObjects[j].checkTouchCancel(this);
                     }
                     if(isPressed){
                         if (Math.abs(event.x - startX) > 50 || Math.abs(event.y - startY) > 50) {

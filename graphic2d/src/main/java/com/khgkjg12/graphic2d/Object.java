@@ -33,6 +33,7 @@ public abstract class Object {
     private boolean mIsPressed;
     private boolean mConsumeTouchEvent;
     private boolean mConsumeDragEvent;
+    private ChildListener mChildListener;
 
     public Object(float z, int x, int y, boolean visibility, boolean clickable, OnClickListener onClickListener){
         mVisibility = visibility;
@@ -44,6 +45,11 @@ public abstract class Object {
         mIsPressed = false;
         mConsumeTouchEvent = true;
         mConsumeDragEvent = false;
+    }
+
+    @WorkerThread
+    void setChildListener(ChildListener childListener){
+        mChildListener = childListener;
     }
 
     @WorkerThread
@@ -90,13 +96,15 @@ public abstract class Object {
      * @param clickable
      */
     @WorkerThread
-    public void setClickable(boolean clickable){
+    public void setClickable(World world, boolean clickable){
         mClickable = clickable;
+        checkTouchCancel(world);
     }
 
     @WorkerThread
     public void onClick(World world){
         if(mOnClickListener!=null) mOnClickListener.onClick(world, this);
+        if(mChildListener!=null) mChildListener.onClick(world, this);
     }
 
     /**
@@ -215,7 +223,7 @@ public abstract class Object {
         @WorkerThread
         void onTouchUp(World world, Object object, int x, int y);
         @WorkerThread
-        void onTouchCancel(World world, Object object, int x, int y);
+        void onTouchCancel(World world, Object object);
         @WorkerThread
         void onTouchDrag(World world, Object object, int x, int y);
     }
@@ -237,13 +245,14 @@ public abstract class Object {
         if(mOnTouchListener!=null){
             mOnTouchListener.onTouchDown(world, this, x, y);
         }
+        if(mChildListener!=null) mChildListener.onTouchDown(world, this, x, y);
     }
 
     @WorkerThread
-    void checkTouchCancel(World world, int x, int y){
+    void checkTouchCancel(World world){
         if(mIsPressed){
             mIsPressed = false;
-            onTouchCancel(world, x, y);
+            onTouchCancel(world);
         }
     }
 
@@ -255,7 +264,7 @@ public abstract class Object {
                 onTouchUp(world, x, y);
                 onClick(world);
             }else{
-                onTouchCancel(world, x, y);
+                onTouchCancel(world);
             }
         }
     }
@@ -268,7 +277,7 @@ public abstract class Object {
                 return mConsumeDragEvent;
             }else{
                 mIsPressed = false;
-                onTouchCancel(world, x, y);
+                onTouchCancel(world);
             }
         }
         return false;
@@ -277,15 +286,33 @@ public abstract class Object {
     @WorkerThread
     public void onTouchDrag(World world, int x, int y){
         if(mOnTouchListener!=null) mOnTouchListener.onTouchDrag(world, this, x, y);
+        if(mChildListener!=null) mChildListener.onTouchDrag(world, this, x, y);
     }
 
     @WorkerThread
     public void onTouchUp(World world, int x, int y){
         if(mOnTouchListener!=null) mOnTouchListener.onTouchUp(world, this, x, y);
+        if(mChildListener!=null) mChildListener.onTouchUp(world, this, x, y);
     }
 
     @WorkerThread
-    public void onTouchCancel(World world, int x, int y){
-        if(mOnTouchListener!=null) mOnTouchListener.onTouchCancel(world, this, x, y);
+    public void onTouchCancel(World world){
+        if(mOnTouchListener!=null) mOnTouchListener.onTouchCancel(world, this);
+        if(mChildListener!=null) mChildListener.onTouchCancel(world, this);
     }
+
+
+    interface ChildListener{
+        @WorkerThread
+        void onClick(World world, Object object);
+        @WorkerThread
+        void onTouchDown(World world, Object object, int x, int y);
+        @WorkerThread
+        void onTouchUp(World world, Object object, int x, int y);
+        @WorkerThread
+        void onTouchCancel(World world, Object object);
+        @WorkerThread
+        void onTouchDrag(World world, Object object, int x, int y);
+    }
+
 }

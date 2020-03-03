@@ -92,11 +92,11 @@ public class GroupObject extends Object{
     @Override
     void attached(World world) {
         super.attached(world);
-            for (int i = 0; i < mGroupSize; i++) {
-                if(mObjectList[i]!=null) {
-                    mObjectList[i].attached(world);
-                }
+        for (int i = 0; i < mGroupSize; i++) {
+            if(mObjectList[i]!=null) {
+                mAttachedWorld.putObject(mObjectList[i]);
             }
+        }
     }
 
     @WorkerThread

@@ -84,7 +84,6 @@ public class World {
      * @exception IndexOutOfBoundsException 배열이 가득 찬 상태에서 집어넣음.
      * @exception PutAttachedObjectException Attempt to insert an object that has already been inserted.
      * @param object 오브젝트.
-     * @return 성공 여부. 이미 attached된 오브젝트면 false.
      */
     @WorkerThread
     public void putObject(@NonNull Object object){

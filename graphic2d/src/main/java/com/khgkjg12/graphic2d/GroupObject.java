@@ -1,34 +1,45 @@
 package com.khgkjg12.graphic2d;
 
 import android.support.annotation.IntRange;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.annotation.WorkerThread;
 
-public class GroupObject extends Object implements Group{
+public class GroupObject extends Object{
     private Object[] mObjectList;
     private int mGroupSize;
-    private OnClickGroupListener mOnClickGroupListener;
-    private World mWorld;
+    private OnClickChildListener mOnClickChildListener;
     private InnerItemListener mInnerItemListener;
-    private boolean mGroupPressed;
-    private boolean mClickable;
+    private boolean mChildClickable;
 
     /**
      * @param z                    그룹 기준 z-coordinate.
      * @param x                    그룹 기준 x-coordinate.
      * @param y                    그룹 기준 y-coordinate.
-     * @param clickable            OnClickGroup 호출 여부.
      * @param groupSize            그룹으로 묶일수 있는 최대 갯수.
-     * @param onClickGroupListener touch event callback {@link com.khgkjg12.graphic2d.GroupObject.OnClickGroupListener}
+     * @param childClickable            OnClickGroup 호출 여부.
+     * @param onClickChildListener touch event callback {@link OnClickChildListener}
      */
-    public GroupObject(float z, int x, int y, boolean clickable, int groupSize, @Nullable OnClickGroupListener onClickGroupListener) {
+    @WorkerThread
+    public GroupObject(float z, int x, int y, int groupSize, boolean childClickable, @Nullable OnClickChildListener onClickChildListener) {
         super(z, x, y, false, false, null);
-        mOnClickGroupListener = onClickGroupListener;
+        mOnClickChildListener = onClickChildListener;
         mGroupSize = groupSize;
         mObjectList = new Object[mGroupSize];
         mInnerItemListener = new InnerItemListener();
-        mGroupPressed = false;
-        mClickable = clickable;
+        mChildClickable = childClickable;
+    }
+
+    @WorkerThread
+    public void setChildClickable(boolean childClickable){
+        mChildClickable = childClickable;
+        for(int i=0; i<mGroupSize; i++){
+            mObjectList[i].setClickableGroupMask(mChildClickable);
+        }
+    }
+
+    public boolean getChildClickable(){
+        return mChildClickable;
     }
 
     public Object getObject(int idx) {
@@ -48,8 +59,8 @@ public class GroupObject extends Object implements Group{
     }
 
     @WorkerThread
-    public void setOnClickGroupListener(OnClickGroupListener onClickGroupListener) {
-        mOnClickGroupListener = onClickGroupListener;
+    public void setOnClickGroupListener(@Nullable OnClickChildListener onClickGroupListener) {
+        mOnClickChildListener = onClickGroupListener;
     }
 
     /**
@@ -61,37 +72,42 @@ public class GroupObject extends Object implements Group{
     @WorkerThread
     public void putObject(Object obj, @IntRange(from = 0) int idx) {
         if (mObjectList[idx] != null) {
-            if (mWorld != null) {
-                mWorld.removeObject(mObjectList[idx]);
+            mObjectList[idx].setChildListener(null);
+            mObjectList[idx].setClickableGroupMask(true);
+            if (mAttachedWorld != null) {
+                mAttachedWorld.removeObject(mObjectList[idx]);
             }
         }
         if (obj != null) {
             obj.setChildListener(mInnerItemListener);
-            if (mWorld != null) {
-                mWorld.putObject(obj);
+            obj.setClickableGroupMask(mChildClickable);
+            if (mAttachedWorld != null) {
+                mAttachedWorld.putObject(obj);
             }
         }
         mObjectList[idx] = obj;
     }
 
     @WorkerThread
-    public void attached(World world) {
-        for (int i = 0; i < mGroupSize; i++) {
-            if(mObjectList[i]!=null) {
-                world.putObject(mObjectList[i]);
+    @Override
+    void attached(World world) {
+        super.attached(world);
+            for (int i = 0; i < mGroupSize; i++) {
+                if(mObjectList[i]!=null) {
+                    mObjectList[i].attached(world);
+                }
             }
-        }
-        mWorld = world;
     }
 
     @WorkerThread
-    public void detached(World world) {
+    @Override
+    void detached() {
         for (int i = 0; i < mGroupSize; i++) {
             if(mObjectList[i]!=null) {
-                world.removeObject(mObjectList[i]);
+                mAttachedWorld.removeObject(mObjectList[i]);
             }
         }
-        mWorld = null;
+        super.detached();
     }
 
     @WorkerThread
@@ -105,18 +121,16 @@ public class GroupObject extends Object implements Group{
     void calculateBoundary() {
     }
 
-
     @WorkerThread
-    public void moveXY(World world, int x, int y) {
+    @Override
+    public void moveXY(int x, int y) {
         int deltaX = x - mX;
         int deltaY = y - mY;
         mX = x;
         mY = y;
         for (int i = 0; i < mGroupSize; i++) {
             if(mObjectList[i]!=null) {
-                mObjectList[i].mX += deltaX;
-                mObjectList[i].mY += deltaY;
-                mObjectList[i].calculateRenderXY(world);
+                mObjectList[i].moveXY(mObjectList[i].mX+deltaX, mObjectList[i].mY+deltaY);
             }
         }
     }
@@ -124,69 +138,96 @@ public class GroupObject extends Object implements Group{
     void draw(Graphic2dDrawer drawer) {
     }
 
+    /**
+     * To get child object idx.
+     * @param object 그룹의 자식오브젝트.
+     * @return 오브젝트의 인덱스. 없으면 -1.
+     */
+    @WorkerThread
+    public int getChildIndex(@Nullable Object object){
+        for(int i=0; i<mGroupSize; i++){
+            if(object == mObjectList[i]){
+                return i;
+            }
+        }
+        return -1;
+    }
 
     class InnerItemListener implements ChildListener{
         @WorkerThread
         @Override
-        public void onClick(World world, Object object) {
-            if(mClickable){
-                GroupObject.this.onClick(world);
-                if(mOnClickGroupListener!=null)
-                    for(int i=0;i<mGroupSize; i++){
-                        if(mObjectList[i] == object){
-                            mOnClickGroupListener.onClickGroup(world, GroupObject.this, object, i);
-                        }
-                    }
-            }
+        public void onClick(@Nullable World attachedWorld, @NonNull Object object) {
+            onChildClick(attachedWorld, object);
         }
 
         @Override
-        public void onTouchDown(World world, Object object, int x, int y) {
-            if(mClickable){
-                mGroupPressed = true;
-                GroupObject.this.onTouchDown(world, x, y);
-            }
+        public void onTouchDown(@Nullable World attachedWorld, @NonNull Object object, int x, int y) {
+            onChildTouchDown(attachedWorld, x, y, object);
         }
 
         @Override
-        public void onTouchUp(World world, Object object, int x, int y) {
-            if(mGroupPressed){
-                mGroupPressed = false;
-                GroupObject.this.onTouchUp(world, x, y);
-            }
+        public void onTouchUp(@Nullable World attachedWorld, @NonNull Object object, int x, int y) {
+            onChildTouchUp(attachedWorld, x, y, object);
         }
 
         @Override
-        public void onTouchCancel(World world, Object object) {
-            if(mGroupPressed){
-                mGroupPressed = false;
-                GroupObject.this.onTouchCancel(world);
-            }
+        public void onTouchCancel(@Nullable World attachedWorld, @NonNull Object object) {
+            onChildTouchCancel(attachedWorld, object);
         }
 
         @Override
-        public void onTouchDrag(World world, Object object, int x, int y) {
-            if(mGroupPressed){
-                GroupObject.this.onTouchDrag(world, x, y);
-            }
+        public void onTouchDrag(@Nullable World attachedWorld, @NonNull Object object, int x, int y) {
+            onChildTouchDrag(attachedWorld, x, y, object);
         }
     }
 
-    public interface OnClickGroupListener {
+    public interface OnClickChildListener {
+        /**
+         * 항상 호출은 오브젝트트리의 말단부터 시작되고 부모 클래스의 콜백이 우선이다.
+         * @param attachedWorld
+         * @param groupObject
+         * @param object
+         * @param idx -1 이면 콜백 호출 직전에 해당 오브젝트가 그룹에서 제거된것.
+         */
         @WorkerThread
-        boolean onClickGroup(World world, GroupObject groupObject, Object object, int idx);
+        void onClickChild(@Nullable World attachedWorld, @NonNull GroupObject groupObject, @NonNull Object object, int idx);
     }
 
     @WorkerThread
     @Override
-    public void moveZ(World world, float z) {
+    public void moveZ(float z) {
         float deltaZ = z - mZ;
         mZ = z;
         for (int i = 0; i < mGroupSize; i++) {
             if(mObjectList[i]!=null) {
-                mObjectList[i].mZ += deltaZ;
-                mObjectList[i].calculateScale(world);
+                mObjectList[i].moveZ(mObjectList[i].mZ+deltaZ);
             }
         }
+    }
+
+    @WorkerThread
+    public void onChildTouchDown(@Nullable World attachedWorld, int x, int y, @NonNull Object object){
+        onTouchDown(x, y);
+    }
+
+    @WorkerThread
+    public void onChildTouchDrag(@Nullable World attachedWorld, int x, int y, @NonNull Object object){
+        onTouchDrag(x, y);
+    }
+
+    @WorkerThread
+    public void onChildTouchUp(@Nullable World attachedWorld, int x, int y, @NonNull Object object){
+        onTouchUp(x, y);
+    }
+
+    @WorkerThread
+    public void onChildTouchCancel(@Nullable World attachedWorld, @NonNull Object object){
+        onTouchCancel();
+    }
+
+    @WorkerThread
+    public void onChildClick(@Nullable World attachedWorld, @NonNull Object object){
+        onClick();
+        if(mOnClickChildListener !=null) mOnClickChildListener.onClickChild(attachedWorld, this, object, getChildIndex(object));
     }
 }

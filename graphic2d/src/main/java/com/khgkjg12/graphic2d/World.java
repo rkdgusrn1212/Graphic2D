@@ -82,23 +82,27 @@ public class World {
     /**
      * 오브젝트를 z 우선순위에 맞춰서 배열에 집어넣음.
      * @exception IndexOutOfBoundsException 배열이 가득 찬 상태에서 집어넣음.
+     * @exception PutAttachedObjectException Attempt to insert an object that has already been inserted.
      * @param object 오브젝트.
+     * @return 성공 여부. 이미 attached된 오브젝트면 false.
      */
     @WorkerThread
     public void putObject(@NonNull Object object){
-        int i = 0;
-        while(i!=mObjectCount&&mObjects[i].mZ > object.mZ){
-            i++;
-        }
-        int j = mObjectCount++;
-        while(j!=i){
-            mObjects[j] = mObjects[j-1];
-            j--;
-        }
-        object.calculateScale(this);
-        mObjects[i] = object;
-        if(object instanceof Group){
-            ((Group) object).attached(this);
+        if(object.mAttachedWorld==null) {
+            int i = 0;
+            while (i != mObjectCount && mObjects[i].mZ > object.mZ) {
+                i++;
+            }
+            int j = mObjectCount++;
+            while (j != i) {
+                mObjects[j] = mObjects[j - 1];
+                j--;
+            }
+            object.calculateScale(this);
+            mObjects[i] = object;
+            mObjects[i].attached(this);
+        }else{
+            throw new PutAttachedObjectException();
         }
     }
 
@@ -106,19 +110,22 @@ public class World {
      * world 에서 오브젝트를 제거.
      * 호출시점에서 매개변수로 받은 제거대상이 무조건 존재하고 있음을 가정.
      * @exception IndexOutOfBoundsException 해당 id 와 일치하는 오브젝트가 없을때 발생.
+     * @exception RemoveChildFromWorldException 그룹이 아닌 World에서 자식 오브젝트를 제거하려함.
      * @param object 삭제할 오브젝트 레퍼런스.
      */
     @WorkerThread
     public void removeObject(@NonNull Object object){
-        int i = 0;
-        while(mObjects[i++] != object);
-        while(i!=mObjectCount){
-            mObjects[i-1] = mObjects[i];
-            i++;
-        }
-        mObjectCount--;
-        if(object instanceof Group){
-            ((Group)object).detached(this);
+        if(object.mChildListener==null) {
+            int i = 0;
+            while (mObjects[i++] != object) ;
+            while (i != mObjectCount) {
+                mObjects[i - 1] = mObjects[i];
+                i++;
+            }
+            mObjectCount--;
+            object.detached();
+        }else{
+            throw new RemoveChildFromWorldException();
         }
     }
 
@@ -198,7 +205,7 @@ public class World {
                     startY = event.y;
                     isPressed = true;
                     for (int j = 0; j < mObjectCount; j++) {
-                        if (mObjects[j].checkTouchDown(this, event.x, event.y)) {
+                        if (mObjects[j].checkTouchDown(event.x, event.y)) {
                             isPressed = false;
                             break;
                         }
@@ -206,13 +213,13 @@ public class World {
                 }else if(event.type == TouchHandler.TouchEvent.TOUCH_DRAGGED){//pressed인 오브젝트중 영역일치 아닌 것들은 모두 onTouchCancel 호출
                     int j=0;
                     for (; j < mObjectCount; j++) {
-                        if(mObjects[j].checkDrag(this, event.x, event.y)){
+                        if(mObjects[j].checkDrag(event.x, event.y)){
                             isPressed = false;
                             break;
                         }
                     }
                     for(; j<mObjectCount; j++){
-                        mObjects[j].checkTouchCancel(this);
+                        mObjects[j].checkTouchCancel();
                     }
                     if(isPressed){
                         if (Math.abs(event.x - startX) > 50 || Math.abs(event.y - startY) > 50) {
@@ -229,7 +236,7 @@ public class World {
                         isPressed = false;
                     }
                     for (int j = 0; j < mObjectCount; j++) {
-                        mObjects[j].checkTouchUp(this, event.x, event.y);
+                        mObjects[j].checkTouchUp(event.x, event.y);
                     }
                 }
             }

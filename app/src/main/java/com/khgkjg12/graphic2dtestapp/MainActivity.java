@@ -23,6 +23,7 @@ import android.os.Bundle;
 import android.util.Log;
 
 import com.khgkjg12.graphic2d.GridObject;
+import com.khgkjg12.graphic2d.GroupObject;
 import com.khgkjg12.graphic2d.Object;
 import com.khgkjg12.graphic2d.TextObject;
 import com.khgkjg12.graphic2d.Texture;
@@ -41,7 +42,7 @@ import static android.view.WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON;
  * 2D오브젝트의 클릭: 검은 돌과 하얀돌을 클릭하면 해당 객체에 지정된 클릭 리스너가 실행됨. 클릭시 효과음도 설정;
  */
 
-public class MainActivity extends Activity implements Graphic2dRenderView.Renderer, GridObject.OnClickGridListener {
+public class MainActivity extends Activity implements Graphic2dRenderView.Renderer, GridObject.OnClickGridListener, GroupObject.OnClickChildListener {
 
     public static Texture background;
     public static Texture blackStone;
@@ -83,7 +84,7 @@ public class MainActivity extends Activity implements Graphic2dRenderView.Render
             }
             world.putObject(horLine);
         }*/
-        gridObject = new GridObject(0,0,0,true, true, 800, 800, 8, 8,this);
+        gridObject = new GridObject(0,0,0,800, 800, 8, 8,true, this, true, this);
         world.putObject(gridObject);
         /*for(int i=0;i<8;i++){
             for(int j=0; j<8; j++) {
@@ -120,11 +121,11 @@ public class MainActivity extends Activity implements Graphic2dRenderView.Render
             startTime+=deltaTime;
             if(startTime>=2){
                 pop = false;
-                popObject.moveZ(world, 0);
+                popObject.moveZ( 0);
                 popObject = null;
                 startTime = 0;
             }else{
-                popObject.moveZ(world,98*startTime-0.5f*98*startTime*startTime);
+                popObject.moveZ(98*startTime-0.5f*98*startTime*startTime);
             }
         }
     }
@@ -133,14 +134,6 @@ public class MainActivity extends Activity implements Graphic2dRenderView.Render
     public void loadTextures(Graphic2dDrawer graphic2dDrawer){
         background = graphic2dDrawer.newTexture("background.png", Texture.Format.ARGB8888);
         blackStone = graphic2dDrawer.newTexture("black_stone.png", Texture.Format.ARGB8888);
-    }
-
-    @Override
-    public void onClickItem(World world, GridObject gridObject, Object object, int row, int column) {
-        pop = true;
-        popObject = gridObject;
-        //flip = true;
-        //flipObject = objectList[row][column];
     }
 
     @Override
@@ -163,5 +156,11 @@ public class MainActivity extends Activity implements Graphic2dRenderView.Render
         background.dispose();
         blackStone.dispose();
         super.onDestroy();
+    }
+
+    @Override
+    public void onClickChild(World attachedWorld, GroupObject groupObject, Object object, int idx) {
+        pop = true;
+        popObject = gridObject;
     }
 }

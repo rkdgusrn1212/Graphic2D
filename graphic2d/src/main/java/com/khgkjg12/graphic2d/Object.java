@@ -15,6 +15,7 @@
  */
 package com.khgkjg12.graphic2d;
 
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.annotation.WorkerThread;
 
@@ -22,7 +23,7 @@ public abstract class Object {
 
     private boolean mVisibility;
     boolean mClickable;
-    OnClickListener mOnClickListener;
+    private OnClickListener mOnClickListener;
     float mZ;
     int mX, mY;
     boolean mIsInCameraRange;
@@ -30,11 +31,14 @@ public abstract class Object {
     float mRenderX;
     float mRenderY;
     private OnTouchListener mOnTouchListener;
-    private boolean mIsPressed;
-    private boolean mConsumeTouchEvent;
-    private boolean mConsumeDragEvent;
-    private ChildListener mChildListener;
+    boolean mIsPressed;
+    boolean mConsumeTouchEvent;
+    boolean mConsumeDragEvent;
+    ChildListener mChildListener;
+    boolean mClickableGroupMask;
+    World mAttachedWorld;
 
+    @WorkerThread
     public Object(float z, int x, int y, boolean visibility, boolean clickable, OnClickListener onClickListener){
         mVisibility = visibility;
         mClickable = clickable;
@@ -45,6 +49,23 @@ public abstract class Object {
         mIsPressed = false;
         mConsumeTouchEvent = true;
         mConsumeDragEvent = false;
+        mClickableGroupMask = true;
+        mAttachedWorld = null;
+    }
+
+    @WorkerThread
+    void attached(World world){
+        mAttachedWorld = world;
+    }
+
+    @WorkerThread
+    void detached() {
+        mAttachedWorld = null;
+    }
+
+    @WorkerThread
+    void setClickableGroupMask(boolean clickableGroupMask){
+        mClickableGroupMask = clickableGroupMask;
     }
 
     @WorkerThread
@@ -57,6 +78,7 @@ public abstract class Object {
         mConsumeDragEvent = consumeDragEvent;
     }
 
+    @WorkerThread
     public boolean getConsumeDragEvent(){
         return mConsumeDragEvent;
     }
@@ -66,18 +88,22 @@ public abstract class Object {
         mConsumeTouchEvent = consumeTouchEvent;
     }
 
+    @WorkerThread
     public boolean getConsumeTouchEvent(){
         return mConsumeTouchEvent;
     }
 
+    @WorkerThread
     public float getZ(){
         return mZ;
     }
 
+    @WorkerThread
     public int getX(){
         return mX;
     }
 
+    @WorkerThread
     public int getY(){
         return mY;
     }
@@ -96,15 +122,14 @@ public abstract class Object {
      * @param clickable
      */
     @WorkerThread
-    public void setClickable(World world, boolean clickable){
+    public void setClickable(boolean clickable){
         mClickable = clickable;
-        checkTouchCancel(world);
     }
 
     @WorkerThread
-    public void onClick(World world){
-        if(mOnClickListener!=null) mOnClickListener.onClick(world, this);
-        if(mChildListener!=null) mChildListener.onClick(world, this);
+    public void onClick(){
+        if(mOnClickListener!=null) mOnClickListener.onClick(mAttachedWorld, this);
+        if(mChildListener!=null) mChildListener.onClick(mAttachedWorld, this);
     }
 
     /**
@@ -145,62 +170,63 @@ public abstract class Object {
 
     public interface OnClickListener{
         @WorkerThread
-        void onClick(World world, Object object);
+        void onClick(@Nullable World attachedWorld, Object object);
     }
 
     /**
      * @exception IndexOutOfBoundsException 해당 오브젝트 없음.
-     * @param world
      * @param z 새 z 좌표.
      */
     @WorkerThread
-    public void moveZ(World world, float z){
-        if(z>=mZ){
-            int i=0;
-            while(world.mObjects[i].mZ>z){
-                i++;
+    public void moveZ(float z){
+        if(mAttachedWorld!=null) {
+            if (z >= mZ) {
+                int i = 0;
+                while (mAttachedWorld.mObjects[i].mZ > z) {
+                    i++;
+                }
+                Object tempObj;
+                int j = i;
+                while (mAttachedWorld.mObjects[j] != this) {
+                    j++;
+                }
+                tempObj = mAttachedWorld.mObjects[j];
+                while (i != j) {
+                    mAttachedWorld.mObjects[j] = mAttachedWorld.mObjects[j - 1];
+                    j--;
+                }
+                mAttachedWorld.mObjects[j] = tempObj;
+            } else {
+                int i = mAttachedWorld.mObjectCount - 1;
+                while (mAttachedWorld.mObjects[i].mZ <= z) {
+                    i--;
+                }
+                Object tempObj;
+                int j = i;
+                while (mAttachedWorld.mObjects[j] != this) {
+                    j--;
+                }
+                tempObj = mAttachedWorld.mObjects[j];
+                while (i != j) {
+                    mAttachedWorld.mObjects[j] = mAttachedWorld.mObjects[j + 1];
+                    j++;
+                }
+                mAttachedWorld.mObjects[j] = tempObj;
             }
-            Object tempObj;
-            int j = i;
-            while(world.mObjects[j]!=this){
-                j++;
-            }
-            tempObj = world.mObjects[j];
-            while(i!=j) {
-                world.mObjects[j] = world.mObjects[j-1];
-                j--;
-            }
-            world.mObjects[j] = tempObj;
-        }else{
-            int i = world.mObjectCount-1;
-            while(world.mObjects[i].mZ<=z){
-                i--;
-            }
-            Object tempObj;
-            int j = i;
-            while(world.mObjects[j]!=this){
-                j--;
-            }
-            tempObj = world.mObjects[j];
-            while(i!=j) {
-                world.mObjects[j] = world.mObjects[j+1];
-                j++;
-            }
-            world.mObjects[j] = tempObj;
         }
         mZ = z;
-        calculateScale(world);
+        if(mAttachedWorld!=null) calculateScale(mAttachedWorld);
     }
 
     @WorkerThread
-    public void moveXY(World world, int x, int y){
+    public void moveXY(int x, int y){
         mX = x;
         mY = y;
-        calculateRenderXY(world);
+        if(mAttachedWorld!=null) calculateRenderXY(mAttachedWorld);
     }
 
     @WorkerThread
-    void calculateScale(World world){
+    void calculateScale(@NonNull World world){
         if(mZ<world.mCameraZ) {
             mIsInCameraRange = true;
             mScale = world.mFocusedZ / (world.mCameraZ - mZ);
@@ -211,7 +237,7 @@ public abstract class Object {
     }
 
     @WorkerThread
-    void calculateRenderXY(World world){
+    void calculateRenderXY(@NonNull World world){
         mRenderX = (world.mViewportWidth / 2f) - (world.mViewportX - mX) * mScale;
         mRenderY = (world.mViewportHeight / 2f) - (world.mViewportY - mY) * mScale;
         calculateBoundary();
@@ -219,100 +245,97 @@ public abstract class Object {
 
     public interface OnTouchListener{
         @WorkerThread
-        void onTouchDown(World world, Object object, int x, int y);
+        void onTouchDown(@Nullable World attachedWorld, @NonNull Object object, int x, int y);
         @WorkerThread
-        void onTouchUp(World world, Object object, int x, int y);
+        void onTouchUp(@Nullable World attachedWorld, @NonNull Object object, int x, int y);
         @WorkerThread
-        void onTouchCancel(World world, Object object);
+        void onTouchCancel(@Nullable World attachedWorld, @NonNull Object object);
         @WorkerThread
-        void onTouchDrag(World world, Object object, int x, int y);
+        void onTouchDrag(@Nullable World attachedWorld, @NonNull Object object, int x, int y);
     }
 
     @WorkerThread
-    boolean checkTouchDown(World world, int x, int y){
-        if(mIsInCameraRange&&checkBoundary(x, y)){
-            if(mClickable) {
-                mIsPressed = true;
-                onTouchDown(world, x, y);
-                return mConsumeTouchEvent;
-            }
+    boolean checkTouchDown(int x, int y){
+        if(mClickable && mClickableGroupMask&&mIsInCameraRange&&checkBoundary(x, y)){
+            mIsPressed = true;
+            onTouchDown(x, y);
+            return mConsumeTouchEvent;
+        }else{
+            return false;
         }
-        return false;
     }
 
     @WorkerThread
-   public void onTouchDown(World world, int x, int y){
-        if(mOnTouchListener!=null){
-            mOnTouchListener.onTouchDown(world, this, x, y);
-        }
-        if(mChildListener!=null) mChildListener.onTouchDown(world, this, x, y);
-    }
-
-    @WorkerThread
-    void checkTouchCancel(World world){
+    void checkTouchCancel(){
         if(mIsPressed){
             mIsPressed = false;
-            onTouchCancel(world);
+            onTouchCancel();
         }
     }
 
     @WorkerThread
-    void checkTouchUp(World world, int x, int y){
+    void checkTouchUp(int x, int y){
         if(mIsPressed){
             mIsPressed = false;
             if(mIsInCameraRange&&checkBoundary(x, y)){
-                onTouchUp(world, x, y);
-                onClick(world);
+                onTouchUp(x, y);
+                onClick();
             }else{
-                onTouchCancel(world);
+                onTouchCancel();
             }
         }
     }
 
     @WorkerThread
-    boolean checkDrag(World world, int x, int y){
+    boolean checkDrag(int x, int y){
         if(mIsPressed){
             if(mIsInCameraRange&&checkBoundary(x, y)){
-                onTouchDrag(world, x, y);
+                onTouchDrag(x, y);
                 return mConsumeDragEvent;
             }else{
                 mIsPressed = false;
-                onTouchCancel(world);
+                onTouchCancel();
             }
         }
         return false;
     }
 
     @WorkerThread
-    public void onTouchDrag(World world, int x, int y){
-        if(mOnTouchListener!=null) mOnTouchListener.onTouchDrag(world, this, x, y);
-        if(mChildListener!=null) mChildListener.onTouchDrag(world, this, x, y);
+    public void onTouchDown(int x, int y){
+        if(mOnTouchListener!=null) mOnTouchListener.onTouchDown(mAttachedWorld, this, x, y);
+        if(mChildListener!=null) mChildListener.onTouchDown(mAttachedWorld, this, x, y);
     }
 
     @WorkerThread
-    public void onTouchUp(World world, int x, int y){
-        if(mOnTouchListener!=null) mOnTouchListener.onTouchUp(world, this, x, y);
-        if(mChildListener!=null) mChildListener.onTouchUp(world, this, x, y);
+    public void onTouchDrag(int x, int y){
+        if(mOnTouchListener!=null) mOnTouchListener.onTouchDrag(mAttachedWorld, this, x, y);
+        if(mChildListener!=null) mChildListener.onTouchDrag(mAttachedWorld, this, x, y);
     }
 
     @WorkerThread
-    public void onTouchCancel(World world){
-        if(mOnTouchListener!=null) mOnTouchListener.onTouchCancel(world, this);
-        if(mChildListener!=null) mChildListener.onTouchCancel(world, this);
+    public void onTouchUp(int x, int y){
+        if(mOnTouchListener!=null) mOnTouchListener.onTouchUp(mAttachedWorld, this, x, y);
+        if(mChildListener!=null) mChildListener.onTouchUp(mAttachedWorld, this, x, y);
+    }
+
+    @WorkerThread
+    public void onTouchCancel(){
+        if (mOnTouchListener != null) mOnTouchListener.onTouchCancel(mAttachedWorld, this);
+        if (mChildListener != null) mChildListener.onTouchCancel(mAttachedWorld, this);
     }
 
 
     interface ChildListener{
         @WorkerThread
-        void onClick(World world, Object object);
+        void onClick(@Nullable World attachedWorld, @NonNull Object object);
         @WorkerThread
-        void onTouchDown(World world, Object object, int x, int y);
+        void onTouchDown(@Nullable World attachedWorld, @NonNull Object object, int x, int y);
         @WorkerThread
-        void onTouchUp(World world, Object object, int x, int y);
+        void onTouchUp(@Nullable World attachedWorld, @NonNull Object object, int x, int y);
         @WorkerThread
-        void onTouchCancel(World world, Object object);
+        void onTouchCancel(@Nullable World attachedWorld, @NonNull Object object);
         @WorkerThread
-        void onTouchDrag(World world, Object object, int x, int y);
+        void onTouchDrag(@Nullable World attachedWorld, @NonNull Object object, int x, int y);
     }
 
 }

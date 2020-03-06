@@ -99,11 +99,11 @@ public class GroupObject extends Object{
 
     @WorkerThread
     @Override
-    void detached() {
-        super.detached();
+    void detached(World world) {//super.detach 후 발생하는 NullPointer 때문
+        super.detached(world);
         for (int i = 0; i < mGroupSize; i++) {
             if(mObjectList[i]!=null) {
-                mAttachedWorld.removeObject(mObjectList[i]);
+                world.removeObject(mObjectList[i]);
             }
         }
     }

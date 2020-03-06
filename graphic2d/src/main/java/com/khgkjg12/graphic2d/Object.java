@@ -61,7 +61,7 @@ public abstract class Object {
     }
 
     @WorkerThread
-    void detached() {
+    void detached(World world) {
         mAttachedWorld = null;
     }
 

@@ -122,7 +122,7 @@ public class World {
                 i++;
             }
             mObjectCount--;
-            object.detached();
+            object.detached(this);
         }else{
             throw new RemoveChildFromWorldException();
         }

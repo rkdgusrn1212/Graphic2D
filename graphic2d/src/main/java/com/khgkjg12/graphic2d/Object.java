@@ -22,7 +22,7 @@ import android.support.annotation.WorkerThread;
 public abstract class Object {
 
     private boolean mVisibility;
-    boolean mClickable;
+    private boolean mClickable;
     private OnClickListener mOnClickListener;
     float mZ;
     int mX, mY;
@@ -35,7 +35,6 @@ public abstract class Object {
     boolean mConsumeTouchEvent;
     boolean mConsumeDragEvent;
     ChildListener mChildListener;
-    boolean mClickableGroupMask;
     World mAttachedWorld;
     GroupObject mGroup;
 
@@ -50,7 +49,6 @@ public abstract class Object {
         mIsPressed = false;
         mConsumeTouchEvent = true;
         mConsumeDragEvent = false;
-        mClickableGroupMask = true;
         mAttachedWorld = null;
         mGroup = null;
     }
@@ -66,21 +64,14 @@ public abstract class Object {
     }
 
     @WorkerThread
-    void setClickableGroupMask(boolean clickableGroupMask){
-        mClickableGroupMask = clickableGroupMask;
-    }
-
-    @WorkerThread
     void joinGroup(GroupObject group){
         mChildListener = group.mInnerItemListener;
-        mClickableGroupMask = group.mClickableGroupMask;
         mGroup = group;
     }
 
     @WorkerThread
     void leaveGroup(){
         mChildListener = null;
-        mClickableGroupMask = true;
         mGroup = null;
     }
 
@@ -266,8 +257,13 @@ public abstract class Object {
     }
 
     @WorkerThread
+    public boolean isClickable(){
+        return mClickable && (mGroup==null||mGroup.mChildClickable);
+    }
+
+    @WorkerThread
     boolean checkTouchDown(int x, int y){
-        if(mClickable && mClickableGroupMask&&mIsInCameraRange&&checkBoundary(x, y)){
+        if(isClickable() &&mIsInCameraRange&&checkBoundary(x, y)){
             mIsPressed = true;
             onTouchDown(x, y);
             return mConsumeTouchEvent;

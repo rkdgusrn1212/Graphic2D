@@ -125,7 +125,7 @@ public class GridObject extends GroupObject {
     //해당 메소드가 오직 world.onTouch를 통해서만 호출된다 가정.
     @WorkerThread
     boolean checkTouchDown(int x, int y){
-        if(mClickable && mClickableGroupMask&&mIsInCameraRange&&checkBoundary(x, y)){
+        if(isClickable()&&mIsInCameraRange&&checkBoundary(x, y)){
             mPressedColumn = (int) ((x - mRenderLeft) * mColumn / mRenderWidth);
             mPressedRow = (int) ((y - mRenderTop) * mRow / mRenderHeight);
             mIsPressed = true;

@@ -33,9 +33,6 @@ public class GroupObject extends Object{
     @WorkerThread
     public void setChildClickable(boolean childClickable){
         mChildClickable = childClickable;
-        for(int i=0; i<mGroupSize; i++){
-            mObjectList[i].setClickableGroupMask(mChildClickable);
-        }
     }
 
     public boolean getChildClickable(){

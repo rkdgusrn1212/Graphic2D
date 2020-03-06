@@ -114,7 +114,7 @@ public class World {
      */
     @WorkerThread
     public void removeObject(@NonNull Object object){
-        if(object.mChildListener==null) {
+        if(object.mGroup==null||object.mGroup.mAttachedWorld==null) {
             int i = 0;
             while (mObjects[i++] != object) ;
             while (i != mObjectCount) {

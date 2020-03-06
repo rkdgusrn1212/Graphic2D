@@ -9,8 +9,8 @@ public class GroupObject extends Object{
     private Object[] mObjectList;
     private int mGroupSize;
     private OnClickChildListener mOnClickChildListener;
-    private InnerItemListener mInnerItemListener;
-    private boolean mChildClickable;
+    InnerItemListener mInnerItemListener;
+    boolean mChildClickable;
 
     /**
      * @param z                    그룹 기준 z-coordinate.
@@ -72,15 +72,13 @@ public class GroupObject extends Object{
     @WorkerThread
     public void putObject(Object obj, @IntRange(from = 0) int idx) {
         if (mObjectList[idx] != null) {
-            mObjectList[idx].setChildListener(null);
-            mObjectList[idx].setClickableGroupMask(true);
+            mObjectList[idx].leaveGroup();
             if (mAttachedWorld != null) {
                 mAttachedWorld.removeObject(mObjectList[idx]);
             }
         }
         if (obj != null) {
-            obj.setChildListener(mInnerItemListener);
-            obj.setClickableGroupMask(mChildClickable);
+            obj.joinGroup(this);
             if (mAttachedWorld != null) {
                 mAttachedWorld.putObject(obj);
             }
@@ -102,12 +100,12 @@ public class GroupObject extends Object{
     @WorkerThread
     @Override
     void detached() {
+        super.detached();
         for (int i = 0; i < mGroupSize; i++) {
             if(mObjectList[i]!=null) {
                 mAttachedWorld.removeObject(mObjectList[i]);
             }
         }
-        super.detached();
     }
 
     @WorkerThread

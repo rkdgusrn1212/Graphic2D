@@ -37,6 +37,7 @@ public abstract class Object {
     ChildListener mChildListener;
     boolean mClickableGroupMask;
     World mAttachedWorld;
+    GroupObject mGroup;
 
     @WorkerThread
     public Object(float z, int x, int y, boolean visibility, boolean clickable, OnClickListener onClickListener){
@@ -51,6 +52,7 @@ public abstract class Object {
         mConsumeDragEvent = false;
         mClickableGroupMask = true;
         mAttachedWorld = null;
+        mGroup = null;
     }
 
     @WorkerThread
@@ -69,8 +71,17 @@ public abstract class Object {
     }
 
     @WorkerThread
-    void setChildListener(ChildListener childListener){
-        mChildListener = childListener;
+    void joinGroup(GroupObject group){
+        mChildListener = group.mInnerItemListener;
+        mClickableGroupMask = group.mClickableGroupMask;
+        mGroup = group;
+    }
+
+    @WorkerThread
+    void leaveGroup(){
+        mChildListener = null;
+        mClickableGroupMask = true;
+        mGroup = null;
     }
 
     @WorkerThread

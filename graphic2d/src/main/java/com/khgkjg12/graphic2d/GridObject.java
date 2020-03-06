@@ -87,6 +87,34 @@ public class GridObject extends GroupObject {
         super.putObject(obj, row*mColumn+column);
     }
 
+    /**
+     * @param object
+     * @return child가 아니면 -1.
+     */
+    @WorkerThread
+    public int getChildRow(Object object){
+        int idx = getChildIndex(object);
+        if(idx!=-1){
+            return idx/mColumn;
+        }else{
+            return -1;
+        }
+    }
+
+    /**
+     * @param object
+     * @return child가 아니면 -1.
+     */
+    @WorkerThread
+    public int getChildColumn(Object object){
+        int idx = getChildIndex(object);
+        if(idx!=-1){
+            return idx%mColumn;
+        }else{
+            return -1;
+        }
+    }
+
     @WorkerThread
     @Override
     boolean checkBoundary(int x, int y) {

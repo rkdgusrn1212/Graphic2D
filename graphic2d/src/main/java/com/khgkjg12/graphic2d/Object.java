@@ -158,6 +158,13 @@ public abstract class Object {
         }
     }
 
+    @WorkerThread
+    void renderViewport(Graphic2dDrawer drawer){
+        if(mVisibility){
+            drawViewport(drawer);
+        }
+    }
+
     /**
      * 오브젝트의 경계를 계산.
      */
@@ -169,6 +176,10 @@ public abstract class Object {
      */
     @WorkerThread
     abstract void draw(Graphic2dDrawer drawer);
+
+    @WorkerThread
+    abstract void drawViewport(Graphic2dDrawer drawer);
+
 
     public interface OnClickListener{
         @WorkerThread

@@ -25,6 +25,7 @@ import android.util.Log;
 import com.khgkjg12.graphic2d.GridObject;
 import com.khgkjg12.graphic2d.GroupObject;
 import com.khgkjg12.graphic2d.Object;
+import com.khgkjg12.graphic2d.RoundRectObject;
 import com.khgkjg12.graphic2d.TextObject;
 import com.khgkjg12.graphic2d.Texture;
 import com.khgkjg12.graphic2d.Graphic2dDrawer;
@@ -138,7 +139,8 @@ public class MainActivity extends Activity implements Graphic2dRenderView.Render
 
     @Override
     public void onClickGrid(World world, GridObject gridObject, Object object, int row, int column) {
-        gridObject.putObject(new TextObject( gridObject.getZ(), gridObject.getColumnX(column),gridObject.getRowY(row), true , true,null, "IgIg", 100, Typeface.SERIF, Color.WHITE), row, column);
+        gridObject.putObject(new RoundRectObject(gridObject.getZ(), gridObject.getColumnX(column), gridObject.getRowY(row), true, true, null, 100, 100, 0, 0, Color.YELLOW, 10, 10, true), row, column);
+        //gridObject.putObject(new TextObject( gridObject.getZ(), gridObject.getColumnX(column),gridObject.getRowY(row), true , true,null, "IgIg", 100, Typeface.SERIF, Color.WHITE), row, column);
     }
 
     @Override

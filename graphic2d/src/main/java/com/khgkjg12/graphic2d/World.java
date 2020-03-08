@@ -24,6 +24,8 @@ public class World {
 
     private int mWidth, mHeight;//0은 무한.
     Object[] mObjects;
+    Object[] mViewportObjects;
+    private int mViewportObjectCount;
     boolean isDragging = false;
     int startX, startY;
     boolean isPressed = false;
@@ -61,6 +63,26 @@ public class World {
         mDragToMove = dragToMove;
         mPinchToZoom = pinchToZoom;
         mOnClickWorldListener = null;
+    }
+
+    @WorkerThread
+    public int getViewportWidth(){
+        return mViewportWidth;
+    }
+
+    @WorkerThread
+    public int getViewportHeight(){
+        return mViewportHeight;
+    }
+
+    @WorkerThread
+    public int getViewportX(){
+        return mViewportX;
+    }
+
+    @WorkerThread
+    public int getViewportY(){
+        return mViewportY;
     }
 
     public int getMaxObjectCount(){
@@ -105,6 +127,26 @@ public class World {
         }
     }
 
+    @WorkerThread
+    public void putViewportObject(@NonNull Object object){
+        if(object.mAttachedWorld==null) {
+            int i = 0;
+            while (i != mViewportObjectCount && mViewportObjects[i].mZ > object.mZ) {
+                i++;
+            }
+            int j = mViewportObjectCount++;
+            while (j != i) {
+                mViewportObjects[j] = mViewportObjects[j - 1];
+                j--;
+            }
+            object.calculateScale(this);
+            mViewportObjects[i] = object;
+            mViewportObjects[i].attached(this);
+        }else{
+            throw new PutAttachedObjectException();
+        }
+    }
+
     /**
      * world 에서 오브젝트를 제거.
      * 호출시점에서 매개변수로 받은 제거대상이 무조건 존재하고 있음을 가정.
@@ -122,6 +164,22 @@ public class World {
                 i++;
             }
             mObjectCount--;
+            object.detached(this);
+        }else{
+            throw new RemoveChildFromWorldException();
+        }
+    }
+
+    @WorkerThread
+    public void removeViewportObject(@NonNull Object object){
+        if(object.mGroup==null||object.mGroup.mAttachedWorld==null) {
+            int i = 0;
+            while (mViewportObjects[i++] != object) ;
+            while (i != mViewportObjectCount) {
+                mViewportObjects[i - 1] = mViewportObjects[i];
+                i++;
+            }
+            mViewportObjectCount--;
             object.detached(this);
         }else{
             throw new RemoveChildFromWorldException();
@@ -157,6 +215,9 @@ public class World {
         }
         for(int i=mObjectCount-1; i>=0; i--){
             mObjects[i].render(drawer);
+        }
+        for(int i=mViewportObjectCount; i>=0; i--){
+            mViewportObjects[i].renderViewport(drawer);
         }
     }
 

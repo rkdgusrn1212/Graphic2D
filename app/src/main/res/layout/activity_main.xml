@@ -14,5 +14,6 @@
         app:worldHeight="800"
         app:focusedZ="100"
         android:layout_gravity="center"
+        app:backgroundColor="@android:color/white"
         android:id="@+id/render_view"/>
 </FrameLayout>

@@ -10,9 +10,10 @@ public abstract class PaintableWidget extends Widget {
     private boolean mAutoShadow;
     Paint mPaint;
 
-    public PaintableWidget(float z, float x, float y, boolean visibility, boolean clickable, boolean autoShadow, OnClickListener onClickListener) {
+    public PaintableWidget(float z, float x, float y, boolean visibility, boolean clickable, OnClickListener onClickListener, int color, boolean autoShadow) {
         super(z, x, y, visibility, clickable, onClickListener);
         mPaint = new Paint();
+        mPaint.setColor(color);
         mShadow = -1;
         if(autoShadow){
             enableAutoShadow();
@@ -75,5 +76,26 @@ public abstract class PaintableWidget extends Widget {
     public void moveZ(float z) {
         super.moveZ(z);
         if(mAutoShadow)calculateShadow();
+    }
+
+    //32-bit
+    @WorkerThread
+    public void changeColor(int color){
+        mPaint.setColor(color);
+    }
+    //32-bit
+    @WorkerThread
+    public int getColor(){
+        return mPaint.getColor();
+    }
+
+    @WorkerThread
+    public void changeAlpha(int alpha){
+        mPaint.setAlpha(alpha);
+    }
+
+    @WorkerThread
+    public int getAlpha(){
+        return mPaint.getAlpha();
     }
 }

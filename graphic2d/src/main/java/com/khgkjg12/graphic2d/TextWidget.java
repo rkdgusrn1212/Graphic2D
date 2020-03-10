@@ -6,10 +6,9 @@ import android.graphics.Typeface;
 import android.support.annotation.NonNull;
 import android.support.annotation.WorkerThread;
 
-public class TextObject extends PaintableObject {
+public class TextWidget extends PaintableWidget {
 
     private String mText;
-    private float mTextSize;
     private Rect mBound;
     private float mLeft;
     private float mRight;
@@ -19,11 +18,11 @@ public class TextObject extends PaintableObject {
     private float mTextWidth;
     private float mTextHeight;
 
-    public TextObject(float z, float x, float y, boolean visibility, boolean clickable, OnClickListener onClickListener, int color, boolean autoShadow, @NonNull String text, float textSize, Paint.Align textAlignment, @NonNull Typeface typeface) {
+    public TextWidget(float z, float x, float y, boolean visibility, boolean clickable, OnClickListener onClickListener, int color, boolean autoShadow, @NonNull String text, float textSize, Paint.Align textAlignment, @NonNull Typeface typeface) {
         super(z, x, y, visibility, clickable, onClickListener, color, autoShadow);
         mPaint.setTextAlign(textAlignment);
         mPaint.setTypeface(typeface);
-        mTextSize = textSize;
+        mPaint.setTextSize(textSize);
         mText = text;
         mBound = new Rect();
     }
@@ -39,7 +38,7 @@ public class TextObject extends PaintableObject {
     }
 
     public float getTextSize(){
-        return mTextSize;
+        return mPaint.getTextSize();
     }
     /**
      * world 콜백에서 호출.
@@ -57,30 +56,28 @@ public class TextObject extends PaintableObject {
 
     @WorkerThread
     public void changeTextSize(float textSize){
-        mTextSize = textSize;
+        mPaint.setTextSize(textSize);
         calculateBoundary();
     }
 
     @Override
     @WorkerThread
     void calculateBoundary() {
-        mScaledSize = mTextSize * mScale;
-        mPaint.setTextSize(mScaledSize);
         mPaint.getTextBounds(mText, 0, mText.length(), mBound);
         mTextHeight = mBound.height();
         mTextWidth = mBound.width();
-        mTop = mRenderY - mTextHeight/2;
+        mTop = mY - mTextHeight/2;
         mBottom = mTop + mTextHeight;
         Paint.Align align = mPaint.getTextAlign();
         if(align != Paint.Align.RIGHT){
             if(align == Paint.Align.CENTER) {
-                mLeft = mRenderX-mTextWidth/2;
+                mLeft = mX-mTextWidth/2;
             }else {
-                mLeft = mRenderX;
+                mLeft = mX;
             }
             mRight = mLeft + mTextWidth;
         }else{
-            mRight = mRenderX;
+            mRight = mX;
             mLeft = mRight - mTextWidth;
         }
     }
@@ -94,7 +91,7 @@ public class TextObject extends PaintableObject {
     @Override
     @WorkerThread
     void draw(Graphic2dDrawer drawer) {
-        drawer.drawText(mText, mRenderX, mBottom - mBound.bottom, mPaint);
+        drawer.drawText(mText, mX, mBottom - mBound.bottom, mPaint);
     }
 
     @WorkerThread

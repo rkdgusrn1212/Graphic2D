@@ -7,10 +7,29 @@ public class RoundRectObject extends RectObject {
     private float mRY, mRX;
     private float mRenderRY, mRenderRX;
 
-    public RoundRectObject(float z, float x, float y,  boolean visibility, boolean clickable, boolean autoShadow, OnClickListener onClickListener, int width, int height, int color, float rX, float rY) {
-        super(z, x, y, visibility, clickable, autoShadow, onClickListener, width, height, color);
+    public RoundRectObject(float z, float x, float y,  boolean visibility, boolean clickable, OnClickListener onClickListener, int color, boolean autoShadow, int width, int height, float rX, float rY) {
+        super(z, x, y, visibility, clickable, onClickListener, color, autoShadow, width, height);
         mRX = rX;
         mRY = rY;
+    }
+
+    @WorkerThread
+    public void changeRX(float rX){
+        mRX = rX;
+        calculateBoundary();
+    }
+
+    @WorkerThread
+    public void changeRY(float rY){
+        mRY = rY;
+        calculateBoundary();
+    }
+
+    @WorkerThread
+    public void changeRXY(float rX, float rY){
+        mRX = rX;
+        mRY = rY;
+        calculateBoundary();
     }
 
     @Override

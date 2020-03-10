@@ -19,6 +19,7 @@ import android.app.Activity;
 import android.content.res.Configuration;
 import android.graphics.BlurMaskFilter;
 import android.graphics.Color;
+import android.graphics.Paint;
 import android.graphics.Shader;
 import android.graphics.Typeface;
 import android.os.Bundle;
@@ -141,10 +142,9 @@ public class MainActivity extends Activity implements Graphic2dRenderView.Render
 
     @Override
     public void onClickGrid(World world, GridObject gridObject, Object object, int row, int column) {
-        RoundRectObject rro = new RoundRectObject(gridObject.getZ(), gridObject.getColumnX(column), gridObject.getRowY(row), true, true, null, 100, 100,Color.YELLOW, 10, 10, true);
-        rro.editPaint().setStrokeWidth(10);
-        rro.editPaint().setS
+        RoundRectObject rro = new RoundRectObject(gridObject.getZ(), gridObject.getColumnX(column), gridObject.getRowY(row), true, true, null, Color.YELLOW, true, 100, 100, 10, 10);
         gridObject.putChild(rro, row, column);
+        world.putObject(new TextObject(gridObject.getZ(), gridObject.getColumnX(column), gridObject.getRowY(row), true, true, null, Color.BLACK, false, "158", 60, Paint.Align.LEFT,Typeface.SERIF));
         //gridObject.putObject(new TextObject( gridObject.getZ(), gridObject.getColumnX(column),gridObject.getRowY(row), true , true,null, "IgIg", 100, Typeface.SERIF, Color.WHITE), row, column);
     }
 

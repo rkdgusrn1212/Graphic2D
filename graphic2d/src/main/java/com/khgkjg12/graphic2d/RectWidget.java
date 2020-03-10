@@ -13,7 +13,10 @@ public class RectWidget extends PaintableWidget {
         mPaint.setColor(color);
         mWidth = width;
         mHeight = height;
-        calculateBoundary();
+        mLeft = mX - width/2;
+        mTop = mY - height/2;
+        mRight = mLeft + width;
+        mBottom = mTop + height;
     }
 
     @WorkerThread
@@ -53,7 +56,7 @@ public class RectWidget extends PaintableWidget {
         mLeft = mX - mWidth/2;
         mTop = mY - mHeight/2;
         mRight = mLeft + mWidth;
-        mBottom = mRight + mRight;
+        mBottom = mTop + mHeight;
     }
 
     @Override

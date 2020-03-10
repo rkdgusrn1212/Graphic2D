@@ -7,9 +7,8 @@ public class RectObject extends PaintableObject {
     float mRenderWidth, mRenderHeight;
     float mRenderLeft, mRenderRight, mRenderTop, mRenderBottom;
     @WorkerThread
-    public RectObject(float z, float x, float y, boolean visibility, boolean clickable, boolean autoShadow, OnClickListener onClickListener, float width, float height, int color){
-        super(z, x, y, visibility, clickable, autoShadow, onClickListener);
-        mPaint.setColor(color);
+    public RectObject(float z, float x, float y, boolean visibility, boolean clickable, OnClickListener onClickListener, int color, boolean autoShadow, float width, float height){
+        super(z, x, y, visibility, clickable, onClickListener, color, autoShadow);
         mWidth = width;
         mHeight = height;
     }
@@ -36,14 +35,6 @@ public class RectObject extends PaintableObject {
     @WorkerThread
     boolean checkBoundary(int x, int y) {
         return x < mRenderRight && x > mRenderLeft && y < mRenderBottom && y > mRenderTop;
-    }
-
-    /**
-     * world 콜백에서만 호출.
-    * */
-    @WorkerThread
-    public void changeColor(int color){
-        mPaint.setColor(color);
     }
 
     @Override

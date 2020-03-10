@@ -10,27 +10,26 @@ public class TextObject extends PaintableObject {
 
     private String mText;
     private float mTextSize;
-    private Paint.FontMetrics mFontMetrics;
     private Rect mBound;
     private float mLeft;
     private float mRight;
     private float mTop;
     private float mBottom;
     private float mScaledSize;
+    private float mTextWidth;
+    private float mTextHeight;
 
-    public TextObject(float z, float x, float y, boolean visibility, boolean clickable, boolean autoShadow, OnClickListener onClickListener, @NonNull String text, float textSize, @NonNull Typeface typeface, int color) {
-        super(z, x, y, visibility, clickable, autoShadow, onClickListener);
-        mPaint.setColor(color);
-        mPaint.setTextAlign(Paint.Align.CENTER);
+    public TextObject(float z, float x, float y, boolean visibility, boolean clickable, OnClickListener onClickListener, int color, boolean autoShadow, @NonNull String text, float textSize, Paint.Align textAlignment, @NonNull Typeface typeface) {
+        super(z, x, y, visibility, clickable, onClickListener, color, autoShadow);
+        mPaint.setTextAlign(textAlignment);
         mPaint.setTypeface(typeface);
         mTextSize = textSize;
         mText = text;
         mBound = new Rect();
-        mFontMetrics = new Paint.FontMetrics();
     }
 
     @WorkerThread
-    public void setTypeface(@NonNull Typeface Typeface){
+    public void changeTypeface(@NonNull Typeface Typeface){
         mPaint.setTypeface(Typeface);
         calculateBoundary();
     }
@@ -47,7 +46,7 @@ public class TextObject extends PaintableObject {
      * @param text
      */
     @WorkerThread
-    public void setText(@NonNull String text){
+    public void changeText(@NonNull String text){
         mText = text;
         calculateBoundary();
     }
@@ -56,22 +55,9 @@ public class TextObject extends PaintableObject {
         return mText;
     }
 
-    /**
-     * world 콜백에서 호출.
-     * @param color
-     */
     @WorkerThread
-    public void setColor(int color){
-        mPaint.setColor(color);
-    }
-
-    public int getColor(){
-        return mPaint.getColor();
-    }
-
-    @WorkerThread
-    public void setTextSize(float textSize){
-        mPaint.setTextSize(textSize);
+    public void changeTextSize(float textSize){
+        mTextSize = textSize;
         calculateBoundary();
     }
 
@@ -80,13 +66,23 @@ public class TextObject extends PaintableObject {
     void calculateBoundary() {
         mScaledSize = mTextSize * mScale;
         mPaint.setTextSize(mScaledSize);
-        mPaint.getFontMetrics(mFontMetrics);
         mPaint.getTextBounds(mText, 0, mText.length(), mBound);
-        float halfWidth = mPaint.measureText(mText)/2;
-        mLeft = mRenderX+mBound.left-halfWidth;
-        mTop = mRenderY+mBound.top-mFontMetrics.bottom+mScaledSize/2;
-        mRight = mRenderX+mBound.right-halfWidth;
-        mBottom = mRenderY+mBound.bottom-mFontMetrics.bottom+mScaledSize/2;
+        mTextHeight = mBound.height();
+        mTextWidth = mBound.width();
+        mTop = mRenderY - mTextHeight/2;
+        mBottom = mTop + mTextHeight;
+        Paint.Align align = mPaint.getTextAlign();
+        if(align != Paint.Align.RIGHT){
+            if(align == Paint.Align.CENTER) {
+                mLeft = mRenderX-mTextWidth/2;
+            }else {
+                mLeft = mRenderX;
+            }
+            mRight = mLeft + mTextWidth;
+        }else{
+            mRight = mRenderX;
+            mLeft = mRight - mTextWidth;
+        }
     }
 
     @Override
@@ -98,6 +94,16 @@ public class TextObject extends PaintableObject {
     @Override
     @WorkerThread
     void draw(Graphic2dDrawer drawer) {
-        drawer.drawText(mText, mRenderX, mRenderY+mScaledSize/2-mFontMetrics.bottom, mPaint);
+        drawer.drawText(mText, mRenderX, mBottom - mBound.bottom, mPaint);
+    }
+
+    @WorkerThread
+    public float getTextWidth(){
+        return mTextWidth;
+    }
+
+    @WorkerThread
+    public float getTextHeight(){
+        return mTextHeight;
     }
 }

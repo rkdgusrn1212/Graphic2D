@@ -1,6 +1,5 @@
 package com.khgkjg12.graphic2d;
 
-import android.support.annotation.NonNull;
 import android.support.annotation.WorkerThread;
 
 public class RoundRectObject extends RectObject {
@@ -8,8 +7,8 @@ public class RoundRectObject extends RectObject {
     private float mRY, mRX;
     private float mRenderRY, mRenderRX;
 
-    public RoundRectObject(float z, int x, int y,  boolean visibility, boolean clickable, OnClickListener onClickListener, int width, int height, int degreeH, int degreeV, int color, float rX, float rY, boolean shadow) {
-        super(z, x, y, visibility, clickable, onClickListener, width, height, degreeH, degreeV, color, shadow);
+    public RoundRectObject(float z, float x, float y,  boolean visibility, boolean clickable, boolean autoShadow, OnClickListener onClickListener, int width, int height, int color, float rX, float rY) {
+        super(z, x, y, visibility, clickable, autoShadow, onClickListener, width, height, color);
         mRX = rX;
         mRY = rY;
     }
@@ -24,6 +23,6 @@ public class RoundRectObject extends RectObject {
     @Override
     @WorkerThread
     void draw(Graphic2dDrawer drawer) {
-        drawer.drawRoundRect(mRenderLeft, mRenderTop, mRenderRight, mRenderBottom, mRenderRX, mRenderRY, super.mPaint);
+        drawer.drawRoundRect(mRenderLeft, mRenderTop, mRenderRight, mRenderBottom, mRenderRX, mRenderRY, mPaint);
     }
 }

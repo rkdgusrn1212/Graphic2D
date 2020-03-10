@@ -24,8 +24,9 @@ public class World {
 
     private int mWidth, mHeight;//0은 무한.
     Object[] mObjects;
-    Object[] mViewportObjects;
-    private int mViewportObjectCount;
+    Widget[] mWidgets;
+    private int mWidgetCount;
+    private int mMaxWidgetCount;
     boolean isDragging = false;
     int startX, startY;
     boolean isPressed = false;
@@ -59,6 +60,8 @@ public class World {
         mMaxObjectCount = maxObjectCount;
         mObjectCount = 0;
         mObjects = new Object[maxObjectCount];
+        mWidgetCount = 0;
+        mWidgets = new Widget[10];
         mBackgroundColor = backgroundColor;
         mDragToMove = dragToMove;
         mPinchToZoom = pinchToZoom;
@@ -101,6 +104,14 @@ public class World {
         System.arraycopy(tempObjects, 0, mObjects, 0, maxObjectCount);
     }
 
+    @WorkerThread
+    public void changeMaxWidgetCount(int maxWidgetCount){
+        mMaxWidgetCount = maxWidgetCount;
+        Widget[] tempWidgets = mWidgets;
+        mWidgets = new Widget[maxWidgetCount];
+        System.arraycopy(tempWidgets, 0, mWidgets, 0, maxWidgetCount);
+    }
+
     /**
      * 오브젝트를 z 우선순위에 맞춰서 배열에 집어넣음.
      * @exception IndexOutOfBoundsException 배열이 가득 찬 상태에서 집어넣음.
@@ -128,22 +139,21 @@ public class World {
     }
 
     @WorkerThread
-    public void putViewportObject(@NonNull Object object){
-        if(object.mAttachedWorld==null) {
+    public void putWidget(@NonNull Widget widget){
+        if(widget.mAttachedWorld==null) {
             int i = 0;
-            while (i != mViewportObjectCount && mViewportObjects[i].mZ > object.mZ) {
+            while (i != mWidgetCount && mWidgets[i].mZ > widget.mZ) {
                 i++;
             }
-            int j = mViewportObjectCount++;
+            int j = mWidgetCount++;
             while (j != i) {
-                mViewportObjects[j] = mViewportObjects[j - 1];
+                mWidgets[j] = mWidgets[j - 1];
                 j--;
             }
-            object.calculateScale(this);
-            mViewportObjects[i] = object;
-            mViewportObjects[i].attached(this);
+            mWidgets[i] = widget;
+            mWidgets[i].attached(this);
         }else{
-            throw new PutAttachedObjectException();
+            throw new PutAttachedWidgetException();
         }
     }
 
@@ -171,16 +181,16 @@ public class World {
     }
 
     @WorkerThread
-    public void removeViewportObject(@NonNull Object object){
-        if(object.mGroup==null||object.mGroup.mAttachedWorld==null) {
+    public void removeWidget(@NonNull Widget widget){
+        if(widget.mGroup==null||widget.mGroup.mAttachedWorld==null) {
             int i = 0;
-            while (mViewportObjects[i++] != object) ;
-            while (i != mViewportObjectCount) {
-                mViewportObjects[i - 1] = mViewportObjects[i];
+            while (mWidgets[i++] != widget) ;
+            while (i != mWidgetCount) {
+                mWidgets[i - 1] = mWidgets[i];
                 i++;
             }
-            mViewportObjectCount--;
-            object.detached(this);
+            mWidgetCount--;
+            widget.detached(this);
         }else{
             throw new RemoveChildFromWorldException();
         }
@@ -216,8 +226,8 @@ public class World {
         for(int i=mObjectCount-1; i>=0; i--){
             mObjects[i].render(drawer);
         }
-        for(int i=mViewportObjectCount; i>=0; i--){
-            mViewportObjects[i].renderViewport(drawer);
+        for(int i=mWidgetCount-1; i>=0; i--){
+            mWidgets[i].render(drawer);
         }
     }
 
@@ -264,22 +274,43 @@ public class World {
                     startX = event.x;
                     startY = event.y;
                     isPressed = true;
-                    for (int j = 0; j < mObjectCount; j++) {
-                        if (mObjects[j].checkTouchDown(event.x, event.y)) {
+                    for(int j=0; j<mWidgetCount; j++){
+                        if(mWidgets[j].checkTouchDown(event.x, event.y)){
                             isPressed = false;
                             break;
+                        }
+                    }
+                    if(isPressed) {
+                        for (int j = 0; j < mObjectCount; j++) {
+                            if (mObjects[j].checkTouchDown(event.x, event.y)) {
+                                isPressed = false;
+                                break;
+                            }
                         }
                     }
                 }else if(event.type == TouchHandler.TouchEvent.TOUCH_DRAGGED){//pressed인 오브젝트중 영역일치 아닌 것들은 모두 onTouchCancel 호출
                     int j=0;
-                    for (; j < mObjectCount; j++) {
-                        if(mObjects[j].checkDrag(event.x, event.y)){
+                    for(;j<mWidgetCount; j++){
+                        if(mWidgets[j].checkDrag(event.x, event.y)){
                             isPressed = false;
                             break;
                         }
                     }
-                    for(; j<mObjectCount; j++){
-                        mObjects[j].checkTouchCancel();
+                    int m=0;
+                    if(isPressed) {
+                        for (; m < mObjectCount; m++) {
+                            if (mObjects[m].checkDrag(event.x, event.y)) {
+                                isPressed = false;
+                                break;
+                            }
+                        }
+                    }else{
+                        for (; j < mWidgetCount; j++) {
+                            mWidgets[j].checkTouchCancel();
+                        }
+                    }
+                    for(; m<mObjectCount; m++){
+                        mObjects[m].checkTouchCancel();
                     }
                     if(isPressed){
                         if (Math.abs(event.x - startX) > 50 || Math.abs(event.y - startY) > 50) {
@@ -294,6 +325,9 @@ public class World {
                             }
                         }
                         isPressed = false;
+                    }
+                    for(int j=0; j<mWidgetCount; j++){
+                        mWidgets[j].checkTouchUp(event.x, event.y);
                     }
                     for (int j = 0; j < mObjectCount; j++) {
                         mObjects[j].checkTouchUp(event.x, event.y);

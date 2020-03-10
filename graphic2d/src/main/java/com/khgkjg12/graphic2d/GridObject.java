@@ -21,8 +21,8 @@ import android.support.annotation.WorkerThread;
 public class GridObject extends GroupObject {
     private int mRow, mColumn;
     private OnClickGridListener mOnClickGridListener;
-    private int mWidth;
-    private int mHeight;
+    private float mWidth;
+    private float mHeight;
     private float mRenderWidth;
     private float mRenderHeight;
     private float mRenderLeft;
@@ -46,7 +46,7 @@ public class GridObject extends GroupObject {
      * @param onClickGridListener touch event callback {@link OnClickGridListener}
      */
     @WorkerThread
-    public GridObject(float z, int x, int y, int width, int height, int row, int column, boolean childClickable, @Nullable OnClickChildListener onClickChildListener, boolean gridClickable, @Nullable OnClickGridListener onClickGridListener){
+    public GridObject(float z, float x, float y, float width, float height, int row, int column, boolean childClickable, @Nullable OnClickChildListener onClickChildListener, boolean gridClickable, @Nullable OnClickGridListener onClickGridListener){
         super(z, x, y, row*column,childClickable, onClickChildListener);
         mWidth = width;
         mHeight = height;
@@ -63,8 +63,8 @@ public class GridObject extends GroupObject {
     }
 
     @WorkerThread
-    public Object getObject(int row, int column){
-        return super.getObject(mColumn*row+column);
+    public Object getChild(int row, int column){
+        return super.getChild(mColumn*row+column);
     }
 
     @WorkerThread
@@ -83,8 +83,8 @@ public class GridObject extends GroupObject {
     }
 
     @WorkerThread
-    public void putObject(Object obj, int row, int column){
-        super.putObject(obj, row*mColumn+column);
+    public void putChild(Object obj, int row, int column){
+        super.putChild(obj, row*mColumn+column);
     }
 
     /**
@@ -224,7 +224,7 @@ public class GridObject extends GroupObject {
     @WorkerThread
     public void onGridClick(int row, int column){
         if (mOnClickGridListener != null)
-            mOnClickGridListener.onClickGrid(mAttachedWorld, this, getObject(row,column), row, column);
+            mOnClickGridListener.onClickGrid(mAttachedWorld, this, getChild(row,column), row, column);
     }
 
     @Override
@@ -252,8 +252,8 @@ public class GridObject extends GroupObject {
      * @return y-coordinate of given row.
      */
     @WorkerThread
-    public int getRowY(int row){
-        return mY-(mHeight>>1)+mHeight*row/mRow+((mHeight/mRow)>>1);
+    public float getRowY(int row){
+        return mY-(mHeight/2)+mHeight*row/mRow+((mHeight/mRow)/2);
     }
 
     /**
@@ -262,7 +262,7 @@ public class GridObject extends GroupObject {
      * @return y-coordinate of given row.
      */
     @WorkerThread
-    public int getColumnX(int column){
-        return mX-(mWidth>>1)+mWidth*column/mColumn+((mWidth/mColumn)>>1);
+    public float getColumnX(int column){
+        return mX-(mWidth/2)+mWidth*column/mColumn+((mWidth/mColumn)/2);
     }
 }

@@ -6,14 +6,14 @@ import android.support.annotation.WorkerThread;
 
 public class TextureObject extends Object {
     private Texture mTexture;
-    int mWidth, mHeight;
+    float mWidth, mHeight;
     RectF mRectF;
     int mHorizontalDegree;
     int mVerticalDegree;
     float mRenderWidth;
     float mRenderHeight;
 
-    public TextureObject(float z, int x, int y, boolean visibility, boolean clickable, OnClickListener onClickListener, int width, int height, int degreeH, int degreeV, @NonNull Texture texture){
+    public TextureObject(float z, float x, float y, boolean visibility, boolean clickable, OnClickListener onClickListener, float width, float height, int degreeH, int degreeV, @NonNull Texture texture){
         super(z, x, y, visibility, clickable, onClickListener);
         mTexture = texture;
         mRectF = new RectF();

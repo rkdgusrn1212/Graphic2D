@@ -6,11 +6,10 @@ import android.graphics.Typeface;
 import android.support.annotation.NonNull;
 import android.support.annotation.WorkerThread;
 
-public class TextObject extends Object {
+public class TextObject extends PaintableObject {
 
-    private Paint mPaint;
     private String mText;
-    private int mTextSize;
+    private float mTextSize;
     private Paint.FontMetrics mFontMetrics;
     private Rect mBound;
     private float mLeft;
@@ -19,9 +18,8 @@ public class TextObject extends Object {
     private float mBottom;
     private float mScaledSize;
 
-    public TextObject(float z, int x, int y, boolean visibility, boolean clickable, OnClickListener onClickListener, @NonNull String text, int textSize, @NonNull Typeface typeface, int color) {
-        super(z, x, y, visibility, clickable, onClickListener);
-        mPaint = new Paint();
+    public TextObject(float z, float x, float y, boolean visibility, boolean clickable, boolean autoShadow, OnClickListener onClickListener, @NonNull String text, float textSize, @NonNull Typeface typeface, int color) {
+        super(z, x, y, visibility, clickable, autoShadow, onClickListener);
         mPaint.setColor(color);
         mPaint.setTextAlign(Paint.Align.CENTER);
         mPaint.setTypeface(typeface);
@@ -41,13 +39,7 @@ public class TextObject extends Object {
         return mPaint.getTypeface();
     }
 
-    @WorkerThread
-    public void setTextSize(int textSize){
-        mTextSize = textSize;
-        calculateBoundary();
-    }
-
-    public int getTextSize(){
+    public float getTextSize(){
         return mTextSize;
     }
     /**

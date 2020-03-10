@@ -2,16 +2,18 @@ package com.khgkjg12.graphic2d;
 
 import android.support.annotation.WorkerThread;
 
-public class RectObject extends PaintableObject {
+public class RectWidget extends PaintableWidget {
+
     float mWidth, mHeight;
-    float mRenderWidth, mRenderHeight;
-    float mRenderLeft, mRenderRight, mRenderTop, mRenderBottom;
+    float mLeft, mRight, mTop, mBottom;
+
     @WorkerThread
-    public RectObject(float z, float x, float y, boolean visibility, boolean clickable, boolean autoShadow, OnClickListener onClickListener, float width, float height, int color){
+    public RectWidget(float z, float x, float y, boolean visibility, boolean clickable, boolean autoShadow, Widget.OnClickListener onClickListener, float width, float height, int color){
         super(z, x, y, visibility, clickable, autoShadow, onClickListener);
         mPaint.setColor(color);
         mWidth = width;
         mHeight = height;
+        calculateBoundary();
     }
 
     @WorkerThread
@@ -35,12 +37,12 @@ public class RectObject extends PaintableObject {
     @Override
     @WorkerThread
     boolean checkBoundary(int x, int y) {
-        return x < mRenderRight && x > mRenderLeft && y < mRenderBottom && y > mRenderTop;
+        return x < mRight && x > mLeft && y < mBottom && y > mTop;
     }
 
     /**
      * world 콜백에서만 호출.
-    * */
+     * */
     @WorkerThread
     public void changeColor(int color){
         mPaint.setColor(color);
@@ -48,16 +50,14 @@ public class RectObject extends PaintableObject {
 
     @Override
     void calculateBoundary(){
-        mRenderWidth = mWidth *mScale;
-        mRenderHeight = mHeight *mScale;
-        mRenderLeft = mRenderX - mRenderWidth/2;
-        mRenderTop = mRenderY - mRenderHeight/2;
-        mRenderRight = mRenderLeft + mRenderWidth;
-        mRenderBottom = mRenderTop + mRenderHeight;
+        mLeft = mX - mWidth/2;
+        mTop = mY - mHeight/2;
+        mRight = mLeft + mWidth;
+        mBottom = mRight + mRight;
     }
 
     @Override
     void draw(Graphic2dDrawer drawer) {
-        drawer.drawRect(mRenderLeft, mRenderTop, mRenderRight, mRenderBottom, mPaint);
+        drawer.drawRect(mLeft, mTop, mRight, mBottom, mPaint);
     }
 }

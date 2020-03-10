@@ -1,18 +1,3 @@
-/**
- * Copyright 2018 Hyungu Kang
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *     http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
 package com.khgkjg12.graphic2d;
 
 import android.graphics.Color;
@@ -21,27 +6,22 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.annotation.WorkerThread;
 
-public abstract class Object {
+public abstract class Widget {
 
     private boolean mVisibility;
     private boolean mClickable;
-    private OnClickListener mOnClickListener;
+    private Widget.OnClickListener mOnClickListener;
     float mZ;
     float mX, mY;
-    boolean mIsInCameraRange;
-    float mScale;
-    float mRenderX;
-    float mRenderY;
-    private OnTouchListener mOnTouchListener;
+    private Widget.OnTouchListener mOnTouchListener;
     boolean mIsPressed;
     boolean mConsumeTouchEvent;
     boolean mConsumeDragEvent;
-    ChildListener mChildListener;
+    Widget.ChildListener mChildListener;
     World mAttachedWorld;
-    GroupObject mGroup;
-
+    GroupWidget mGroup;
     @WorkerThread
-    public Object(float z, float x, float y, boolean visibility, boolean clickable, OnClickListener onClickListener) {
+    public Widget(float z, float x, float y, boolean visibility, boolean clickable, Widget.OnClickListener onClickListener) {
         mVisibility = visibility;
         mClickable = clickable;
         mZ = z;
@@ -54,8 +34,6 @@ public abstract class Object {
         mAttachedWorld = null;
         mGroup = null;
     }
-
-
     @WorkerThread
     void attached(World world){
         mAttachedWorld = world;
@@ -67,7 +45,7 @@ public abstract class Object {
     }
 
     @WorkerThread
-    void joinGroup(GroupObject group){
+    void joinGroup(GroupWidget group){
         mChildListener = group.mInnerItemListener;
         mGroup = group;
     }
@@ -145,27 +123,21 @@ public abstract class Object {
     abstract boolean checkBoundary(int x, int y);
 
     @WorkerThread
-    public void setOnClickListener(@Nullable OnClickListener onClickListener){
+    public void setOnClickListener(@Nullable Widget.OnClickListener onClickListener){
         mOnClickListener = onClickListener;
     }
 
     @WorkerThread
-    public void setOnTouchListener(@Nullable OnTouchListener onTouchListener){
+    public void setOnTouchListener(@Nullable Widget.OnTouchListener onTouchListener){
         mOnTouchListener = onTouchListener;
     }
 
     @WorkerThread
     void render(Graphic2dDrawer drawer){
-        if(mIsInCameraRange&&mVisibility){
+        if(mVisibility){
             draw(drawer);
         }
     }
-
-    /**
-     * 오브젝트의 경계를 계산.
-     */
-    @WorkerThread
-    abstract void calculateBoundary();
 
     /**
      * 렌더 프레임상 x, y좌표 와 카메라 위치에 따른 스케일.
@@ -176,7 +148,7 @@ public abstract class Object {
 
     public interface OnClickListener{
         @WorkerThread
-        void onClick(@Nullable World attachedWorld, Object object);
+        void onClick(@Nullable World attachedWorld, Widget widget);
     }
 
     /**
@@ -188,76 +160,63 @@ public abstract class Object {
         if(mAttachedWorld!=null) {
             if (z >= mZ) {
                 int i = 0;
-                while (mAttachedWorld.mObjects[i].mZ > z) {
+                while (mAttachedWorld.mWidgets[i].mZ > z) {
                     i++;
                 }
-                Object tempObj;
+                Widget tempWidget;
                 int j = i;
-                while (mAttachedWorld.mObjects[j] != this) {
+                while (mAttachedWorld.mWidgets[j] != this) {
                     j++;
                 }
-                tempObj = mAttachedWorld.mObjects[j];
+                tempWidget = mAttachedWorld.mWidgets[j];
                 while (i != j) {
-                    mAttachedWorld.mObjects[j] = mAttachedWorld.mObjects[j - 1];
+                    mAttachedWorld.mWidgets[j] = mAttachedWorld.mWidgets[j - 1];
                     j--;
                 }
-                mAttachedWorld.mObjects[j] = tempObj;
+                mAttachedWorld.mWidgets[j] = tempWidget;
             } else {
                 int i = mAttachedWorld.mObjectCount - 1;
-                while (mAttachedWorld.mObjects[i].mZ <= z) {
+                while (mAttachedWorld.mWidgets[i].mZ <= z) {
                     i--;
                 }
-                Object tempObj;
+                Widget tempWidget;
                 int j = i;
-                while (mAttachedWorld.mObjects[j] != this) {
+                while (mAttachedWorld.mWidgets[j] != this) {
                     j--;
                 }
-                tempObj = mAttachedWorld.mObjects[j];
+                tempWidget = mAttachedWorld.mWidgets[j];
                 while (i != j) {
-                    mAttachedWorld.mObjects[j] = mAttachedWorld.mObjects[j + 1];
+                    mAttachedWorld.mWidgets[j] = mAttachedWorld.mWidgets[j + 1];
                     j++;
                 }
-                mAttachedWorld.mObjects[j] = tempObj;
+                mAttachedWorld.mWidgets[j] = tempWidget;
             }
         }
         mZ = z;
-        if(mAttachedWorld!=null) calculateScale(mAttachedWorld);
     }
 
     @WorkerThread
     public void moveXY(float x, float y){
         mX = x;
         mY = y;
-        if(mAttachedWorld!=null) calculateRenderXY(mAttachedWorld);
-    }
-
-    @WorkerThread
-    void calculateScale(@NonNull World world){
-        if(mZ<world.mCameraZ) {
-            mIsInCameraRange = true;
-            mScale = world.mFocusedZ / (world.mCameraZ - mZ);
-            calculateRenderXY(world);
-        }else{
-            mIsInCameraRange = false;
-        }
-    }
-
-    @WorkerThread
-    void calculateRenderXY(@NonNull World world){
-        mRenderX = (world.mViewportWidth / 2f) - (world.mViewportX - mX) * mScale;
-        mRenderY = (world.mViewportHeight / 2f) - (world.mViewportY - mY) * mScale;
         calculateBoundary();
     }
 
+    /**
+     * 위젯 생성자 마지막에 한번 호출해주기
+     */
+    @WorkerThread
+    abstract void calculateBoundary();
+
     public interface OnTouchListener{
         @WorkerThread
-        void onTouchDown(@Nullable World attachedWorld, @NonNull Object object, int x, int y);
+        void onTouchDown(@Nullable World attachedWorld, @NonNull Widget widget, int x, int y);
         @WorkerThread
-        void onTouchUp(@Nullable World attachedWorld, @NonNull Object object, int x, int y);
+        void onTouchUp(@Nullable World attachedWorld, @NonNull Widget widget, int x, int y);
         @WorkerThread
-        void onTouchCancel(@Nullable World attachedWorld, @NonNull Object object);
+        void onTouchCancel(@Nullable World attachedWorld, @NonNull Widget widget);
         @WorkerThread
-        void onTouchDrag(@Nullable World attachedWorld, @NonNull Object object, int x, int y);
+        void onTouchDrag(@Nullable World attachedWorld, @NonNull Widget widget, int x, int y);
     }
 
     @WorkerThread
@@ -267,7 +226,7 @@ public abstract class Object {
 
     @WorkerThread
     boolean checkTouchDown(int x, int y){
-        if(isClickable() &&mIsInCameraRange&&checkBoundary(x, y)){
+        if(isClickable()&&checkBoundary(x, y)){
             mIsPressed = true;
             onTouchDown(x, y);
             return mConsumeTouchEvent;
@@ -288,7 +247,7 @@ public abstract class Object {
     void checkTouchUp(int x, int y){
         if(mIsPressed){
             mIsPressed = false;
-            if(mIsInCameraRange&&checkBoundary(x, y)){
+            if(checkBoundary(x, y)){
                 onTouchUp(x, y);
                 onClick();
             }else{
@@ -300,7 +259,7 @@ public abstract class Object {
     @WorkerThread
     boolean checkDrag(int x, int y){
         if(mIsPressed){
-            if(mIsInCameraRange&&checkBoundary(x, y)){
+            if(checkBoundary(x, y)){
                 onTouchDrag(x, y);
                 return mConsumeDragEvent;
             }else{
@@ -338,14 +297,14 @@ public abstract class Object {
 
     interface ChildListener{
         @WorkerThread
-        void onClick(@Nullable World attachedWorld, @NonNull Object object);
+        void onClick(@Nullable World attachedWorld, @NonNull Widget widget);
         @WorkerThread
-        void onTouchDown(@Nullable World attachedWorld, @NonNull Object object, int x, int y);
+        void onTouchDown(@Nullable World attachedWorld, @NonNull Widget widget, int x, int y);
         @WorkerThread
-        void onTouchUp(@Nullable World attachedWorld, @NonNull Object object, int x, int y);
+        void onTouchUp(@Nullable World attachedWorld, @NonNull Widget widget, int x, int y);
         @WorkerThread
-        void onTouchCancel(@Nullable World attachedWorld, @NonNull Object object);
+        void onTouchCancel(@Nullable World attachedWorld, @NonNull Widget widget);
         @WorkerThread
-        void onTouchDrag(@Nullable World attachedWorld, @NonNull Object object, int x, int y);
+        void onTouchDrag(@Nullable World attachedWorld, @NonNull Widget widget, int x, int y);
     }
 }

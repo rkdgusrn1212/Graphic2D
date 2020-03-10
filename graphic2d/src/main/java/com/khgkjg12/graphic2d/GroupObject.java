@@ -17,11 +17,11 @@ public class GroupObject extends Object{
      * @param x                    그룹 기준 x-coordinate.
      * @param y                    그룹 기준 y-coordinate.
      * @param groupSize            그룹으로 묶일수 있는 최대 갯수.
-     * @param childClickable            OnClickGroup 호출 여부.
+     * @param childClickable       OnClickGroup 호출 여부.
      * @param onClickChildListener touch event callback {@link OnClickChildListener}
      */
     @WorkerThread
-    public GroupObject(float z, int x, int y, int groupSize, boolean childClickable, @Nullable OnClickChildListener onClickChildListener) {
+    public GroupObject(float z, float x, float y, int groupSize, boolean childClickable, @Nullable OnClickChildListener onClickChildListener) {
         super(z, x, y, false, false, null);
         mOnClickChildListener = onClickChildListener;
         mGroupSize = groupSize;
@@ -39,7 +39,7 @@ public class GroupObject extends Object{
         return mChildClickable;
     }
 
-    public Object getObject(int idx) {
+    public Object getChild(int idx) {
         return mObjectList[idx];
     }
 
@@ -67,7 +67,7 @@ public class GroupObject extends Object{
      * @param idx 대상 인덱스.
      */
     @WorkerThread
-    public void putObject(Object obj, @IntRange(from = 0) int idx) {
+    public void putChild(Object obj, @IntRange(from = 0) int idx) {
         if (mObjectList[idx] != null) {
             mObjectList[idx].leaveGroup();
             if (mAttachedWorld != null) {
@@ -118,9 +118,9 @@ public class GroupObject extends Object{
 
     @WorkerThread
     @Override
-    public void moveXY(int x, int y) {
-        int deltaX = x - mX;
-        int deltaY = y - mY;
+    public void moveXY(float x, float y) {
+        float deltaX = x - mX;
+        float deltaY = y - mY;
         mX = x;
         mY = y;
         for (int i = 0; i < mGroupSize; i++) {

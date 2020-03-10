@@ -14,7 +14,6 @@ public class TextWidget extends PaintableWidget {
     private float mRight;
     private float mTop;
     private float mBottom;
-    private float mScaledSize;
     private float mTextWidth;
     private float mTextHeight;
 

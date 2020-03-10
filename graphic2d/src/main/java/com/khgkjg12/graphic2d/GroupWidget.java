@@ -39,7 +39,7 @@ public class GroupWidget extends Widget {
         return mChildClickable;
     }
 
-    public Widget getWidget(int idx) {
+    public Widget getChild(int idx) {
         return mWidgetList[idx];
     }
 
@@ -48,7 +48,7 @@ public class GroupWidget extends Widget {
     }
 
     @WorkerThread
-    public void setGroupSize(@IntRange(from=1) int groupSize) {
+    public void changeGroupSize(@IntRange(from=1) int groupSize) {
         Widget[] tempArray = new Widget[groupSize];
         System.arraycopy(mWidgetList, 0, tempArray, 0, Math.min(groupSize, mGroupSize));
         mGroupSize = groupSize;

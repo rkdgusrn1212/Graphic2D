@@ -48,7 +48,7 @@ public class World {
     private OnClickWorldListener mOnClickWorldListener;
 
 
-    World(int width, int height, int viewportX, int viewportY, float cameraZ, float minCameraZ, float maxCameraZ, float focusedZ, int backgroundColor, boolean dragToMove, boolean pinchToZoom, int maxObjectCount){
+    World(int width, int height, int viewportX, int viewportY, float cameraZ, float minCameraZ, float maxCameraZ, float focusedZ, int backgroundColor, boolean dragToMove, boolean pinchToZoom, int maxObjectCount, int maxWidgetCount){
         mWidth = width;
         mHeight = height;
         mViewportX = viewportX;
@@ -60,8 +60,9 @@ public class World {
         mMaxObjectCount = maxObjectCount;
         mObjectCount = 0;
         mObjects = new Object[maxObjectCount];
+        mMaxWidgetCount = maxWidgetCount;
         mWidgetCount = 0;
-        mWidgets = new Widget[10];
+        mWidgets = new Widget[maxWidgetCount];
         mBackgroundColor = backgroundColor;
         mDragToMove = dragToMove;
         mPinchToZoom = pinchToZoom;
@@ -90,6 +91,10 @@ public class World {
 
     public int getMaxObjectCount(){
         return mMaxObjectCount;
+    }
+
+    public int getMaxWidgetCount(){
+        return mMaxWidgetCount;
     }
 
     /**

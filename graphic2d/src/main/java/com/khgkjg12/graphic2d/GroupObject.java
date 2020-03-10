@@ -48,7 +48,7 @@ public class GroupObject extends Object{
     }
 
     @WorkerThread
-    public void setGroupSize(@IntRange(from=1) int groupSize) {
+    public void changeGroupSize(@IntRange(from=1) int groupSize) {
         Object[] tempArray = new Object[groupSize];
         System.arraycopy(mObjectList, 0, tempArray, 0, Math.min(groupSize, mGroupSize));
         mGroupSize = groupSize;

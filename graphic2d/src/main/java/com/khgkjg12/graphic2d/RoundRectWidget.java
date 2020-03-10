@@ -6,8 +6,8 @@ public class RoundRectWidget extends RectWidget {
 
     private float mRY, mRX;
 
-    public RoundRectWidget(float z, float x, float y, boolean visibility, boolean clickable, boolean autoShadow, OnClickListener onClickListener, int width, int height, int color, float rX, float rY) {
-        super(z, x, y, visibility, clickable, autoShadow, onClickListener, width, height, color);
+    public RoundRectWidget(float z, float x, float y, boolean visibility, boolean clickable, OnClickListener onClickListener, int color, boolean autoShadow, int width, int height, float rX, float rY) {
+        super(z, x, y, visibility, clickable, onClickListener, color, autoShadow, width, height);
         mRX = rX;
         mRY = rY;
     }

@@ -26,13 +26,18 @@ import android.os.Bundle;
 import android.util.Log;
 
 import com.khgkjg12.graphic2d.GridObject;
+import com.khgkjg12.graphic2d.GridWidget;
 import com.khgkjg12.graphic2d.GroupObject;
+import com.khgkjg12.graphic2d.GroupWidget;
 import com.khgkjg12.graphic2d.Object;
 import com.khgkjg12.graphic2d.RoundRectObject;
+import com.khgkjg12.graphic2d.RoundRectWidget;
 import com.khgkjg12.graphic2d.TextObject;
+import com.khgkjg12.graphic2d.TextWidget;
 import com.khgkjg12.graphic2d.Texture;
 import com.khgkjg12.graphic2d.Graphic2dDrawer;
 import com.khgkjg12.graphic2d.Graphic2dRenderView;
+import com.khgkjg12.graphic2d.Widget;
 import com.khgkjg12.graphic2d.World;
 
 import static android.view.WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON;
@@ -46,19 +51,19 @@ import static android.view.WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON;
  * 2D오브젝트의 클릭: 검은 돌과 하얀돌을 클릭하면 해당 객체에 지정된 클릭 리스너가 실행됨. 클릭시 효과음도 설정;
  */
 
-public class MainActivity extends Activity implements Graphic2dRenderView.Renderer, GridObject.OnClickGridListener, GroupObject.OnClickChildListener {
+public class MainActivity extends Activity implements Graphic2dRenderView.Renderer, GridWidget.OnClickGridListener, GroupWidget.OnClickChildListener {
 
     public static Texture background;
     public static Texture blackStone;
     private Graphic2dRenderView renderView;
     private float startTime = 0;
     private boolean flip = false;
-    private Object flipObject = null;
+    private Widget flipObject = null;
     private boolean pop = false;
-    private Object popObject = null;
+    private Widget popObject = null;
     private float timeAcc = 0;
     private int count = 0;
-    GridObject gridObject;
+    GridWidget gridObject;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -88,8 +93,8 @@ public class MainActivity extends Activity implements Graphic2dRenderView.Render
             }
             world.putObject(horLine);
         }*/
-        gridObject = new GridObject(0,0,0,800, 800, 8, 8,true, this, true, this);
-        world.putObject(gridObject);
+        gridObject = new GridWidget(0,0,0,800, 800, 8, 8,true, this, true, this);
+        world.putWidget(gridObject);
         /*for(int i=0;i<8;i++){
             for(int j=0; j<8; j++) {
                 gridObject.putObject(world, new TextObject("lplplp", Typeface.SANS_SERIF, Color.BLACK, 100, 0, 0, 0, true, true), i, j);
@@ -141,10 +146,10 @@ public class MainActivity extends Activity implements Graphic2dRenderView.Render
     }
 
     @Override
-    public void onClickGrid(World world, GridObject gridObject, Object object, int row, int column) {
-        RoundRectObject rro = new RoundRectObject(gridObject.getZ(), gridObject.getColumnX(column), gridObject.getRowY(row), true, true, null, Color.YELLOW, true, 100, 100, 10, 10);
+    public void onClickGrid(World world, GridWidget gridWidget, Widget widget, int row, int column) {
+        RoundRectWidget rro = new RoundRectWidget(gridObject.getZ(), gridObject.getColumnX(column), gridObject.getRowY(row), true, true, null, Color.YELLOW, true, 100, 100, 10, 10);
         gridObject.putChild(rro, row, column);
-        world.putObject(new TextObject(gridObject.getZ(), gridObject.getColumnX(column), gridObject.getRowY(row), true, true, null, Color.BLACK, false, "158", 60, Paint.Align.LEFT,Typeface.SERIF));
+        world.putWidget(new TextWidget(gridObject.getZ(), gridObject.getColumnX(column), gridObject.getRowY(row), true, true, null, Color.BLACK, false, "158", 60, Paint.Align.CENTER,Typeface.SERIF));
         //gridObject.putObject(new TextObject( gridObject.getZ(), gridObject.getColumnX(column),gridObject.getRowY(row), true , true,null, "IgIg", 100, Typeface.SERIF, Color.WHITE), row, column);
     }
 
@@ -166,7 +171,7 @@ public class MainActivity extends Activity implements Graphic2dRenderView.Render
     }
 
     @Override
-    public void onClickChild(World attachedWorld, GroupObject groupObject, Object object, int idx) {
+    public void onClickChild(World attachedWorld, GroupWidget groupWidget, Widget widget, int idx) {
         pop = true;
         popObject = gridObject;
     }

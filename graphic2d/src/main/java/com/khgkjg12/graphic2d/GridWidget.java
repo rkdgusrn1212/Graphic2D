@@ -15,20 +15,19 @@
  */
 package com.khgkjg12.graphic2d;
 
+import android.support.annotation.GuardedBy;
 import android.support.annotation.Nullable;
 import android.support.annotation.WorkerThread;
 
-public class GridObject extends GroupObject {
+public class GridWidget extends GroupWidget {
     private int mRow, mColumn;
     private OnClickGridListener mOnClickGridListener;
     private float mWidth;
     private float mHeight;
-    private float mRenderWidth;
-    private float mRenderHeight;
-    private float mRenderLeft;
-    private float mRenderRight;
-    private float mRenderTop;
-    private float mRenderBottom;
+    private float mLeft;
+    private float mTop;
+    private float mBottom;
+    private float mRight;
     private int mPressedRow;
     private int mPressedColumn;
     private OnTouchGridListener mOnTouchGridListener;
@@ -46,12 +45,16 @@ public class GridObject extends GroupObject {
      * @param onClickGridListener touch event callback {@link OnClickGridListener}
      */
     @WorkerThread
-    public GridObject(float z, float x, float y, float width, float height, int row, int column, boolean childClickable, @Nullable OnClickChildListener onClickChildListener, boolean gridClickable, @Nullable OnClickGridListener onClickGridListener){
+    public GridWidget(float z, float x, float y, float width, float height, int row, int column, boolean childClickable, @Nullable OnClickChildListener onClickChildListener, boolean gridClickable, @Nullable OnClickGridListener onClickGridListener){
         super(z, x, y, row*column,childClickable, onClickChildListener);
         mWidth = width;
         mHeight = height;
         mRow = row;
         mColumn = column;
+        mLeft =  mX - mWidth/2;
+        mTop = mY - mHeight/2;
+        mRight = mLeft + mWidth;
+        mBottom = mTop + mHeight;
         mOnClickGridListener = onClickGridListener;
         mOnTouchGridListener = null;
         setClickable(gridClickable);
@@ -63,7 +66,7 @@ public class GridObject extends GroupObject {
     }
 
     @WorkerThread
-    public Object getChild(int row, int column){
+    public Widget getChild(int row, int column){
         return super.getChild(mColumn*row+column);
     }
 
@@ -83,17 +86,17 @@ public class GridObject extends GroupObject {
     }
 
     @WorkerThread
-    public void putChild(Object obj, int row, int column){
-        super.putChild(obj, row*mColumn+column);
+    public void putChild(Widget widget, int row, int column){
+        super.putChild(widget, row*mColumn+column);
     }
 
     /**
-     * @param object
+     * @param widget
      * @return child가 아니면 -1.
      */
     @WorkerThread
-    public int getChildRow(Object object){
-        int idx = getChildIndex(object);
+    public int getChildRow(Widget widget){
+        int idx = getChildIndex(widget);
         if(idx!=-1){
             return idx/mColumn;
         }else{
@@ -102,12 +105,12 @@ public class GridObject extends GroupObject {
     }
 
     /**
-     * @param object
+     * @param widget
      * @return child가 아니면 -1.
      */
     @WorkerThread
-    public int getChildColumn(Object object){
-        int idx = getChildIndex(object);
+    public int getChildColumn(Widget widget){
+        int idx = getChildIndex(widget);
         if(idx!=-1){
             return idx%mColumn;
         }else{
@@ -118,16 +121,16 @@ public class GridObject extends GroupObject {
     @WorkerThread
     @Override
     boolean checkBoundary(int x, int y) {
-        return x < mRenderRight && x > mRenderLeft && y < mRenderBottom && y > mRenderTop;
+        return x < mRight && x > mLeft && y < mBottom && y > mTop;
     }
 
 
     //해당 메소드가 오직 world.onTouch를 통해서만 호출된다 가정.
     @WorkerThread
     boolean checkTouchDown(int x, int y){
-        if(isClickable()&&mIsInCameraRange&&checkBoundary(x, y)){
-            mPressedColumn = (int) ((x - mRenderLeft) * mColumn / mRenderWidth);
-            mPressedRow = (int) ((y - mRenderTop) * mRow / mRenderHeight);
+        if(isClickable()&&checkBoundary(x, y)){
+            mPressedColumn = (int) ((x - mLeft) * mColumn / mWidth);
+            mPressedRow = (int) ((y - mTop) * mRow / mHeight);
             mIsPressed = true;
             onTouchDown(x, y);
             onGridTouchDown(x, y, mPressedRow, mPressedColumn);
@@ -152,9 +155,9 @@ public class GridObject extends GroupObject {
     void checkTouchUp(int x, int y){
         if(mIsPressed){
             mIsPressed = false;
-            int column = (int) ((x - mRenderLeft) * mColumn / mRenderWidth);
-            int row = (int) ((y - mRenderTop) * mRow / mRenderHeight);
-            if(mIsInCameraRange&&checkBoundary(x, y)&&column==mPressedColumn&&row==mPressedRow){
+            int column = (int) ((x - mLeft) * mColumn / mWidth);
+            int row = (int) ((y - mTop) * mRow / mHeight);
+            if(checkBoundary(x, y)&&column==mPressedColumn&&row==mPressedRow){
                 onTouchUp(x, y);
                 onGridTouchUp(x, y, mPressedRow, mPressedColumn);
                 onClick();
@@ -170,9 +173,9 @@ public class GridObject extends GroupObject {
     @WorkerThread
     boolean checkDrag(int x, int y){
         if(mIsPressed){
-            int column = (int) ((x - mRenderLeft) * mColumn / mRenderWidth);
-            int row = (int) ((y - mRenderTop) * mRow / mRenderHeight);
-            if(mIsInCameraRange&&checkBoundary(x, y)&&column==mPressedColumn&&row==mPressedRow){
+            int column = (int) ((x - mLeft) * mColumn / mWidth);
+            int row = (int) ((y - mTop) * mRow / mHeight);
+            if(checkBoundary(x, y)&&column==mPressedColumn&&row==mPressedRow){
                 onTouchDrag(x, y);
                 onGridTouchDrag(x, y, mPressedRow, mPressedColumn);
                 return mConsumeDragEvent;
@@ -187,13 +190,13 @@ public class GridObject extends GroupObject {
 
     public interface OnTouchGridListener{
         @WorkerThread
-        void onTouchGridDown(World world, GridObject gridObject, int x, int y, int row, int column);
+        void onTouchGridDown(World world, GridWidget gridWidget, int x, int y, int row, int column);
         @WorkerThread
-        void onTouchGridUp(World world, GridObject gridObject, int x, int y, int row, int column);
+        void onTouchGridUp(World world, GridWidget gridWidget, int x, int y, int row, int column);
         @WorkerThread
-        void onTouchGridCancel(World world, GridObject gridObject, int row, int column);
+        void onTouchGridCancel(World world, GridWidget gridWidget, int row, int column);
         @WorkerThread
-        void onTouchGridDrag(World world, GridObject gridObject, int x, int y, int row, int column);
+        void onTouchGridDrag(World world, GridWidget gridWidget, int x, int y, int row, int column);
     }
 
     @WorkerThread
@@ -229,12 +232,10 @@ public class GridObject extends GroupObject {
 
     @Override
     void calculateBoundary() {
-        mRenderWidth = mWidth * mScale;
-        mRenderHeight = mHeight *mScale;
-        mRenderLeft =  mRenderX - mRenderWidth/2;
-        mRenderTop = mRenderY - mRenderHeight/2;
-        mRenderRight = mRenderLeft + mRenderWidth;
-        mRenderBottom = mRenderTop + mRenderHeight;
+        mLeft =  mX - mWidth/2;
+        mTop = mY - mHeight/2;
+        mRight = mLeft + mWidth;
+        mBottom = mTop + mHeight;
     }
 
     @Override
@@ -242,7 +243,7 @@ public class GridObject extends GroupObject {
 
     public interface OnClickGridListener {
         @WorkerThread
-        void onClickGrid(World world, GridObject gridObject, @Nullable Object object, int row, int column);
+        void onClickGrid(World world, GridWidget gridWidget, @Nullable Widget widget, int row, int column);
     }
 
 

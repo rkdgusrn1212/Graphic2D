@@ -8,9 +8,8 @@ public class RectWidget extends PaintableWidget {
     float mLeft, mRight, mTop, mBottom;
 
     @WorkerThread
-    public RectWidget(float z, float x, float y, boolean visibility, boolean clickable, boolean autoShadow, Widget.OnClickListener onClickListener, float width, float height, int color){
-        super(z, x, y, visibility, clickable, autoShadow, onClickListener);
-        mPaint.setColor(color);
+    public RectWidget(float z, float x, float y, boolean visibility, boolean clickable, Widget.OnClickListener onClickListener, int color, boolean autoShadow, float width, float height){
+        super(z, x, y, visibility, clickable, onClickListener, color, autoShadow);
         mWidth = width;
         mHeight = height;
         mLeft = mX - width/2;
@@ -41,14 +40,6 @@ public class RectWidget extends PaintableWidget {
     @WorkerThread
     boolean checkBoundary(int x, int y) {
         return x < mRight && x > mLeft && y < mBottom && y > mTop;
-    }
-
-    /**
-     * world 콜백에서만 호출.
-     * */
-    @WorkerThread
-    public void changeColor(int color){
-        mPaint.setColor(color);
     }
 
     @Override

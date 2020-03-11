@@ -24,6 +24,23 @@ public class TextWidget extends PaintableWidget {
         mPaint.setTextSize(textSize);
         mText = text;
         mBound = new Rect();
+        mPaint.getTextBounds(mText, 0, mText.length(), mBound);
+        mTextHeight = mBound.height();
+        mTextWidth = mBound.width();
+        mTop = mY - mTextHeight/2;
+        mBottom = mTop + mTextHeight;
+        Paint.Align align = mPaint.getTextAlign();
+        if(align != Paint.Align.RIGHT){
+            if(align == Paint.Align.CENTER) {
+                mLeft = mX-mTextWidth/2;
+            }else {
+                mLeft = mX;
+            }
+            mRight = mLeft + mTextWidth;
+        }else{
+            mRight = mX;
+            mLeft = mRight - mTextWidth;
+        }
     }
 
     @WorkerThread

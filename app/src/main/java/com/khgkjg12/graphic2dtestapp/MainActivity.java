@@ -30,6 +30,7 @@ import com.khgkjg12.graphic2d.GridWidget;
 import com.khgkjg12.graphic2d.GroupObject;
 import com.khgkjg12.graphic2d.GroupWidget;
 import com.khgkjg12.graphic2d.Object;
+import com.khgkjg12.graphic2d.OvalWidget;
 import com.khgkjg12.graphic2d.RoundRectObject;
 import com.khgkjg12.graphic2d.RoundRectWidget;
 import com.khgkjg12.graphic2d.TextObject;
@@ -147,9 +148,9 @@ public class MainActivity extends Activity implements Graphic2dRenderView.Render
 
     @Override
     public void onClickGrid(World world, GridWidget gridWidget, Widget widget, int row, int column) {
-        RoundRectWidget rro = new RoundRectWidget(gridObject.getZ(), gridObject.getColumnX(column), gridObject.getRowY(row), true, true, null, Color.YELLOW, true, 100, 100, 10, 10);
+        OvalWidget rro = new OvalWidget(gridObject.getZ(), gridObject.getColumnX(column), gridObject.getRowY(row), true, true, null, Color.YELLOW, true, 50, 100);
         gridObject.putChild(rro, row, column);
-        world.putWidget(new TextWidget(gridObject.getZ(), gridObject.getColumnX(column), gridObject.getRowY(row), true, true, null, Color.BLACK, false, "158", 60, Paint.Align.CENTER,Typeface.SERIF));
+        world.putWidget(new TextWidget(gridObject.getZ(), gridObject.getColumnX(column), gridObject.getRowY(row), true, false, null, Color.BLACK, false, "158", 60, Paint.Align.CENTER,Typeface.SERIF));
         //gridObject.putObject(new TextObject( gridObject.getZ(), gridObject.getColumnX(column),gridObject.getRowY(row), true , true,null, "IgIg", 100, Typeface.SERIF, Color.WHITE), row, column);
     }
 

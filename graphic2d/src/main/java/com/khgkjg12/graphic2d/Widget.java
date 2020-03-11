@@ -175,7 +175,7 @@ public abstract class Widget {
                 }
                 mAttachedWorld.mWidgets[j] = tempWidget;
             } else {
-                int i = mAttachedWorld.mObjectCount - 1;
+                int i = mAttachedWorld.mWidgetCount - 1;
                 while (mAttachedWorld.mWidgets[i].mZ <= z) {
                     i--;
                 }

@@ -25,7 +25,7 @@ public class World {
     private int mWidth, mHeight;//0은 무한.
     Object[] mObjects;
     Widget[] mWidgets;
-    private int mWidgetCount;
+    int mWidgetCount;
     private int mMaxWidgetCount;
     boolean isDragging = false;
     int startX, startY;

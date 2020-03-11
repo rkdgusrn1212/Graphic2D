@@ -4,15 +4,19 @@ import android.graphics.RectF;
 import android.support.annotation.FloatRange;
 import android.support.annotation.WorkerThread;
 
-public class OvalObject extends PaintableObject {
+public class OvalWidget extends PaintableWidget {
     float mWidth, mHeight;
     RectF mRenderRect;
     @WorkerThread
-    public OvalObject(float z, float x, float y, boolean visibility, boolean clickable, OnClickListener onClickListener, int color, boolean autoShadow, @FloatRange(from = 0, fromInclusive = false) float width, @FloatRange(from = 0, fromInclusive = false) float height){
+    public OvalWidget(float z, float x, float y, boolean visibility, boolean clickable, OnClickListener onClickListener, int color, boolean autoShadow, @FloatRange(from = 0, fromInclusive = false) float width, @FloatRange(from = 0, fromInclusive = false) float height){
         super(z, x, y, visibility, clickable, onClickListener, color, autoShadow);
         mWidth = width;
         mHeight = height;
         mRenderRect = new RectF();
+        mRenderRect.left = mX - mWidth/2;
+        mRenderRect.top = mY - mHeight/2;
+        mRenderRect.right = mRenderRect.left + mWidth;
+        mRenderRect.bottom = mRenderRect.top + mHeight;
     }
 
     @WorkerThread
@@ -36,8 +40,8 @@ public class OvalObject extends PaintableObject {
     @Override
     @WorkerThread
     boolean checkBoundary(int x, int y) {
-        float deltaX = x - mRenderX;
-        float deltaY = y - mRenderY;
+        float deltaX = x - mX;
+        float deltaY = y - mY;
         float xRadius = mRenderRect.width()/2;
         float yRadius = mRenderRect.height()/2;
         return (deltaX*deltaX)/(xRadius*xRadius)+(deltaY*deltaY)/(yRadius*yRadius)<=1;
@@ -45,12 +49,10 @@ public class OvalObject extends PaintableObject {
 
     @Override
     void calculateBoundary(){
-        float renderWidth = mWidth *mScale;
-        float renderHeight = mHeight *mScale;
-        mRenderRect.left = mRenderX - renderWidth/2;
-        mRenderRect.top = mRenderY - renderHeight/2;
-        mRenderRect.right = mRenderRect.left + renderWidth;
-        mRenderRect.bottom = mRenderRect.top + renderHeight;
+        mRenderRect.left = mX - mWidth/2;
+        mRenderRect.top = mY - mHeight/2;
+        mRenderRect.right = mRenderRect.left + mWidth;
+        mRenderRect.bottom = mRenderRect.top + mHeight;
     }
 
     @Override

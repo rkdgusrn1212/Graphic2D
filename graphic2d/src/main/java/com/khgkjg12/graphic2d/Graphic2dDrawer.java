@@ -145,6 +145,14 @@ public class Graphic2dDrawer {
         mCanvas.drawText(text, x, y, paint);
     }
 
+    public void drawOval(RectF rectF, Paint paint){
+        mCanvas.drawOval(rectF, paint);
+    }
+
+    public void drawCircle(float cx, float cy, float radius, Paint paint){
+        mCanvas.drawCircle(cx, cy, radius, paint);
+    }
+
     public Bitmap getFrameBuffer() {
         return mFrameBuffer;
     }

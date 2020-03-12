@@ -25,6 +25,7 @@ import android.graphics.Typeface;
 import android.os.Bundle;
 import android.util.Log;
 
+import com.khgkjg12.graphic2d.CircleWidget;
 import com.khgkjg12.graphic2d.GridObject;
 import com.khgkjg12.graphic2d.GridWidget;
 import com.khgkjg12.graphic2d.GroupObject;
@@ -148,7 +149,7 @@ public class MainActivity extends Activity implements Graphic2dRenderView.Render
 
     @Override
     public void onClickGrid(World world, GridWidget gridWidget, Widget widget, int row, int column) {
-        OvalWidget rro = new OvalWidget(gridObject.getZ(), gridObject.getColumnX(column), gridObject.getRowY(row), true, true, null, Color.YELLOW, true, 50, 100);
+        CircleWidget rro = new CircleWidget(gridObject.getZ(), gridObject.getColumnX(column), gridObject.getRowY(row), true, true, null, Color.YELLOW, true, 50);
         gridObject.putChild(rro, row, column);
         world.putWidget(new TextWidget(gridObject.getZ(), gridObject.getColumnX(column), gridObject.getRowY(row), true, false, null, Color.BLACK, false, "158", 60, Paint.Align.CENTER,Typeface.SERIF));
         //gridObject.putObject(new TextObject( gridObject.getZ(), gridObject.getColumnX(column),gridObject.getRowY(row), true , true,null, "IgIg", 100, Typeface.SERIF, Color.WHITE), row, column);

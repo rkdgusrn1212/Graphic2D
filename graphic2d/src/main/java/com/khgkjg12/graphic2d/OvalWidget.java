@@ -42,8 +42,8 @@ public class OvalWidget extends PaintableWidget {
     boolean checkBoundary(int x, int y) {
         float deltaX = x - mX;
         float deltaY = y - mY;
-        float xRadius = mRenderRect.width()/2;
-        float yRadius = mRenderRect.height()/2;
+        float xRadius = mWidth/2;
+        float yRadius = mHeight/2;
         return (deltaX*deltaX)/(xRadius*xRadius)+(deltaY*deltaY)/(yRadius*yRadius)<=1;
     }
 

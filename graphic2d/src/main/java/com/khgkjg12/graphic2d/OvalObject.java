@@ -6,6 +6,7 @@ import android.support.annotation.WorkerThread;
 
 public class OvalObject extends PaintableObject {
     float mWidth, mHeight;
+    float mRenderWidth, mRenderHeight;
     RectF mRenderRect;
     @WorkerThread
     public OvalObject(float z, float x, float y, boolean visibility, boolean clickable, OnClickListener onClickListener, int color, boolean autoShadow, @FloatRange(from = 0, fromInclusive = false) float width, @FloatRange(from = 0, fromInclusive = false) float height){
@@ -38,19 +39,19 @@ public class OvalObject extends PaintableObject {
     boolean checkBoundary(int x, int y) {
         float deltaX = x - mRenderX;
         float deltaY = y - mRenderY;
-        float xRadius = mRenderRect.width()/2;
-        float yRadius = mRenderRect.height()/2;
+        float xRadius = mRenderWidth/2;
+        float yRadius = mRenderHeight/2;
         return (deltaX*deltaX)/(xRadius*xRadius)+(deltaY*deltaY)/(yRadius*yRadius)<=1;
     }
 
     @Override
     void calculateBoundary(){
-        float renderWidth = mWidth *mScale;
-        float renderHeight = mHeight *mScale;
-        mRenderRect.left = mRenderX - renderWidth/2;
-        mRenderRect.top = mRenderY - renderHeight/2;
-        mRenderRect.right = mRenderRect.left + renderWidth;
-        mRenderRect.bottom = mRenderRect.top + renderHeight;
+        mRenderWidth = mWidth *mScale;
+        mRenderHeight = mHeight *mScale;
+        mRenderRect.left = mRenderX - mRenderWidth/2;
+        mRenderRect.top = mRenderY - mRenderHeight/2;
+        mRenderRect.right = mRenderRect.left + mRenderWidth;
+        mRenderRect.bottom = mRenderRect.top + mRenderHeight;
     }
 
     @Override

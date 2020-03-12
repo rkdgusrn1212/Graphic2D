@@ -179,8 +179,7 @@ public class MainActivity extends Activity implements Graphic2dRenderView.Render
 
     @Override
     public void onClickChild(World attachedWorld, GroupWidget groupWidget, Widget widget, int idx) {
-        ((GridWidget)groupWidget).changeSize(400, 200);
-      //  pop = true;
-       // popObject = gridObject;
+        pop = true;
+       popObject = gridObject;
     }
 }

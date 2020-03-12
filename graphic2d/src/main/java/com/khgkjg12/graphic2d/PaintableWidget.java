@@ -24,13 +24,11 @@ public abstract class PaintableWidget extends Widget {
         float shadow;
         if(mZ<0){
             shadow = 0;
-        }else if(mZ<10){
-            shadow = mZ;
         }else{
-            shadow = 10;
+            shadow = mZ;
         }
         if(shadow!=mShadow){
-            mPaint.setShadowLayer(mZ, mZ / 5, mZ / 2, Color.BLACK);
+            mPaint.setShadowLayer(mZ, mZ/8, mZ/4, Color.BLACK);
             mShadow = shadow;
         }
     }

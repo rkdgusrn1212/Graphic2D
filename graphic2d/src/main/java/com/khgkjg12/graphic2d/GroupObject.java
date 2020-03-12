@@ -6,8 +6,8 @@ import android.support.annotation.Nullable;
 import android.support.annotation.WorkerThread;
 
 public class GroupObject extends Object{
-    private Object[] mObjectList;
-    private int mGroupSize;
+    Object[] mObjectList;
+    int mGroupSize;
     private OnClickChildListener mOnClickChildListener;
     InnerItemListener mInnerItemListener;
 
@@ -39,6 +39,9 @@ public class GroupObject extends Object{
     @WorkerThread
     public void changeGroupSize(@IntRange(from=1) int groupSize) {
         Object[] tempArray = new Object[groupSize];
+        for(int i=groupSize;i<mGroupSize;i++){
+            putChild(null, i);
+        }
         System.arraycopy(mObjectList, 0, tempArray, 0, Math.min(groupSize, mGroupSize));
         mGroupSize = groupSize;
         mObjectList = tempArray;

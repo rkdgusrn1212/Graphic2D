@@ -6,8 +6,8 @@ import android.support.annotation.Nullable;
 import android.support.annotation.WorkerThread;
 
 public class GroupWidget extends Widget {
-    private Widget[] mWidgetList;
-    private int mGroupSize;
+    Widget[] mWidgetList;
+    int mGroupSize;
     private GroupWidget.OnClickChildListener mOnClickChildListener;
     GroupWidget.InnerItemListener mInnerItemListener;
 
@@ -39,6 +39,9 @@ public class GroupWidget extends Widget {
     @WorkerThread
     public void changeGroupSize(@IntRange(from=1) int groupSize) {
         Widget[] tempArray = new Widget[groupSize];
+        for(int i=groupSize;i<mGroupSize;i++){
+            putChild(null, i);
+        }
         System.arraycopy(mWidgetList, 0, tempArray, 0, Math.min(groupSize, mGroupSize));
         mGroupSize = groupSize;
         mWidgetList = tempArray;

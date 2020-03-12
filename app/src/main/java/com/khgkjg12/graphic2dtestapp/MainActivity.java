@@ -179,7 +179,12 @@ public class MainActivity extends Activity implements Graphic2dRenderView.Render
 
     @Override
     public void onClickChild(World attachedWorld, GroupWidget groupWidget, Widget widget, int idx) {
-        pop = true;
-       popObject = gridObject;
+        if(gridObject.getRowSize()==4) {
+            gridObject.changeGridSize(8,8);
+        }else{
+            gridObject.changeGridSize(4, 4);
+        }
+        //pop = true;
+        // popObject = gridObject;
     }
 }

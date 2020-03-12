@@ -105,7 +105,7 @@ public class GridObject extends GroupObject {
 
     @WorkerThread
     public Object getChild(int row, int column){
-        return super.getChild(mColumn*row+column);
+        return mObjectList[mColumn*row+column];
     }
 
     @WorkerThread
@@ -294,7 +294,7 @@ public class GridObject extends GroupObject {
      */
     @WorkerThread
     public float getRowY(int row){
-        return mY-(mHeight/2)+mHeight*row/mRow+((mHeight/mRow)/2);
+        return getRowY(row, mRow);
     }
 
     /**
@@ -304,7 +304,14 @@ public class GridObject extends GroupObject {
      */
     @WorkerThread
     public float getColumnX(int column){
-        return mX-(mWidth/2)+mWidth*column/mColumn+((mWidth/mColumn)/2);
+        return getColumnX(column, mColumn);
+    }
+
+    float getColumnX(int column, int columnSize){
+        return mX-(mWidth/2)+mWidth*column/columnSize+((mWidth/columnSize)/2);
+    }
+    float getRowY(int row, int rowSize){
+        return mY-(mHeight/2)+mHeight*row/rowSize+((mHeight/rowSize)/2);
     }
 
     @Override
@@ -322,5 +329,57 @@ public class GridObject extends GroupObject {
     public void moveXY(float x, float y) {
         super.moveXY(x, y);
         if(mAttachedWorld!=null) calculateRenderXY(mAttachedWorld);
+    }
+
+    public void changeGridSize(int row, int column){
+        super.changeGroupSize(row*column);
+        float[] lastColumnX = new float[mColumn];
+        for(int i=0; i<mColumn;i++){
+            lastColumnX[i] = getColumnX(i);
+        }
+        float[] columnX = new float[column];
+        float[] rowY = new float[row];
+        for(int i=0; i<column;i++){
+            columnX[i] = getColumnX(i, column);
+        }
+        for(int i=0; i<row;i++){
+            rowY[i] = getRowY(i, row);
+        }
+        int count =0;
+        for(int i=0; i<mRow; i++){
+            float lastRowY = getRowY(i);
+            for(int j=0; j<mColumn; j++){
+                if(count<mGroupSize) {
+                    Object object = mObjectList[count];
+                    if (object != null) {
+                        float deltaX = object.mX - lastColumnX[j];
+                        float deltaY = object.mY - lastRowY;
+                        object.moveXY(columnX[count % column] + deltaX, rowY[count / column] + deltaY);
+                    }
+                    count++;
+                }else{
+                    break;
+                }
+            }
+        }
+        mColumn = column;
+        mRow = row;
+    }
+
+    public void alignChild(){
+        float[] columnX = new float[mColumn];
+        for(int i=0; i<mColumn; i++){
+            columnX[i] = getColumnX(i);
+        }
+        int count = 0;
+        for(int i=0;i<mRow;i++){
+            float rowY = getRowY(i);
+            for(int j=0; j<mColumn;j++){
+                Object object = mObjectList[count++];
+                if(object!=null){
+                    object.moveXY(columnX[i],rowY);
+                }
+            }
+        }
     }
 }

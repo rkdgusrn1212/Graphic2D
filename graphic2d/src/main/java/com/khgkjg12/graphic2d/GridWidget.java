@@ -31,13 +31,14 @@ public class GridWidget extends GroupWidget {
     private int mPressedRow;
     private int mPressedColumn;
     private OnTouchGridListener mOnTouchGridListener;
+    private boolean mGridClickable;
 
     /**
      * @param z z-coordinate.
      * @param x x-coordinate.
      * @param y y-coordinate.
      * @param gridClickable 그리드 onClickGrid{@link OnClickGridListener} 호출 여부.
-     * @param childClickable 그리드 {@link OnClickChildListener} 호출여부.
+     * @param clickable 그리드 {@link OnClickChildListener} 호출여부.
      * @param width  x-axis length.
      * @param height y-axis length.
      * @param row number of rows.
@@ -45,8 +46,8 @@ public class GridWidget extends GroupWidget {
      * @param onClickGridListener touch event callback {@link OnClickGridListener}
      */
     @WorkerThread
-    public GridWidget(float z, float x, float y, float width, float height, int row, int column, boolean childClickable, @Nullable OnClickChildListener onClickChildListener, boolean gridClickable, @Nullable OnClickGridListener onClickGridListener){
-        super(z, x, y, row*column,childClickable, onClickChildListener);
+    public GridWidget(float z, float x, float y, float width, float height, int row, int column, boolean clickable, @Nullable OnClickChildListener onClickChildListener, boolean gridClickable, @Nullable OnClickGridListener onClickGridListener){
+        super(z, x, y, row*column,clickable, onClickChildListener);
         mWidth = width;
         mHeight = height;
         mRow = row;
@@ -57,7 +58,7 @@ public class GridWidget extends GroupWidget {
         mBottom = mTop + mHeight;
         mOnClickGridListener = onClickGridListener;
         mOnTouchGridListener = null;
-        setClickable(gridClickable);
+        mGridClickable = gridClickable;
     }
 
     @WorkerThread
@@ -121,7 +122,7 @@ public class GridWidget extends GroupWidget {
     @WorkerThread
     @Override
     boolean checkBoundary(int x, int y) {
-        return x < mRight && x > mLeft && y < mBottom && y > mTop;
+        return mGridClickable && x < mRight && x > mLeft && y < mBottom && y > mTop;
     }
 
 

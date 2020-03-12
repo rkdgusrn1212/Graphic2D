@@ -10,33 +10,22 @@ public class GroupObject extends Object{
     private int mGroupSize;
     private OnClickChildListener mOnClickChildListener;
     InnerItemListener mInnerItemListener;
-    boolean mChildClickable;
 
     /**
      * @param z                    그룹 기준 z-coordinate.
      * @param x                    그룹 기준 x-coordinate.
      * @param y                    그룹 기준 y-coordinate.
      * @param groupSize            그룹으로 묶일수 있는 최대 갯수.
-     * @param childClickable       OnClickGroup 호출 여부.
+     * @param clickable       OnClickGroup 호출 여부.
      * @param onClickChildListener touch event callback {@link OnClickChildListener}
      */
     @WorkerThread
-    public GroupObject(float z, float x, float y, int groupSize, boolean childClickable, @Nullable OnClickChildListener onClickChildListener) {
-        super(z, x, y, false, false, null);
+    public GroupObject(float z, float x, float y, int groupSize, boolean clickable, @Nullable OnClickChildListener onClickChildListener) {
+        super(z, x, y, false, clickable, null);
         mOnClickChildListener = onClickChildListener;
         mGroupSize = groupSize;
         mObjectList = new Object[mGroupSize];
         mInnerItemListener = new InnerItemListener();
-        mChildClickable = childClickable;
-    }
-
-    @WorkerThread
-    public void setChildClickable(boolean childClickable){
-        mChildClickable = childClickable;
-    }
-
-    public boolean getChildClickable(){
-        return mChildClickable;
     }
 
     public Object getChild(int idx) {

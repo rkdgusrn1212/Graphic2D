@@ -31,6 +31,7 @@ public class GridObject extends GroupObject {
     private float mRenderBottom;
     private int mPressedRow;
     private int mPressedColumn;
+    private boolean mGridClickable;
     private OnTouchGridListener mOnTouchGridListener;
 
     /**
@@ -38,7 +39,7 @@ public class GridObject extends GroupObject {
      * @param x x-coordinate.
      * @param y y-coordinate.
      * @param gridClickable 그리드 onClickGrid{@link OnClickGridListener} 호출 여부.
-     * @param childClickable 그리드 {@link OnClickChildListener} 호출여부.
+     * @param clickable 전체 클릭이벤트  여부.
      * @param width  x-axis length.
      * @param height y-axis length.
      * @param row number of rows.
@@ -46,15 +47,15 @@ public class GridObject extends GroupObject {
      * @param onClickGridListener touch event callback {@link OnClickGridListener}
      */
     @WorkerThread
-    public GridObject(float z, float x, float y, float width, float height, int row, int column, boolean childClickable, @Nullable OnClickChildListener onClickChildListener, boolean gridClickable, @Nullable OnClickGridListener onClickGridListener){
-        super(z, x, y, row*column,childClickable, onClickChildListener);
+    public GridObject(float z, float x, float y, float width, float height, int row, int column, boolean clickable, @Nullable OnClickChildListener onClickChildListener, boolean gridClickable, @Nullable OnClickGridListener onClickGridListener){
+        super(z, x, y, row*column, clickable, onClickChildListener);
         mWidth = width;
         mHeight = height;
         mRow = row;
         mColumn = column;
         mOnClickGridListener = onClickGridListener;
         mOnTouchGridListener = null;
-        setClickable(gridClickable);
+        mGridClickable = gridClickable;
     }
 
     @WorkerThread
@@ -118,7 +119,7 @@ public class GridObject extends GroupObject {
     @WorkerThread
     @Override
     boolean checkBoundary(int x, int y) {
-        return x < mRenderRight && x > mRenderLeft && y < mRenderBottom && y > mRenderTop;
+        return mGridClickable && x < mRenderRight && x > mRenderLeft && y < mRenderBottom && y > mRenderTop;
     }
 
 

@@ -20,6 +20,7 @@ public abstract class Widget {
     Widget.ChildListener mChildListener;
     World mAttachedWorld;
     GroupWidget mGroup;
+
     @WorkerThread
     public Widget(float z, float x, float y, boolean visibility, boolean clickable, Widget.OnClickListener onClickListener) {
         mVisibility = visibility;
@@ -221,7 +222,7 @@ public abstract class Widget {
 
     @WorkerThread
     public boolean isClickable(){
-        return mClickable && (mGroup==null||mGroup.mChildClickable);
+        return mClickable && (mGroup==null||mGroup.isClickable());
     }
 
     @WorkerThread

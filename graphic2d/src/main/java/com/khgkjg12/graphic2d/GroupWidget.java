@@ -10,33 +10,22 @@ public class GroupWidget extends Widget {
     private int mGroupSize;
     private GroupWidget.OnClickChildListener mOnClickChildListener;
     GroupWidget.InnerItemListener mInnerItemListener;
-    boolean mChildClickable;
 
     /**
      * @param z                    그룹 기준 z-coordinate.
      * @param x                    그룹 기준 x-coordinate.
      * @param y                    그룹 기준 y-coordinate.
      * @param groupSize            그룹으로 묶일수 있는 최대 갯수.
-     * @param childClickable            OnClickGroup 호출 여부.
+     * @param clickable            OnClickGroup 호출 여부.
      * @param onClickChildListener touch event callback {@link GroupObject.OnClickChildListener}
      */
     @WorkerThread
-    public GroupWidget(float z, float x, float y, int groupSize, boolean childClickable, @Nullable GroupWidget.OnClickChildListener onClickChildListener) {
-        super(z, x, y, false, false, null);
+    public GroupWidget(float z, float x, float y, int groupSize, boolean clickable, @Nullable GroupWidget.OnClickChildListener onClickChildListener) {
+        super(z, x, y, false, clickable, null);
         mOnClickChildListener = onClickChildListener;
         mGroupSize = groupSize;
         mWidgetList = new Widget[mGroupSize];
         mInnerItemListener = new GroupWidget.InnerItemListener();
-        mChildClickable = childClickable;
-    }
-
-    @WorkerThread
-    public void setChildClickable(boolean childClickable){
-        mChildClickable = childClickable;
-    }
-
-    public boolean getChildClickable(){
-        return mChildClickable;
     }
 
     public Widget getChild(int idx) {

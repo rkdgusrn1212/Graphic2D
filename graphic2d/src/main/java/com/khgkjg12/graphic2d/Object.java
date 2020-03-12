@@ -262,7 +262,7 @@ public abstract class Object {
 
     @WorkerThread
     public boolean isClickable(){
-        return mClickable && (mGroup==null||mGroup.mChildClickable);
+        return mClickable && (mGroup==null||mGroup.isClickable());
     }
 
     @WorkerThread

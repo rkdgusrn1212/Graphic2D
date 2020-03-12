@@ -125,8 +125,10 @@ public class Graphic2dRenderView extends SurfaceView implements Runnable, Surfac
     public void run() {
         mWorld.setViewportSize(mViewportWidth, mViewportHeight);
         if(!mIsWorldInitiated) {
-            mRenderer.prepareWorld(mWorld);
+            mRenderer.startWorld(mWorld, mViewportWidth, mViewportHeight);
             mIsWorldInitiated = true;
+        }else {
+            mRenderer.resumeWorld(mWorld, mViewportWidth, mViewportHeight);
         }
         Rect dstRect = new Rect();
         long startTime = System.nanoTime();
@@ -207,11 +209,13 @@ public class Graphic2dRenderView extends SurfaceView implements Runnable, Surfac
 
     public interface Renderer{
         @WorkerThread
-        public void prepareWorld(World world);
+        void startWorld(World world, int viewportWidth, int viewportHeight);
         @WorkerThread
-        public void updateWorld(float deltaTime, World world);
+        void updateWorld(float deltaTime, World world);
         @MainThread
-        public void loadTextures(Graphic2dDrawer drawer);//사용 오브젝트들의 리소스들을 다 로드함.
+        void loadTextures(Graphic2dDrawer drawer);//사용 오브젝트들의 리소스들을 다 로드함.
+        @WorkerThread
+        void resumeWorld(World world, int viewportWidth, int viewportHeight);
     }
 
     /**

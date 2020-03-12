@@ -271,4 +271,10 @@ public class GridWidget extends GroupWidget {
     public void changeGroupSize(int groupSize) {
         throw new RuntimeException("Try to change grid size");
     }
+
+    @Override
+    public void moveXY(float x, float y) {
+        super.moveXY(x, y);
+        calculateBoundary();
+    }
 }

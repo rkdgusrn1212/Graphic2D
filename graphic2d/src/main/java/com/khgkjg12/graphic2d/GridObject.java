@@ -270,4 +270,16 @@ public class GridObject extends GroupObject {
     public void changeGroupSize(int groupSize) {
         throw new RuntimeException("Try to change grid size");
     }
+
+    @Override
+    public void moveZ(float z) {
+        super.moveZ(z);
+        if(mAttachedWorld!=null)calculateScale(mAttachedWorld);
+    }
+
+    @Override
+    public void moveXY(float x, float y) {
+        super.moveXY(x, y);
+        if(mAttachedWorld!=null) calculateRenderXY(mAttachedWorld);
+    }
 }

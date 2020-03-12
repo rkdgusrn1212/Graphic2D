@@ -46,7 +46,7 @@ public class World {
     private int mMaxObjectCount;
     int mObjectCount;
     private OnClickWorldListener mOnClickWorldListener;
-
+    private OnCameraGestureListener mOnCameraGestureListener;
 
     World(int width, int height, int viewportX, int viewportY, float cameraZ, float minCameraZ, float maxCameraZ, float focusedZ, int backgroundColor, boolean dragToMove, boolean pinchToZoom, int maxObjectCount, int maxWidgetCount){
         mWidth = width;
@@ -67,6 +67,16 @@ public class World {
         mDragToMove = dragToMove;
         mPinchToZoom = pinchToZoom;
         mOnClickWorldListener = null;
+        mOnCameraGestureListener = null;
+    }
+    
+    public void setOnChangeCameraGestureListener(OnCameraGestureListener onCameraGestureListener){
+        mOnCameraGestureListener = onCameraGestureListener;
+    }
+
+    public interface OnCameraGestureListener {
+        void onPinchToZoom(World world, float lastZ, float z);
+        void onDragToMove(World world, float lastX, float x, float lastY, float y);
     }
 
     @WorkerThread
@@ -80,13 +90,32 @@ public class World {
     }
 
     @WorkerThread
-    public int getViewportX(){
+    public int getCameraX(){
         return mViewportX;
     }
 
     @WorkerThread
-    public int getViewportY(){
+    public int getCameraY(){
         return mViewportY;
+    }
+
+    @WorkerThread
+    public float getCameraZ(){
+        return mCameraZ;
+    }
+
+    @WorkerThread
+    public float getMaxCameraZ(){
+        return mMaxCameraZ;
+    }
+
+    @WorkerThread
+    public float getMinCameraZ(){
+        return mMinCameraZ;
+    }
+    @WorkerThread
+    public float getFocusedCameraZ(){
+        return mFocusedZ;
     }
 
     public int getMaxObjectCount(){
@@ -243,13 +272,16 @@ public class World {
         for(int i = 0; i < len; i++) {
             TouchHandler.TouchEvent event = touchEvents.get(i);
             if(mPinchToZoom && event.type == TouchHandler.TouchEvent.PINCH_TO_ZOOM){
-                mCameraZ /= event.scale;
-                mCameraZ = Math.max(mMinCameraZ, Math.min(mCameraZ, mMaxCameraZ));
+                float cameraZ = mCameraZ/event.scale;
+                if(cameraZ<mMinCameraZ){
+                    cameraZ = mMinCameraZ;
+                }else if(cameraZ>mMaxCameraZ){
+                    cameraZ = mMaxCameraZ;
+                }
+                if(mOnCameraGestureListener !=null) mOnCameraGestureListener.onPinchToZoom(this, mCameraZ, cameraZ);
+                moveCamreraZ(cameraZ);
                 isDragging = false;
                 isPressed = false;
-                for(int j=0; j<mObjectCount; j++){
-                    mObjects[j].calculateScale(this);
-                }
                 break;
             }else if(event.pointer == 0) {
                 float scale = mFocusedZ/mCameraZ;
@@ -258,17 +290,16 @@ public class World {
                         if(mDragToMove) {
                             int deltaX = (int) ((event.x - startX) / scale);
                             int deltaY = (int) ((event.y - startY) / scale);
-                            if (mWidth == 0) {
-                                mViewportX = mViewportX - deltaX;
-                            } else {
-                                mViewportX = Math.max(-mWidth / 2, Math.min(mViewportX - deltaX, -mWidth / 2 + mWidth));
+                            int viewportX = mViewportX - deltaX;
+                            int viewportY = mViewportY - deltaY;
+                            if (mWidth != 0) {
+                                viewportX = Math.max(-mWidth / 2, Math.min(viewportX, -mWidth / 2 + mWidth));
                             }
-                            if (mHeight == 0) {
-                                mViewportY = mViewportY - deltaY;
-                            } else {
-                                mViewportY = Math.max(-mHeight / 2, Math.min(mViewportY - deltaY, -mHeight / 2 + mHeight));
+                            if (mHeight != 0) {
+                                viewportY = Math.max(-mHeight / 2, Math.min(viewportY, -mHeight / 2 + mHeight));
                             }
-                            calculateObjectXY();
+                            if(mOnCameraGestureListener !=null) mOnCameraGestureListener.onDragToMove(this, mViewportX, viewportX, mViewportY, viewportY);
+                            moveCameraXY(viewportX, viewportY);
                         }
                         startX = event.x;
                         startY = event.y;
@@ -355,8 +386,14 @@ public class World {
     public void moveCameraXY(int x, int y){
         mViewportX = x;
         mViewportY = y;
+        calculateObjectXY();
+    }
+
+    @WorkerThread
+    public void moveCamreraZ(float z){
+        mCameraZ = z;
         for(int j=0; j<mObjectCount; j++){
-            mObjects[j].calculateRenderXY(this);
+            mObjects[j].calculateScale(this);
         }
     }
 

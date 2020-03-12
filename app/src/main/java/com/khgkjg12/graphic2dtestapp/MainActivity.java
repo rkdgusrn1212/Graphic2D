@@ -78,7 +78,7 @@ public class MainActivity extends Activity implements Graphic2dRenderView.Render
 
 
     @Override
-    public void prepareWorld(World world) {
+    public void startWorld(World world, int viewportWidth, int viewportHeight) {
         /*for(int i=0; i< 9; i++) {
             Object verLine = new Object(Color.parseColor(i%3==0?"#021aee":"#d602ee"), 1, 801, "vertical_line_"+i);
             verLine.setPosition(-400+100*i,0);
@@ -95,7 +95,7 @@ public class MainActivity extends Activity implements Graphic2dRenderView.Render
             }
             world.putObject(horLine);
         }*/
-        gridObject = new GridWidget(0,0,0,800, 800, 8, 8,true, this, true, this);
+        gridObject = new GridWidget(0,400,viewportHeight-400,800, 800, 8, 8,true, this, true, this);
         world.putWidget(gridObject);
         /*for(int i=0;i<8;i++){
             for(int j=0; j<8; j++) {
@@ -145,6 +145,11 @@ public class MainActivity extends Activity implements Graphic2dRenderView.Render
     public void loadTextures(Graphic2dDrawer graphic2dDrawer){
         background = graphic2dDrawer.newTexture("background.png", Texture.Format.ARGB8888);
         blackStone = graphic2dDrawer.newTexture("black_stone.png", Texture.Format.ARGB8888);
+    }
+
+    @Override
+    public void resumeWorld(World world,int viewportWidth, int viewportHeight) {
+        gridObject.moveXY(viewportWidth-400,viewportHeight-400);
     }
 
     @Override

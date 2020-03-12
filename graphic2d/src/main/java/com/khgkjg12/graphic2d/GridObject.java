@@ -64,6 +64,46 @@ public class GridObject extends GroupObject {
     }
 
     @WorkerThread
+    public void changeWidth(float width){
+        changeSize(width, mHeight);
+    }
+
+    @WorkerThread
+    public void changeHeight(float height){
+        changeSize(mWidth, height);
+    }
+
+
+    @WorkerThread
+    public float getWidth(){
+        return mWidth;
+    }
+
+    @WorkerThread
+    public float getHeight(){
+        return mHeight;
+    }
+
+    @WorkerThread
+    public void changeSize(float width, float height){
+        for(int i=0; i<mRow; i++){
+            for(int j=0; j<mColumn; j++){
+                Object object = getChild(i, j);
+                if(object!=null) {
+                    float deltaX = object.mX - mX;
+                    float deltaY = object.mY - mY;
+                    deltaX *= width / mWidth;
+                    deltaY *= height / mHeight;
+                    object.moveXY(mX + deltaX, mY + deltaY);
+                }
+            }
+        }
+        mWidth = width;
+        mHeight = height;
+        calculateBoundary();
+    }
+
+    @WorkerThread
     public Object getChild(int row, int column){
         return super.getChild(mColumn*row+column);
     }

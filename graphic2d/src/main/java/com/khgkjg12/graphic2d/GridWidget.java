@@ -61,6 +61,47 @@ public class GridWidget extends GroupWidget {
         mGridClickable = gridClickable;
     }
 
+
+    @WorkerThread
+    public void changeWidth(float width){
+        changeSize(width, mHeight);
+    }
+
+    @WorkerThread
+    public void changeHeight(float height){
+        changeSize(mWidth, height);
+    }
+
+
+    @WorkerThread
+    public float getWidth(){
+        return mWidth;
+    }
+
+    @WorkerThread
+    public float getHeight(){
+        return mHeight;
+    }
+
+    @WorkerThread
+    public void changeSize(float width, float height){
+        for(int i=0; i<mRow; i++){
+            for(int j=0; j<mColumn; j++){
+                Widget widget = getChild(i, j);
+                if(widget!=null) {
+                    float deltaX = widget.mX - mX;
+                    float deltaY = widget.mY - mY;
+                    deltaX *= width / mWidth;
+                    deltaY *= height / mHeight;
+                    widget.moveXY(mX + deltaX, mY + deltaY);
+                }
+            }
+        }
+        mWidth = width;
+        mHeight = height;
+        calculateBoundary();
+    }
+
     @WorkerThread
     public void setOnTouchGridListener(@Nullable OnTouchGridListener onTouchGridListener){
         mOnTouchGridListener = onTouchGridListener;

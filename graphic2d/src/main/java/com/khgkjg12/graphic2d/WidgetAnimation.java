@@ -15,16 +15,16 @@
  */
 package com.khgkjg12.graphic2d;
 
-public abstract class Animation {
+public abstract class WidgetAnimation {
 
-    Object object;
+    Widget widget;
     private float mTimer=0;
     private float mDuration;
 
-    public Animation(Object object, float duration, float delay){
+    public WidgetAnimation(Widget widget, float duration, float delay){
         mDuration=duration;
         mTimer = -delay;
-        this.object = object;
+        this.widget = widget;
     }
 
     //끝남 여부를 반환.
@@ -34,15 +34,15 @@ public abstract class Animation {
             return false;
         }
         if(mTimer<mDuration){
-            onProgressAnimate(object,mTimer/mDuration);
+            onProgressAnimate(widget,mTimer/mDuration);
             return false;
         }else{
-            onPostAnimate(object);
+            onPostAnimate(widget);
             return true;
         }
     }
 
-    protected abstract void onProgressAnimate(Object object, float progress);
+    protected abstract void onProgressAnimate(Widget widget, float progress);
 
-    protected abstract void onPostAnimate(Object object);
+    protected abstract void onPostAnimate(Widget widget);
 }

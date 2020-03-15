@@ -23,34 +23,26 @@ public abstract class Animation {
     private float mTimer;
     private float mDuration;
     private boolean mProgress;
-    private boolean mActivated;
 
     public Animation(float duration){
         mDuration=duration;
         mProgress = false;
-        mActivated = false;
     }
 
     /**
      * updateWorld를 통해 호출.
      * @param world
-     * @param deltaTime 음수는 되감기(progress 상태에서만 가능하며 계속 progress 상태에 머뭄). 양수는 진행.
+     * @param deltaTime 음수는 되감기(progressAnimate만 호출 가능하다). 양수는 진행.
      */
-    public void animate(World world, float deltaTime) {
-        if (mActivated) {
+    public final void animate(World world, float deltaTime) {
+        if (mProgress) {
             mTimer += deltaTime;
-            if (mTimer >= 0) {
-                if (mProgress) {
-                    if (mTimer < mDuration) {
-                        onProgressAnimate(world, mTimer / mDuration);
-                    } else {
-                        mProgress = false;
-                        onPostAnimate(world);
-                        mActivated = false;
-                    }
+            if(mTimer>=0) {
+                if (mTimer < mDuration) {
+                    onProgressAnimate(world, mTimer / mDuration);
                 } else {
-                    onPreAnimate(world);
-                    mProgress = true;
+                    onPostAnimate(world);
+                    mProgress = false;
                 }
             }
         }
@@ -63,13 +55,9 @@ public abstract class Animation {
      */
     @WorkerThread
     public boolean forceFinish(World world){
-        if(mActivated) {
-            if(!mProgress){
-                onPreAnimate(world);
-            }
-            mProgress = false;
+        if(mProgress) {
             onPostAnimate(world);
-            mActivated = false;
+            mProgress = false;
             return true;
         }else{
             return false;
@@ -77,25 +65,21 @@ public abstract class Animation {
     }
 
     @WorkerThread
-    public boolean isActivated(){
-        return mActivated;
-    }
-
-    @WorkerThread
     public boolean isProgress(){
         return mProgress;
     }
 
+
     /**
      * 에니메이션 wait 초 뒤에 시작.
-     * @param wait 대기시간(초)
      * @return 이미 활성화된 에니메이션이면 false;
      */
     @WorkerThread
-    public boolean start(@FloatRange(from = 0) float wait){
-        if(!mActivated) {
-            mTimer = -wait;
-            mActivated = true;
+    public boolean start(World world){
+        if(!mProgress) {
+            mTimer = 0;
+            mProgress = true;
+            onPreAnimate(world);
             return true;
         }else{
             return false;

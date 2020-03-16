@@ -4,10 +4,10 @@ import android.support.annotation.WorkerThread;
 
 public class RoundRectWidget extends RectWidget {
 
-    private float mRY, mRX;
+    protected float mRY, mRX;
 
-    public RoundRectWidget(float z, float x, float y, boolean visibility, boolean clickable, OnClickListener onClickListener, int color, boolean autoShadow, int width, int height, float rX, float rY) {
-        super(z, x, y, visibility, clickable, onClickListener, color, autoShadow, width, height);
+    public RoundRectWidget(float z, float x, float y, boolean visibility, boolean clickable, int color, boolean autoShadow, int width, int height, float rX, float rY) {
+        super(z, x, y, visibility, clickable, color, autoShadow, width, height);
         mRX = rX;
         mRY = rY;
     }
@@ -27,7 +27,15 @@ public class RoundRectWidget extends RectWidget {
         mRX = rX;
         mRY = rY;
     }
+    @WorkerThread
+    public float getRX(){
+        return mRX;
+    }
 
+    @WorkerThread
+    public float getRY(){
+        return mRY;
+    }
     @Override
     @WorkerThread
     void draw(Graphic2dDrawer drawer) {

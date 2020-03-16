@@ -1,16 +1,15 @@
 package com.khgkjg12.graphic2d;
 
-import android.graphics.RectF;
 import android.support.annotation.FloatRange;
 import android.support.annotation.WorkerThread;
 
 public class CircleObject extends PaintableObject {
-    float mRadius;
-    float mRenderRadius;
+    protected float mRadius;
+    protected float mRenderRadius;
 
     @WorkerThread
-    public CircleObject(float z, float x, float y, boolean visibility, boolean clickable, OnClickListener onClickListener, int color, boolean autoShadow, @FloatRange(from = 0, fromInclusive = false) float radius){
-        super(z, x, y, visibility, clickable, onClickListener, color, autoShadow);
+    public CircleObject(float z, float x, float y, boolean visibility, boolean clickable, int color, boolean autoShadow, @FloatRange(from = 0, fromInclusive = false) float radius){
+        super(z, x, y, visibility, clickable, color, autoShadow);
         mRadius = radius;
     }
 
@@ -19,7 +18,8 @@ public class CircleObject extends PaintableObject {
         mRadius = radius;
         calculateBoundary();
     }
-
+    @WorkerThread
+    public float getRadius(){return mRadius;}
     @Override
     @WorkerThread
     boolean checkBoundary(int x, int y) {

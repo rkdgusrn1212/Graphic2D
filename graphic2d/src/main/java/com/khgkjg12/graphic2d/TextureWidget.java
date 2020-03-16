@@ -7,16 +7,15 @@ import android.support.annotation.WorkerThread;
 public class TextureWidget extends Widget {
     private Texture mTexture;
     float mWidth, mHeight;
-    RectF mRectF;
+    RectF mRectF = new RectF();
     int mHorizontalDegree;
     int mVerticalDegree;
     float mRenderWidth;
     float mRenderHeight;
 
-    public TextureWidget(float z, float x, float y, boolean visibility, boolean clickable, OnClickListener onClickListener, float width, float height, int degreeH, int degreeV, @NonNull Texture texture){
-        super(z, x, y, visibility, clickable, onClickListener);
+    public TextureWidget(float z, float x, float y, boolean visibility, boolean clickable, float width, float height, int degreeH, int degreeV, @NonNull Texture texture){
+        super(z, x, y, visibility, clickable);
         mTexture = texture;
-        mRectF = new RectF();
         mWidth = width;
         mHeight = height;
         mHorizontalDegree = degreeH%360;

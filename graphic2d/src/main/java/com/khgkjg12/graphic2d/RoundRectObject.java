@@ -4,11 +4,11 @@ import android.support.annotation.WorkerThread;
 
 public class RoundRectObject extends RectObject {
 
-    private float mRY, mRX;
-    private float mRenderRY, mRenderRX;
+    protected float mRY, mRX;
+    protected float mRenderRY, mRenderRX;
 
-    public RoundRectObject(float z, float x, float y,  boolean visibility, boolean clickable, OnClickListener onClickListener, int color, boolean autoShadow, int width, int height, float rX, float rY) {
-        super(z, x, y, visibility, clickable, onClickListener, color, autoShadow, width, height);
+    public RoundRectObject(float z, float x, float y,  boolean visibility, boolean clickable, int color, boolean autoShadow, int width, int height, float rX, float rY) {
+        super(z, x, y, visibility, clickable, color, autoShadow, width, height);
         mRX = rX;
         mRY = rY;
     }
@@ -30,6 +30,16 @@ public class RoundRectObject extends RectObject {
         mRX = rX;
         mRY = rY;
         calculateBoundary();
+    }
+
+    @WorkerThread
+    public float getRX(){
+        return mRX;
+    }
+
+    @WorkerThread
+    public float getRY(){
+        return mRY;
     }
 
     @Override

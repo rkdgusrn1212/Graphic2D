@@ -4,11 +4,11 @@ import android.support.annotation.FloatRange;
 import android.support.annotation.WorkerThread;
 
 public class CircleWidget extends PaintableWidget {
-    float mRadius;
+    protected float mRadius;
 
     @WorkerThread
-    public CircleWidget(float z, float x, float y, boolean visibility, boolean clickable, OnClickListener onClickListener, int color, boolean autoShadow, @FloatRange(from = 0, fromInclusive = false) float radius){
-        super(z, x, y, visibility, clickable, onClickListener, color, autoShadow);
+    public CircleWidget(float z, float x, float y, boolean visibility, boolean clickable, int color, boolean autoShadow, @FloatRange(from = 0, fromInclusive = false) float radius){
+        super(z, x, y, visibility, clickable, color, autoShadow);
         mRadius = radius;
     }
 
@@ -16,6 +16,9 @@ public class CircleWidget extends PaintableWidget {
     public void changeRadius(@FloatRange(from = 0, fromInclusive = false) float radius){
         mRadius = radius;
     }
+
+    @WorkerThread
+    public float getRadius(){return mRadius;}
 
     @Override
     @WorkerThread

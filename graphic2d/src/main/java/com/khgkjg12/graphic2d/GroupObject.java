@@ -5,11 +5,13 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.annotation.WorkerThread;
 
+import java.util.ArrayList;
+
 public class GroupObject extends Object{
-    Object[] mObjectList;
-    int mGroupSize;
-    private OnClickChildListener mOnClickChildListener;
-    InnerItemListener mInnerItemListener;
+    protected Object[] mObjectList;
+    protected int mGroupSize;
+    protected ArrayList<OnClickChildListener> mOnClickChildListeners = null;
+    protected InnerItemListener mInnerItemListener;
 
     /**
      * @param z                    그룹 기준 z-coordinate.
@@ -17,12 +19,10 @@ public class GroupObject extends Object{
      * @param y                    그룹 기준 y-coordinate.
      * @param groupSize            그룹으로 묶일수 있는 최대 갯수.
      * @param clickable       OnClickGroup 호출 여부.
-     * @param onClickChildListener touch event callback {@link OnClickChildListener}
      */
     @WorkerThread
-    public GroupObject(float z, float x, float y, int groupSize, boolean clickable, @Nullable OnClickChildListener onClickChildListener) {
-        super(z, x, y, false, clickable, null);
-        mOnClickChildListener = onClickChildListener;
+    public GroupObject(float z, float x, float y, @IntRange(from = 1) int groupSize, boolean clickable) {
+        super(z, x, y, false, clickable);
         mGroupSize = groupSize;
         mObjectList = new Object[mGroupSize];
         mInnerItemListener = new InnerItemListener();
@@ -46,10 +46,19 @@ public class GroupObject extends Object{
         mGroupSize = groupSize;
         mObjectList = tempArray;
     }
+    @WorkerThread
+    public void addOnClickChildListener(@NonNull OnClickChildListener onClickGroupListener) {
+        if(mOnClickChildListeners==null){
+            mOnClickChildListeners = new ArrayList<>();
+        }
+        if(!mOnClickChildListeners.contains(onClickGroupListener)) {
+            mOnClickChildListeners.add(onClickGroupListener);
+        }
+    }
 
     @WorkerThread
-    public void setOnClickGroupListener(@Nullable OnClickChildListener onClickGroupListener) {
-        mOnClickChildListener = onClickGroupListener;
+    public void removeOnClickChideListener(@NonNull OnClickChildListener onClickChildListener){
+        if(mOnClickChildListeners!=null) mOnClickChildListeners.remove(onClickChildListener);
     }
 
     /**
@@ -215,6 +224,9 @@ public class GroupObject extends Object{
     @WorkerThread
     public void onChildClick(@Nullable World attachedWorld, @NonNull Object object){
         onClick();
-        if(mOnClickChildListener !=null) mOnClickChildListener.onClickChild(attachedWorld, this, object, getChildIndex(object));
+        if(mOnClickChildListeners !=null){
+            int size = mOnClickChildListeners.size();
+            for(int i=0; i<size;i++) mOnClickChildListeners.get(i).onClickChild(attachedWorld, this, object, getChildIndex(object));
+        }
     }
 }

@@ -8,24 +8,23 @@ import android.support.annotation.WorkerThread;
 
 public class TextObject extends PaintableObject {
 
-    private String mText;
-    private float mTextSize;
-    private Rect mBound;
-    private float mLeft;
-    private float mRight;
-    private float mTop;
-    private float mBottom;
-    private float mScaledSize;
-    private float mTextWidth;
-    private float mTextHeight;
+    protected String mText;
+    protected float mTextSize;
+    protected Rect mBound = new Rect();
+    protected float mLeft;
+    protected float mRight;
+    protected float mTop;
+    protected float mBottom;
+    protected float mScaledSize;
+    protected float mTextWidth;
+    protected float mTextHeight;
 
-    public TextObject(float z, float x, float y, boolean visibility, boolean clickable, OnClickListener onClickListener, int color, boolean autoShadow, @NonNull String text, float textSize, Paint.Align textAlignment, @NonNull Typeface typeface) {
-        super(z, x, y, visibility, clickable, onClickListener, color, autoShadow);
+    public TextObject(float z, float x, float y, boolean visibility, boolean clickable, int color, boolean autoShadow, @NonNull String text, float textSize, Paint.Align textAlignment, @NonNull Typeface typeface) {
+        super(z, x, y, visibility, clickable, color, autoShadow);
         mPaint.setTextAlign(textAlignment);
         mPaint.setTypeface(typeface);
         mTextSize = textSize;
         mText = text;
-        mBound = new Rect();
     }
 
     @WorkerThread

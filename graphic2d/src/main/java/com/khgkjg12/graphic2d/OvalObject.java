@@ -5,15 +5,14 @@ import android.support.annotation.FloatRange;
 import android.support.annotation.WorkerThread;
 
 public class OvalObject extends PaintableObject {
-    float mWidth, mHeight;
-    float mRenderWidth, mRenderHeight;
-    RectF mRenderRect;
+    protected float mWidth, mHeight;
+    protected float mRenderWidth, mRenderHeight;
+    protected RectF mRenderRect = new RectF();
     @WorkerThread
-    public OvalObject(float z, float x, float y, boolean visibility, boolean clickable, OnClickListener onClickListener, int color, boolean autoShadow, @FloatRange(from = 0, fromInclusive = false) float width, @FloatRange(from = 0, fromInclusive = false) float height){
-        super(z, x, y, visibility, clickable, onClickListener, color, autoShadow);
+    public OvalObject(float z, float x, float y, boolean visibility, boolean clickable, int color, boolean autoShadow, @FloatRange(from = 0, fromInclusive = false) float width, @FloatRange(from = 0, fromInclusive = false) float height){
+        super(z, x, y, visibility, clickable, color, autoShadow);
         mWidth = width;
         mHeight = height;
-        mRenderRect = new RectF();
     }
 
     @WorkerThread
@@ -32,6 +31,15 @@ public class OvalObject extends PaintableObject {
         mWidth = width;
         mHeight = height;
         calculateBoundary();
+    }
+
+    @WorkerThread
+    public float getWidth(){
+        return mWidth;
+    }
+    @WorkerThread
+    public float getHeight(){
+        return mHeight;
     }
 
     @Override

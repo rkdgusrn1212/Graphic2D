@@ -15,23 +15,26 @@
  */
 package com.khgkjg12.graphic2d;
 
-import android.support.annotation.GuardedBy;
+import android.support.annotation.IntRange;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.annotation.WorkerThread;
 
+import java.util.ArrayList;
+
 public class GridWidget extends GroupWidget {
-    private int mRow, mColumn;
-    private OnClickGridListener mOnClickGridListener;
-    private float mWidth;
-    private float mHeight;
-    private float mLeft;
-    private float mTop;
-    private float mBottom;
-    private float mRight;
-    private int mPressedRow;
-    private int mPressedColumn;
-    private OnTouchGridListener mOnTouchGridListener;
-    private boolean mGridClickable;
+    protected int mRow, mColumn;
+    protected ArrayList<OnClickGridListener> mOnClickGridListeners = null;
+    protected float mWidth;
+    protected float mHeight;
+    protected float mLeft;
+    protected float mTop;
+    protected float mBottom;
+    protected float mRight;
+    protected int mPressedRow;
+    protected int mPressedColumn;
+    protected ArrayList<OnTouchGridListener> mOnTouchGridListeners = null;
+    protected boolean mGridClickable;
 
     /**
      * @param z z-coordinate.
@@ -43,11 +46,10 @@ public class GridWidget extends GroupWidget {
      * @param height y-axis length.
      * @param row number of rows.
      * @param column number of columns.
-     * @param onClickGridListener touch event callback {@link OnClickGridListener}
      */
     @WorkerThread
-    public GridWidget(float z, float x, float y, float width, float height, int row, int column, boolean clickable, @Nullable OnClickChildListener onClickChildListener, boolean gridClickable, @Nullable OnClickGridListener onClickGridListener){
-        super(z, x, y, row*column,clickable, onClickChildListener);
+    public GridWidget(float z, float x, float y, float width, float height, @IntRange(from = 1) int row, @IntRange(from = 1) int column, boolean clickable, boolean gridClickable){
+        super(z, x, y, row*column,clickable);
         mWidth = width;
         mHeight = height;
         mRow = row;
@@ -56,8 +58,6 @@ public class GridWidget extends GroupWidget {
         mTop = mY - mHeight/2;
         mRight = mLeft + mWidth;
         mBottom = mTop + mHeight;
-        mOnClickGridListener = onClickGridListener;
-        mOnTouchGridListener = null;
         mGridClickable = gridClickable;
     }
 
@@ -103,8 +103,16 @@ public class GridWidget extends GroupWidget {
     }
 
     @WorkerThread
-    public void setOnTouchGridListener(@Nullable OnTouchGridListener onTouchGridListener){
-        mOnTouchGridListener = onTouchGridListener;
+    public void addOnTouchGridListener(@NonNull OnTouchGridListener onTouchGridListener){
+        if(mOnTouchGridListeners ==null){
+            mOnTouchGridListeners = new ArrayList<>();
+        }
+        if(!mOnTouchGridListeners.contains(onTouchGridListener)) mOnTouchGridListeners.add(onTouchGridListener);
+    }
+
+    @WorkerThread
+    public void removeOnTouchGridListener(@NonNull OnTouchGridListener onTouchGridLIstener){
+        if(mOnTouchGridListeners !=null) mOnTouchGridListeners.remove(onTouchGridLIstener);
     }
 
     @WorkerThread
@@ -123,8 +131,17 @@ public class GridWidget extends GroupWidget {
     }
 
     @WorkerThread
-    public void setOnClickGridListener(@Nullable OnClickGridListener onClickGridListener){
-        mOnClickGridListener = onClickGridListener;
+    public void addOnClickGridListener(@NonNull OnClickGridListener onClickGridListener){
+        if(mOnClickGridListeners == null)
+            mOnClickGridListeners = new ArrayList<>();
+        if(!mOnClickGridListeners.contains(onClickGridListener))
+            mOnClickGridListeners.add(onClickGridListener);
+    }
+
+    @WorkerThread
+    public void removeOnClickGridListener(@NonNull OnClickGridListener onClickGridListener){
+        if(mOnClickGridListeners !=null)
+            mOnClickGridListeners.remove(onClickGridListener);
     }
 
     @WorkerThread
@@ -243,33 +260,44 @@ public class GridWidget extends GroupWidget {
 
     @WorkerThread
     public void onGridTouchDown(int x, int y, int row, int column){
-        if(mOnTouchGridListener!=null){
-            mOnTouchGridListener.onTouchGridDown(mAttachedWorld, this, x, y, row, column);
+        if(mOnTouchGridListeners !=null){
+            int size = mOnTouchGridListeners.size();
+            for(int i=0; i<size;i++)
+                mOnTouchGridListeners.get(i).onTouchGridDown(mAttachedWorld, this, x, y, row, column);
         }
     }
     @WorkerThread
     public void onGridTouchDrag(int x, int y, int row, int column){
-        if(mOnTouchGridListener!=null){
-            mOnTouchGridListener.onTouchGridDrag(mAttachedWorld, this, x, y, row, column);
+        if(mOnTouchGridListeners !=null){
+            int size = mOnTouchGridListeners.size();
+            for(int i=0; i<size;i++)
+                mOnTouchGridListeners.get(i).onTouchGridDrag(mAttachedWorld, this, x, y, row, column);
         }
     }
     @WorkerThread
     public void onGridTouchUp(int x, int y, int row, int column){
-        if(mOnTouchGridListener!=null){
-            mOnTouchGridListener.onTouchGridUp(mAttachedWorld, this, x, y, row, column);
+        if(mOnTouchGridListeners !=null){
+            int size = mOnTouchGridListeners.size();
+            for(int i=0; i<size;i++)
+                mOnTouchGridListeners.get(i).onTouchGridUp(mAttachedWorld, this, x, y, row, column);
         }
     }
     @WorkerThread
     public void onGridTouchCancel(int row, int column){
-        if(mOnTouchGridListener!=null){
-            mOnTouchGridListener.onTouchGridCancel(mAttachedWorld, this, row, column);
+        if(mOnTouchGridListeners !=null){
+            int size = mOnTouchGridListeners.size();
+            for(int i=0; i<size;i++)
+                mOnTouchGridListeners.get(i).onTouchGridCancel(mAttachedWorld, this, row, column);
         }
     }
 
     @WorkerThread
     public void onGridClick(int row, int column){
-        if (mOnClickGridListener != null)
-            mOnClickGridListener.onClickGrid(mAttachedWorld, this, getChild(row,column), row, column);
+        if (mOnClickGridListeners != null) {
+            int size = mOnClickGridListeners.size();
+            for(int i=0; i<size;i++)
+                mOnClickGridListeners.get(i).onClickGrid(mAttachedWorld, this, getChild(row, column), row, column);
+        }
     }
 
     @Override

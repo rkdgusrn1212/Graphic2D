@@ -5,15 +5,14 @@ import android.graphics.Paint;
 import android.support.annotation.WorkerThread;
 
 public abstract class PaintableObject extends Object {
-    Paint mPaint;
-    private float mShadow;
-    private boolean mAutoShadow;
+    protected Paint mPaint = new Paint();
+    protected float mShadow = -1;//shadow가 꺼져있음.
+    protected boolean mAutoShadow;
 
-    public PaintableObject(float z, float x, float y, boolean visibility, boolean clickable, OnClickListener onClickListener, int color, boolean autoShadow) {
-        super(z, x, y, visibility, clickable, onClickListener);
-        mPaint = new Paint();
+    @WorkerThread
+    public PaintableObject(float z, float x, float y, boolean visibility, boolean clickable, int color, boolean autoShadow) {
+        super(z, x, y, visibility, clickable);
         mPaint.setColor(color);
-        mShadow = -1;
         if(autoShadow){
             enableAutoShadow();
         }

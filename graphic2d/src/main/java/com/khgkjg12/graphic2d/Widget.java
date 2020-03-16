@@ -1,39 +1,42 @@
 package com.khgkjg12.graphic2d;
 
-import android.graphics.Color;
-import android.graphics.Paint;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.annotation.WorkerThread;
 
+import java.util.ArrayList;
+
 public abstract class Widget {
 
-    private boolean mVisibility;
-    private boolean mClickable;
-    private Widget.OnClickListener mOnClickListener;
-    float mZ;
-    float mX, mY;
-    private Widget.OnTouchListener mOnTouchListener;
-    boolean mIsPressed;
-    boolean mConsumeTouchEvent;
-    boolean mConsumeDragEvent;
-    Widget.ChildListener mChildListener;
-    World mAttachedWorld;
-    GroupWidget mGroup;
+    protected boolean mVisibility;
+    protected boolean mClickable;
+    protected ArrayList<Widget.OnClickListener> mOnClickListeners = null;
+    protected float mZ;
+    protected float mX, mY;
+    protected ArrayList<Widget.OnTouchListener> mOnTouchListeners = null;
+    protected boolean mIsPressed = false;
+    protected boolean mConsumeTouchEvent = true;
+    protected boolean mConsumeDragEvent = false;
+    protected Widget.ChildListener mChildListener;
+    protected World mAttachedWorld = null;
+    protected GroupWidget mGroup = null;
 
     @WorkerThread
-    public Widget(float z, float x, float y, boolean visibility, boolean clickable, Widget.OnClickListener onClickListener) {
+    public Widget(){
+        mZ =0;
+        mX =0;
+        mY =0;
+        mVisibility = true;
+        mClickable = true;
+    }
+
+    @WorkerThread
+    public Widget(float z, float x, float y, boolean visibility, boolean clickable) {
         mVisibility = visibility;
         mClickable = clickable;
         mZ = z;
         mX = x;
         mY = y;
-        mOnClickListener = onClickListener;
-        mIsPressed = false;
-        mConsumeTouchEvent = true;
-        mConsumeDragEvent = false;
-        mAttachedWorld = null;
-        mGroup = null;
     }
     @WorkerThread
     void attached(World world){
@@ -101,6 +104,16 @@ public abstract class Widget {
         mVisibility = visible;
     }
 
+    @WorkerThread
+    public boolean getVisibility(){
+        return mVisibility;
+    }
+
+    @WorkerThread
+    public boolean isVisible(){
+        return mVisibility&&mGroup.isVisible();
+    }
+
     /**
      * World의 콜백 메서드에서만 사용.
      * @param clickable
@@ -111,8 +124,16 @@ public abstract class Widget {
     }
 
     @WorkerThread
+    public boolean getClickable(){
+        return mClickable;
+    }
+
+    @WorkerThread
     public void onClick(){
-        if(mOnClickListener!=null) mOnClickListener.onClick(mAttachedWorld, this);
+        if(mOnClickListeners!=null) {
+            int size = mOnClickListeners.size();
+            for(int i=0;i<size;i++) mOnClickListeners.get(i).onClick(mAttachedWorld, this);
+        }
         if(mChildListener!=null) mChildListener.onClick(mAttachedWorld, this);
     }
 
@@ -124,18 +145,37 @@ public abstract class Widget {
     abstract boolean checkBoundary(int x, int y);
 
     @WorkerThread
-    public void setOnClickListener(@Nullable Widget.OnClickListener onClickListener){
-        mOnClickListener = onClickListener;
+    public void addOnClickListener(@NonNull OnClickListener onClickListener){
+        if(mOnClickListeners==null) {
+            mOnClickListeners = new ArrayList<>();
+        }
+        if(!mOnClickListeners.contains(onClickListener)) {
+            mOnClickListeners.add(onClickListener);
+        }
     }
 
     @WorkerThread
-    public void setOnTouchListener(@Nullable Widget.OnTouchListener onTouchListener){
-        mOnTouchListener = onTouchListener;
+    public void removeOnClickListener(@NonNull OnClickListener onClickListener){
+        if(mOnClickListeners!=null) mOnClickListeners.remove(onClickListener);
     }
 
+    @WorkerThread
+    public void addOnTouchListener(@NonNull OnTouchListener onTouchListener){
+        if(mOnTouchListeners==null) {
+            mOnTouchListeners = new ArrayList<>();
+        }
+        if(!mOnTouchListeners.contains(onTouchListener)) {
+            mOnTouchListeners.add(onTouchListener);
+        }
+    }
+
+    @WorkerThread
+    public void removeOnTouchListener(@NonNull OnClickListener onTouchListener){
+        if(mOnTouchListeners!=null) mOnTouchListeners.remove(onTouchListener);
+    }
     @WorkerThread
     void render(Graphic2dDrawer drawer){
-        if(mVisibility){
+        if(isVisible()){
             draw(drawer);
         }
     }
@@ -273,25 +313,37 @@ public abstract class Widget {
 
     @WorkerThread
     public void onTouchDown(int x, int y){
-        if(mOnTouchListener!=null) mOnTouchListener.onTouchDown(mAttachedWorld, this, x, y);
+        if(mOnTouchListeners!=null) {
+            int size = mOnTouchListeners.size();
+            for (int i = 0; i <size; i++) mOnTouchListeners.get(i).onTouchDown(mAttachedWorld, this, x, y);
+        }
         if(mChildListener!=null) mChildListener.onTouchDown(mAttachedWorld, this, x, y);
     }
 
     @WorkerThread
     public void onTouchDrag(int x, int y){
-        if(mOnTouchListener!=null) mOnTouchListener.onTouchDrag(mAttachedWorld, this, x, y);
+        if(mOnTouchListeners!=null) {
+            int size = mOnTouchListeners.size();
+            for (int i = 0; i <size; i++) mOnTouchListeners.get(i).onTouchDrag(mAttachedWorld, this, x, y);
+        }
         if(mChildListener!=null) mChildListener.onTouchDrag(mAttachedWorld, this, x, y);
     }
 
     @WorkerThread
     public void onTouchUp(int x, int y){
-        if(mOnTouchListener!=null) mOnTouchListener.onTouchUp(mAttachedWorld, this, x, y);
+        if(mOnTouchListeners!=null) {
+            int size = mOnTouchListeners.size();
+            for (int i = 0; i <size; i++) mOnTouchListeners.get(i).onTouchUp(mAttachedWorld, this, x, y);
+        }
         if(mChildListener!=null) mChildListener.onTouchUp(mAttachedWorld, this, x, y);
     }
 
     @WorkerThread
     public void onTouchCancel(){
-        if (mOnTouchListener != null) mOnTouchListener.onTouchCancel(mAttachedWorld, this);
+        if(mOnTouchListeners!=null) {
+            int size = mOnTouchListeners.size();
+            for (int i = 0; i <size; i++) mOnTouchListeners.get(i).onTouchCancel(mAttachedWorld, this);
+        }
         if (mChildListener != null) mChildListener.onTouchCancel(mAttachedWorld, this);
     }
 

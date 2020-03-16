@@ -20,9 +20,9 @@ import android.support.annotation.WorkerThread;
 
 public abstract class Animation {
 
-    private float mTimer;
-    private float mDuration;
-    private boolean mProgress;
+    protected float mTimer;
+    protected float mDuration;
+    protected boolean mProgress;
 
     public Animation(float duration){
         mDuration=duration;

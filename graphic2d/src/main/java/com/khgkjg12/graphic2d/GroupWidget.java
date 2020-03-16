@@ -5,11 +5,13 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.annotation.WorkerThread;
 
+import java.util.ArrayList;
+
 public class GroupWidget extends Widget {
-    Widget[] mWidgetList;
-    int mGroupSize;
-    private GroupWidget.OnClickChildListener mOnClickChildListener;
-    GroupWidget.InnerItemListener mInnerItemListener;
+    protected Widget[] mWidgetList;
+    protected int mGroupSize;
+    protected ArrayList<OnClickChildListener> mOnClickChildListeners = null;
+    protected GroupWidget.InnerItemListener mInnerItemListener;
 
     /**
      * @param z                    그룹 기준 z-coordinate.
@@ -17,12 +19,10 @@ public class GroupWidget extends Widget {
      * @param y                    그룹 기준 y-coordinate.
      * @param groupSize            그룹으로 묶일수 있는 최대 갯수.
      * @param clickable            OnClickGroup 호출 여부.
-     * @param onClickChildListener touch event callback {@link GroupObject.OnClickChildListener}
      */
     @WorkerThread
-    public GroupWidget(float z, float x, float y, int groupSize, boolean clickable, @Nullable GroupWidget.OnClickChildListener onClickChildListener) {
-        super(z, x, y, false, clickable, null);
-        mOnClickChildListener = onClickChildListener;
+    public GroupWidget(float z, float x, float y, @IntRange(from = 1)int groupSize, boolean clickable) {
+        super(z, x, y, false, clickable);
         mGroupSize = groupSize;
         mWidgetList = new Widget[mGroupSize];
         mInnerItemListener = new GroupWidget.InnerItemListener();
@@ -48,8 +48,18 @@ public class GroupWidget extends Widget {
     }
 
     @WorkerThread
-    public void setOnClickGroupListener(@Nullable GroupWidget.OnClickChildListener onClickGroupListener) {
-        mOnClickChildListener = onClickGroupListener;
+    public void addOnClickChildListener(@NonNull GroupWidget.OnClickChildListener onClickGroupListener) {
+        if(mOnClickChildListeners==null){
+            mOnClickChildListeners = new ArrayList<>();
+        }
+        if(!mOnClickChildListeners.contains(onClickGroupListener)) {
+            mOnClickChildListeners.add(onClickGroupListener);
+        }
+    }
+
+    @WorkerThread
+    public void removeOnClickChideListener(@NonNull OnClickChildListener onClickChildListener){
+        if(mOnClickChildListeners!=null) mOnClickChildListeners.remove(onClickChildListener);
     }
 
     /**
@@ -214,6 +224,9 @@ public class GroupWidget extends Widget {
     @WorkerThread
     public void onChildClick(@Nullable World attachedWorld, @NonNull Widget widget){
         onClick();
-        if(mOnClickChildListener !=null) mOnClickChildListener.onClickChild(attachedWorld, this, widget, getChildIndex(widget));
+        if(mOnClickChildListeners !=null){
+            int size = mOnClickChildListeners.size();
+            for(int i=0; i<size;i++) mOnClickChildListeners.get(i).onClickChild(attachedWorld, this, widget, getChildIndex(widget));
+        }
     }
 }

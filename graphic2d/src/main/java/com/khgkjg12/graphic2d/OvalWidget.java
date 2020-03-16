@@ -5,14 +5,13 @@ import android.support.annotation.FloatRange;
 import android.support.annotation.WorkerThread;
 
 public class OvalWidget extends PaintableWidget {
-    float mWidth, mHeight;
-    RectF mRenderRect;
+    protected float mWidth, mHeight;
+    protected RectF mRenderRect = new RectF();
     @WorkerThread
-    public OvalWidget(float z, float x, float y, boolean visibility, boolean clickable, OnClickListener onClickListener, int color, boolean autoShadow, @FloatRange(from = 0, fromInclusive = false) float width, @FloatRange(from = 0, fromInclusive = false) float height){
-        super(z, x, y, visibility, clickable, onClickListener, color, autoShadow);
+    public OvalWidget(float z, float x, float y, boolean visibility, boolean clickable, int color, boolean autoShadow, @FloatRange(from = 0, fromInclusive = false) float width, @FloatRange(from = 0, fromInclusive = false) float height){
+        super(z, x, y, visibility, clickable, color, autoShadow);
         mWidth = width;
         mHeight = height;
-        mRenderRect = new RectF();
         mRenderRect.left = mX - mWidth/2;
         mRenderRect.top = mY - mHeight/2;
         mRenderRect.right = mRenderRect.left + mWidth;
@@ -35,6 +34,15 @@ public class OvalWidget extends PaintableWidget {
         mWidth = width;
         mHeight = height;
         calculateBoundary();
+    }
+
+    @WorkerThread
+    public float getWidth(){
+        return mWidth;
+    }
+    @WorkerThread
+    public float getHeight(){
+        return mHeight;
     }
 
     @Override

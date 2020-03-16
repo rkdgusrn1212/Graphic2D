@@ -1,15 +1,16 @@
 package com.khgkjg12.graphic2d;
 
+import android.support.annotation.FloatRange;
 import android.support.annotation.WorkerThread;
 
 public class RectWidget extends PaintableWidget {
 
-    float mWidth, mHeight;
-    float mLeft, mRight, mTop, mBottom;
+    protected float mWidth, mHeight;
+    protected float mLeft, mRight, mTop, mBottom;
 
     @WorkerThread
-    public RectWidget(float z, float x, float y, boolean visibility, boolean clickable, Widget.OnClickListener onClickListener, int color, boolean autoShadow, float width, float height){
-        super(z, x, y, visibility, clickable, onClickListener, color, autoShadow);
+    public RectWidget(float z, float x, float y, boolean visibility, boolean clickable, int color, boolean autoShadow, @FloatRange(from = 0, fromInclusive = false) float width, @FloatRange(from = 0, fromInclusive = false) float height){
+        super(z, x, y, visibility, clickable, color, autoShadow);
         mWidth = width;
         mHeight = height;
         mLeft = mX - width/2;
@@ -19,21 +20,30 @@ public class RectWidget extends PaintableWidget {
     }
 
     @WorkerThread
-    public void changeWidth(float width){
+    public void changeWidth(@FloatRange(from = 0, fromInclusive = false) float width){
         mWidth = width;
         calculateBoundary();
     }
 
     @WorkerThread
-    public void changeHeight(float height){
+    public void changeHeight(@FloatRange(from = 0, fromInclusive = false) float height){
         mHeight = height;
         calculateBoundary();
     }
     @WorkerThread
-    public void changeSize(float width, float height){
+    public void changeSize(@FloatRange(from = 0, fromInclusive = false) float width,@FloatRange(from = 0, fromInclusive = false) float height){
         mWidth = width;
         mHeight = height;
         calculateBoundary();
+    }
+
+    @WorkerThread
+    public float getWidth(){
+        return mWidth;
+    }
+    @WorkerThread
+    public float getHeight(){
+        return mHeight;
     }
 
     @Override

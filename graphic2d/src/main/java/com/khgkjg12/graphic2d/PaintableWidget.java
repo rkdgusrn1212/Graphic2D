@@ -6,15 +6,13 @@ import android.support.annotation.WorkerThread;
 
 public abstract class PaintableWidget extends Widget {
 
-    private float mShadow;
-    private boolean mAutoShadow;
-    Paint mPaint;
+    protected float mShadow = -1;
+    protected boolean mAutoShadow;
+    protected Paint mPaint = new Paint();
 
-    public PaintableWidget(float z, float x, float y, boolean visibility, boolean clickable, OnClickListener onClickListener, int color, boolean autoShadow) {
-        super(z, x, y, visibility, clickable, onClickListener);
-        mPaint = new Paint();
+    public PaintableWidget(float z, float x, float y, boolean visibility, boolean clickable, int color, boolean autoShadow) {
+        super(z, x, y, visibility, clickable);
         mPaint.setColor(color);
-        mShadow = -1;
         if(autoShadow){
             enableAutoShadow();
         }

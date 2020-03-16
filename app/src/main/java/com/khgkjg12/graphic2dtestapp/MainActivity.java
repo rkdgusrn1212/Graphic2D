@@ -95,7 +95,7 @@ public class MainActivity extends Activity implements Graphic2dRenderView.Render
             }
             world.putObject(horLine);
         }*/
-        gridObject = new GridWidget(0,400,viewportHeight-400,800, 800, 8, 8,true, this, true, this);
+        gridObject = new GridWidget(0,400,viewportHeight-400,800, 800, 8, 8,true, true);
         world.putWidget(gridObject);
         /*for(int i=0;i<8;i++){
             for(int j=0; j<8; j++) {
@@ -154,9 +154,9 @@ public class MainActivity extends Activity implements Graphic2dRenderView.Render
 
     @Override
     public void onClickGrid(World world, GridWidget gridWidget, Widget widget, int row, int column) {
-        CircleWidget rro = new CircleWidget(gridObject.getZ(), gridObject.getColumnX(column), gridObject.getRowY(row), true, true, null, Color.YELLOW, true, 50);
+        CircleWidget rro = new CircleWidget(gridObject.getZ(), gridObject.getColumnX(column), gridObject.getRowY(row), true, true, Color.YELLOW, true, 50);
         gridObject.putChild(rro, row, column);
-        world.putWidget(new TextWidget(gridObject.getZ(), gridObject.getColumnX(column), gridObject.getRowY(row), true, false, null, Color.BLACK, false, "158", 60, Paint.Align.CENTER,Typeface.SERIF));
+        world.putWidget(new TextWidget(gridObject.getZ(), gridObject.getColumnX(column), gridObject.getRowY(row), true, false, Color.BLACK, false, "158", 60, Paint.Align.CENTER,Typeface.SERIF));
         //gridObject.putObject(new TextObject( gridObject.getZ(), gridObject.getColumnX(column),gridObject.getRowY(row), true , true,null, "IgIg", 100, Typeface.SERIF, Color.WHITE), row, column);
     }
 

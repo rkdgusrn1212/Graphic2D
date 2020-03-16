@@ -1,34 +1,46 @@
 package com.khgkjg12.graphic2d;
 
+import android.support.annotation.FloatRange;
 import android.support.annotation.WorkerThread;
 
 public class RectObject extends PaintableObject {
-    float mWidth, mHeight;
-    float mRenderWidth, mRenderHeight;
-    float mRenderLeft, mRenderRight, mRenderTop, mRenderBottom;
+
+    protected float mWidth, mHeight;
+    protected float mRenderWidth, mRenderHeight;
+    protected float mRenderLeft, mRenderRight, mRenderTop, mRenderBottom;
+
     @WorkerThread
-    public RectObject(float z, float x, float y, boolean visibility, boolean clickable, OnClickListener onClickListener, int color, boolean autoShadow, float width, float height){
-        super(z, x, y, visibility, clickable, onClickListener, color, autoShadow);
+    public RectObject(float z, float x, float y, boolean visibility, boolean clickable, int color, boolean autoShadow, @FloatRange(from = 0, fromInclusive = false) float width, @FloatRange(from = 0, fromInclusive = false) float height){
+        super(z, x, y, visibility, clickable, color, autoShadow);
         mWidth = width;
         mHeight = height;
     }
 
     @WorkerThread
-    public void changeWidth(float width){
+    public void changeWidth(@FloatRange(from = 0, fromInclusive = false) float width){
         mWidth = width;
         calculateBoundary();
     }
 
     @WorkerThread
-    public void changeHeight(float height){
+    public void changeHeight(@FloatRange(from = 0, fromInclusive = false) float height){
         mHeight = height;
         calculateBoundary();
     }
     @WorkerThread
-    public void changeSize(float width, float height){
+    public void changeSize(@FloatRange(from = 0, fromInclusive = false) float width, @FloatRange(from = 0, fromInclusive = false) float height){
         mWidth = width;
         mHeight = height;
         calculateBoundary();
+    }
+
+    @WorkerThread
+    public float getWidth(){
+        return mWidth;
+    }
+    @WorkerThread
+    public float getHeight(){
+        return mHeight;
     }
 
     @Override

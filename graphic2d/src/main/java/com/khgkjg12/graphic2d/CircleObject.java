@@ -16,7 +16,7 @@ public class CircleObject extends PaintableObject {
     @WorkerThread
     public void changeRadius(@FloatRange(from = 0, fromInclusive = false) float radius){
         mRadius = radius;
-        calculateBoundary();
+        calculateAndCheckBoundary();
     }
     @WorkerThread
     public float getRadius(){return mRadius;}

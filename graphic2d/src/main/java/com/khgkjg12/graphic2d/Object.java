@@ -35,10 +35,10 @@ public abstract class Object {
     protected ArrayList<OnTouchListener> mOnTouchListeners = null;
     protected boolean mIsPressed = false;
     protected boolean mConsumeTouchEvent = true;
-    protected boolean mConsumeDragEvent = false;
     protected ChildListener mChildListener = null;
     protected World mAttachedWorld = null;
     protected GroupObject mGroup = null;
+    protected int mPressedX, mPressedY;
 
     @WorkerThread
     public Object(float z, float x, float y, boolean visibility, boolean clickable) {
@@ -69,16 +69,6 @@ public abstract class Object {
     void leaveGroup(){
         mChildListener = null;
         mGroup = null;
-    }
-
-    @WorkerThread
-    public void setConsumeDragEvent(boolean consumeDragEvent){
-        mConsumeDragEvent = consumeDragEvent;
-    }
-
-    @WorkerThread
-    public boolean getConsumeDragEvent(){
-        return mConsumeDragEvent;
     }
 
     @WorkerThread
@@ -122,7 +112,7 @@ public abstract class Object {
 
     @WorkerThread
     public boolean isVisible(){
-        return mVisibility&&mGroup.isVisible();
+        return mVisibility&&(mGroup==null||mGroup.isVisible());
     }
 
     /**
@@ -197,6 +187,15 @@ public abstract class Object {
      */
     @WorkerThread
     abstract void calculateBoundary();
+
+    @WorkerThread
+    void calculateAndCheckBoundary(){
+        calculateBoundary();
+        if(mIsPressed&&!checkBoundary(mPressedX, mPressedY)){
+            mIsPressed = false;
+            onTouchCancel();
+        }
+    }
 
     /**
      * 렌더 프레임상 x, y좌표 와 카메라 위치에 따른 스케일.
@@ -277,7 +276,7 @@ public abstract class Object {
     void calculateRenderXY(@NonNull World world){
         mRenderX = (world.mViewportWidth / 2f) - (world.mViewportX - mX) * mScale;
         mRenderY = (world.mViewportHeight / 2f) - (world.mViewportY - mY) * mScale;
-        calculateBoundary();
+        calculateAndCheckBoundary();
     }
 
     public interface OnTouchListener{
@@ -300,18 +299,12 @@ public abstract class Object {
     boolean checkTouchDown(int x, int y){
         if(isClickable() &&mIsInCameraRange&&checkBoundary(x, y)){
             mIsPressed = true;
+            mPressedX = x;
+            mPressedY = y;
             onTouchDown(x, y);
             return mConsumeTouchEvent;
         }else{
             return false;
-        }
-    }
-
-    @WorkerThread
-    void checkTouchCancel(){
-        if(mIsPressed){
-            mIsPressed = false;
-            onTouchCancel();
         }
     }
 
@@ -329,17 +322,17 @@ public abstract class Object {
     }
 
     @WorkerThread
-    boolean checkDrag(int x, int y){
+    void checkDrag(int x, int y){
         if(mIsPressed){
             if(mIsInCameraRange&&checkBoundary(x, y)){
+                mPressedX = x;
+                mPressedY = y;
                 onTouchDrag(x, y);
-                return mConsumeDragEvent;
             }else{
                 mIsPressed = false;
                 onTouchCancel();
             }
         }
-        return false;
     }
 
     @WorkerThread

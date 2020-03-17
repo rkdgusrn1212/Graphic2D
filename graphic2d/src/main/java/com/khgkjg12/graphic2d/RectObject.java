@@ -19,19 +19,19 @@ public class RectObject extends PaintableObject {
     @WorkerThread
     public void changeWidth(@FloatRange(from = 0, fromInclusive = false) float width){
         mWidth = width;
-        calculateBoundary();
+        calculateAndCheckBoundary();
     }
 
     @WorkerThread
     public void changeHeight(@FloatRange(from = 0, fromInclusive = false) float height){
         mHeight = height;
-        calculateBoundary();
+        calculateAndCheckBoundary();
     }
     @WorkerThread
     public void changeSize(@FloatRange(from = 0, fromInclusive = false) float width, @FloatRange(from = 0, fromInclusive = false) float height){
         mWidth = width;
         mHeight = height;
-        calculateBoundary();
+        calculateAndCheckBoundary();
     }
 
     @WorkerThread

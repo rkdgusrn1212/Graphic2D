@@ -30,7 +30,7 @@ public class TextObject extends PaintableObject {
     @WorkerThread
     public void changeTypeface(@NonNull Typeface Typeface){
         mPaint.setTypeface(Typeface);
-        calculateBoundary();
+        calculateAndCheckBoundary();
     }
 
     public Typeface getTypeface(){
@@ -47,7 +47,7 @@ public class TextObject extends PaintableObject {
     @WorkerThread
     public void changeText(@NonNull String text){
         mText = text;
-        calculateBoundary();
+        calculateAndCheckBoundary();
     }
 
     public String getText(){
@@ -57,7 +57,7 @@ public class TextObject extends PaintableObject {
     @WorkerThread
     public void changeTextSize(float textSize){
         mTextSize = textSize;
-        calculateBoundary();
+        calculateAndCheckBoundary();
     }
 
     @Override
@@ -109,7 +109,7 @@ public class TextObject extends PaintableObject {
     @WorkerThread
     public void changeTextAlign(Paint.Align align){
         mPaint.setTextAlign(align);
-        calculateBoundary();
+        calculateAndCheckBoundary();
     }
 
     @WorkerThread

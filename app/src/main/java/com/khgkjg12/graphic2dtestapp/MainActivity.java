@@ -95,8 +95,10 @@ public class MainActivity extends Activity implements Graphic2dRenderView.Render
             }
             world.putObject(horLine);
         }*/
-        gridObject = new GridWidget(0,400,viewportHeight-400,800, 800, 8, 8,true, true);
+        gridObject = new GridWidget(0,400,viewportHeight-400,800, 800, 8, 8,true, true, true);
         world.putWidget(gridObject);
+        gridObject.addOnClickGridListener(this);
+        gridObject.addOnClickChildListener(this);
         /*for(int i=0;i<8;i++){
             for(int j=0; j<8; j++) {
                 gridObject.putObject(world, new TextObject("lplplp", Typeface.SANS_SERIF, Color.BLACK, 100, 0, 0, 0, true, true), i, j);

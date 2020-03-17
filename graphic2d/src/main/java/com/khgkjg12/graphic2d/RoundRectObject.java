@@ -16,20 +16,20 @@ public class RoundRectObject extends RectObject {
     @WorkerThread
     public void changeRX(float rX){
         mRX = rX;
-        calculateBoundary();
+        calculateAndCheckBoundary();
     }
 
     @WorkerThread
     public void changeRY(float rY){
         mRY = rY;
-        calculateBoundary();
+        calculateAndCheckBoundary();
     }
 
     @WorkerThread
     public void changeRXY(float rX, float rY){
         mRX = rX;
         mRY = rY;
-        calculateBoundary();
+        calculateAndCheckBoundary();
     }
 
     @WorkerThread

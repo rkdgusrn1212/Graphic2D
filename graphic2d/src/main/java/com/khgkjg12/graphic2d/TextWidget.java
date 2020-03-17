@@ -45,7 +45,7 @@ public class TextWidget extends PaintableWidget {
     @WorkerThread
     public void changeTypeface(@NonNull Typeface Typeface){
         mPaint.setTypeface(Typeface);
-        calculateBoundary();
+        calculateAndCheckBoundary();
     }
 
     public Typeface getTypeface(){
@@ -62,7 +62,7 @@ public class TextWidget extends PaintableWidget {
     @WorkerThread
     public void changeText(@NonNull String text){
         mText = text;
-        calculateBoundary();
+        calculateAndCheckBoundary();
     }
 
     public String getText(){
@@ -72,7 +72,7 @@ public class TextWidget extends PaintableWidget {
     @WorkerThread
     public void changeTextSize(float textSize){
         mPaint.setTextSize(textSize);
-        calculateBoundary();
+        calculateAndCheckBoundary();
     }
 
     @Override
@@ -122,7 +122,7 @@ public class TextWidget extends PaintableWidget {
     @WorkerThread
     public void changeTextAlign(Paint.Align align){
         mPaint.setTextAlign(align);
-        calculateBoundary();
+        calculateAndCheckBoundary();
     }
 
     @WorkerThread

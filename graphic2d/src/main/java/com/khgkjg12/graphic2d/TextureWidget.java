@@ -47,14 +47,14 @@ public class TextureWidget extends Widget {
     public void changeHorizontalDegree(int degree){
         mVerticalDegree = 0;
         mHorizontalDegree = degree%360;
-        calculateBoundary();
+        calculateAndCheckBoundary();
     }
 
     @WorkerThread
     public void changeVerticalDegree(int degree){
         mHorizontalDegree = 0;
         mVerticalDegree = degree%360;
-        calculateBoundary();
+        calculateAndCheckBoundary();
     }
 
     @Override

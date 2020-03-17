@@ -16,10 +16,10 @@ public abstract class Widget {
     protected ArrayList<Widget.OnTouchListener> mOnTouchListeners = null;
     protected boolean mIsPressed = false;
     protected boolean mConsumeTouchEvent = true;
-    protected boolean mConsumeDragEvent = false;
     protected Widget.ChildListener mChildListener;
     protected World mAttachedWorld = null;
     protected GroupWidget mGroup = null;
+    protected int mPressedX, mPressedY;
 
     @WorkerThread
     public Widget(){
@@ -59,17 +59,6 @@ public abstract class Widget {
         mChildListener = null;
         mGroup = null;
     }
-
-    @WorkerThread
-    public void setConsumeDragEvent(boolean consumeDragEvent){
-        mConsumeDragEvent = consumeDragEvent;
-    }
-
-    @WorkerThread
-    public boolean getConsumeDragEvent(){
-        return mConsumeDragEvent;
-    }
-
     @WorkerThread
     public void setConsumeTouchEvent(boolean consumeTouchEvent){
         mConsumeTouchEvent = consumeTouchEvent;
@@ -111,7 +100,7 @@ public abstract class Widget {
 
     @WorkerThread
     public boolean isVisible(){
-        return mVisibility&&mGroup.isVisible();
+        return mVisibility&&(mGroup==null||mGroup.isVisible());
     }
 
     /**
@@ -143,6 +132,16 @@ public abstract class Widget {
      */
     @WorkerThread
     abstract boolean checkBoundary(int x, int y);
+
+
+    @WorkerThread
+    void calculateAndCheckBoundary(){
+        calculateBoundary();
+        if(mIsPressed&&!checkBoundary(mPressedX, mPressedY)){
+            mIsPressed = false;
+            onTouchCancel();
+        }
+    }
 
     @WorkerThread
     public void addOnClickListener(@NonNull OnClickListener onClickListener){
@@ -240,7 +239,7 @@ public abstract class Widget {
     public void moveXY(float x, float y){
         mX = x;
         mY = y;
-        calculateBoundary();
+        calculateAndCheckBoundary();
     }
 
     /**
@@ -269,18 +268,12 @@ public abstract class Widget {
     boolean checkTouchDown(int x, int y){
         if(isClickable()&&checkBoundary(x, y)){
             mIsPressed = true;
+            mPressedX = x;
+            mPressedY = y;
             onTouchDown(x, y);
             return mConsumeTouchEvent;
         }else{
             return false;
-        }
-    }
-
-    @WorkerThread
-    void checkTouchCancel(){
-        if(mIsPressed){
-            mIsPressed = false;
-            onTouchCancel();
         }
     }
 
@@ -298,17 +291,17 @@ public abstract class Widget {
     }
 
     @WorkerThread
-    boolean checkDrag(int x, int y){
+    void checkDrag(int x, int y){
         if(mIsPressed){
             if(checkBoundary(x, y)){
+                mPressedX = x;
+                mPressedY = y;
                 onTouchDrag(x, y);
-                return mConsumeDragEvent;
             }else{
                 mIsPressed = false;
                 onTouchCancel();
             }
         }
-        return false;
     }
 
     @WorkerThread

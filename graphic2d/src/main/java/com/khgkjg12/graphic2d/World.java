@@ -18,6 +18,8 @@ package com.khgkjg12.graphic2d;
 import android.graphics.RectF;
 import android.support.annotation.NonNull;
 import android.support.annotation.WorkerThread;
+
+import java.util.ArrayList;
 import java.util.List;
 
 public class World {
@@ -45,8 +47,8 @@ public class World {
     private RectF mRectF;
     private int mMaxObjectCount;
     int mObjectCount;
-    private OnClickWorldListener mOnClickWorldListener;
-    private OnCameraGestureListener mOnCameraGestureListener;
+    private ArrayList<OnClickBackgroundListener> mOnClickBackgroundListeners = null;
+    private OnCameraGestureListener mOnCameraGestureListener = null;
 
     World(int width, int height, int viewportX, int viewportY, float cameraZ, float minCameraZ, float maxCameraZ, float focusedZ, int backgroundColor, boolean dragToMove, boolean pinchToZoom, int maxObjectCount, int maxWidgetCount){
         mWidth = width;
@@ -66,8 +68,6 @@ public class World {
         mBackgroundColor = backgroundColor;
         mDragToMove = dragToMove;
         mPinchToZoom = pinchToZoom;
-        mOnClickWorldListener = null;
-        mOnCameraGestureListener = null;
     }
     
     public void setOnChangeCameraGestureListener(OnCameraGestureListener onCameraGestureListener){
@@ -325,28 +325,11 @@ public class World {
                         }
                     }
                 }else if(event.type == TouchHandler.TouchEvent.TOUCH_DRAGGED){//pressed인 오브젝트중 영역일치 아닌 것들은 모두 onTouchCancel 호출
-                    int j=0;
-                    for(;j<mWidgetCount; j++){
-                        if(mWidgets[j].checkDrag(event.x, event.y)){
-                            isPressed = false;
-                            break;
-                        }
+                    for(int j=0;j<mWidgetCount; j++){
+                        mWidgets[j].checkDrag(event.x, event.y);
                     }
-                    int m=0;
-                    if(isPressed) {
-                        for (; m < mObjectCount; m++) {
-                            if (mObjects[m].checkDrag(event.x, event.y)) {
-                                isPressed = false;
-                                break;
-                            }
-                        }
-                    }else{
-                        for (; j < mWidgetCount; j++) {
-                            mWidgets[j].checkTouchCancel();
-                        }
-                    }
-                    for(; m<mObjectCount; m++){
-                        mObjects[m].checkTouchCancel();
+                    for (int j=0; j < mObjectCount; j++) {
+                        mObjects[j].checkDrag(event.x, event.y);
                     }
                     if(isPressed){
                         if (Math.abs(event.x - startX) > 50 || Math.abs(event.y - startY) > 50) {
@@ -355,10 +338,10 @@ public class World {
                     }
                 }else if(event.type == TouchHandler.TouchEvent.TOUCH_UP) {//pressed인 오브젝트중 영역일치 아닌 것들은 모두 onTouchCancel 호출. 영역 일치하면 onClick 호출.
                     if(isPressed) {
-                        if (mOnClickWorldListener != null) {
-                            if (!mOnClickWorldListener.onClickViewport(this, event.x, event.y)) {
-                                mOnClickWorldListener.onClickBackground(this, event.x, event.y);
-                            }
+                        if (mOnClickBackgroundListeners != null) {
+                            int size = mOnClickBackgroundListeners.size();
+                            for(int j=0; j<size;j++)
+                                mOnClickBackgroundListeners.get(j).onClickBackground(this, event.x, event.y);
                         }
                         isPressed = false;
                     }
@@ -397,14 +380,20 @@ public class World {
         }
     }
 
-    public interface OnClickWorldListener{
+    public interface OnClickBackgroundListener{
         @WorkerThread
         void onClickBackground(World world, int x, int y);
-        @WorkerThread
-        boolean onClickViewport(World world, int x, int y);
     }
 
-    public void setOnClickWorldListener(OnClickWorldListener onClickWorldListener){
-        mOnClickWorldListener = onClickWorldListener;
+    public void addOnClickBackgroundListener(OnClickBackgroundListener onClickBackgroundListener){
+        if(mOnClickBackgroundListeners==null)
+            mOnClickBackgroundListeners = new ArrayList<>();
+        if(!mOnClickBackgroundListeners.contains(onClickBackgroundListener))
+            mOnClickBackgroundListeners.add(onClickBackgroundListener);
+    }
+
+    public void removeOnClickBackgroundListener(OnClickBackgroundListener onClickBackgroundListener){
+        if(mOnClickBackgroundListeners!=null)
+            mOnClickBackgroundListeners.remove(onClickBackgroundListener);
     }
 }

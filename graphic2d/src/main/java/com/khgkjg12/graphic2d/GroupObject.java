@@ -21,8 +21,8 @@ public class GroupObject extends Object{
      * @param clickable       OnClickGroup 호출 여부.
      */
     @WorkerThread
-    public GroupObject(float z, float x, float y, @IntRange(from = 1) int groupSize, boolean clickable) {
-        super(z, x, y, false, clickable);
+    public GroupObject(float z, float x, float y, @IntRange(from = 1) int groupSize, boolean visibility, boolean clickable) {
+        super(z, x, y, visibility, clickable);
         mGroupSize = groupSize;
         mObjectList = new Object[mGroupSize];
         mInnerItemListener = new InnerItemListener();

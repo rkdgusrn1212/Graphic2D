@@ -21,8 +21,8 @@ public class GroupWidget extends Widget {
      * @param clickable            OnClickGroup 호출 여부.
      */
     @WorkerThread
-    public GroupWidget(float z, float x, float y, @IntRange(from = 1)int groupSize, boolean clickable) {
-        super(z, x, y, false, clickable);
+    public GroupWidget(float z, float x, float y, @IntRange(from = 1)int groupSize, boolean visibility, boolean clickable) {
+        super(z, x, y, visibility, clickable);
         mGroupSize = groupSize;
         mWidgetList = new Widget[mGroupSize];
         mInnerItemListener = new GroupWidget.InnerItemListener();

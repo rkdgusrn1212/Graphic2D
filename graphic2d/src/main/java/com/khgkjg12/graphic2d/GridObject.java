@@ -50,8 +50,8 @@ public class GridObject extends GroupObject {
      * @param column number of columns.
      */
     @WorkerThread
-    public GridObject(float z, float x, float y, float width, float height, @IntRange(from = 1) int row, @IntRange(from = 1) int column, boolean clickable, boolean gridClickable){
-        super(z, x, y, row*column, clickable);
+    public GridObject(float z, float x, float y, float width, float height, @IntRange(from = 1) int row, @IntRange(from = 1) int column,boolean visibility, boolean clickable, boolean gridClickable){
+        super(z, x, y, row*column, visibility, clickable);
         mWidth = width;
         mHeight = height;
         mRow = row;
@@ -109,7 +109,7 @@ public class GridObject extends GroupObject {
         }
         mWidth = width;
         mHeight = height;
-        calculateBoundary();
+        calculateAndCheckBoundary();
     }
 
     @WorkerThread
@@ -227,21 +227,19 @@ public class GridObject extends GroupObject {
 
     //해당 메소드가 오직 world.onTouch를 통해서만 호출된다 가정.
     @WorkerThread
-    boolean checkDrag(int x, int y){
+    void checkDrag(int x, int y){
         if(mIsPressed){
             int column = (int) ((x - mRenderLeft) * mColumn / mRenderWidth);
             int row = (int) ((y - mRenderTop) * mRow / mRenderHeight);
             if(mIsInCameraRange&&checkBoundary(x, y)&&column==mPressedColumn&&row==mPressedRow){
                 onTouchDrag(x, y);
                 onGridTouchDrag(x, y, mPressedRow, mPressedColumn);
-                return mConsumeDragEvent;
             }else{
                 mIsPressed = false;
                 onTouchCancel();
                 onGridTouchCancel(mPressedRow, mPressedColumn);
             }
         }
-        return false;
     }
 
     public interface OnTouchGridListener{

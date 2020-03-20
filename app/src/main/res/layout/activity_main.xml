@@ -13,6 +13,7 @@
         app:worldWidth="800"
         app:worldHeight="800"
         app:focusedZ="100"
+        app:maxWidgetCount="2048"
         android:layout_gravity="center"
         app:backgroundColor="@android:color/white"
         android:id="@+id/render_view"/>

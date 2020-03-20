@@ -61,7 +61,7 @@ public class RectWidget extends PaintableWidget {
     }
 
     @Override
-    void draw(Graphic2dDrawer drawer) {
+    protected void draw(Graphic2dDrawer drawer) {
         drawer.drawRect(mLeft, mTop, mRight, mBottom, mPaint);
     }
 }

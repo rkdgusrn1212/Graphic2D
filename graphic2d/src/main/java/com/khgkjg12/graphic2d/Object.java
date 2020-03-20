@@ -201,7 +201,7 @@ public abstract class Object {
      * 렌더 프레임상 x, y좌표 와 카메라 위치에 따른 스케일.
      */
     @WorkerThread
-    abstract void draw(Graphic2dDrawer drawer);
+    abstract protected void draw(Graphic2dDrawer drawer);
 
 
     public interface OnClickListener{

@@ -131,7 +131,7 @@ public class GroupWidget extends Widget {
     void calculateBoundary() { }
 
     @Override
-    void draw(Graphic2dDrawer drawer) {
+    protected void draw(Graphic2dDrawer drawer) {
     }
 
     /**

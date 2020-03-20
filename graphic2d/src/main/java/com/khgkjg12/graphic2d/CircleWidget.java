@@ -32,7 +32,7 @@ public class CircleWidget extends PaintableWidget {
     void calculateBoundary(){ }
 
     @Override
-    void draw(Graphic2dDrawer drawer) {
+    protected void draw(Graphic2dDrawer drawer) {
         drawer.drawCircle(mX, mY, mRadius, mPaint);
     }
 }

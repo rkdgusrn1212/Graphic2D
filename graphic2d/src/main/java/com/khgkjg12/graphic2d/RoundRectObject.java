@@ -51,7 +51,7 @@ public class RoundRectObject extends RectObject {
 
     @Override
     @WorkerThread
-    void draw(Graphic2dDrawer drawer) {
+    protected void draw(Graphic2dDrawer drawer) {
         drawer.drawRoundRect(mRenderLeft, mRenderTop, mRenderRight, mRenderBottom, mRenderRX, mRenderRY, mPaint);
     }
 }

@@ -61,7 +61,7 @@ public class TextureObject extends Object {
 
 
     @Override
-    void draw(Graphic2dDrawer drawer) {
+    protected void draw(Graphic2dDrawer drawer) {
         drawer.drawObject(mTexture, mRectF);
     }
 }

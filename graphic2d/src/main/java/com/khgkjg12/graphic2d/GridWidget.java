@@ -307,7 +307,7 @@ public class GridWidget extends GroupWidget {
     }
 
     @Override
-    void draw(Graphic2dDrawer drawer) { }
+    protected void draw(Graphic2dDrawer drawer) { }
 
     public interface OnClickGridListener {
         @WorkerThread

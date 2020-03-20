@@ -38,7 +38,7 @@ public class RoundRectWidget extends RectWidget {
     }
     @Override
     @WorkerThread
-    void draw(Graphic2dDrawer drawer) {
+    protected void draw(Graphic2dDrawer drawer) {
         drawer.drawRoundRect(mLeft, mTop, mRight, mBottom, mRX, mRY, mPaint);
     }
 }

@@ -34,7 +34,7 @@ public class CircleObject extends PaintableObject {
     }
 
     @Override
-    void draw(Graphic2dDrawer drawer) {
+    protected void draw(Graphic2dDrawer drawer) {
         drawer.drawCircle(mRenderX, mRenderY, mRenderRadius, mPaint);
     }
 }

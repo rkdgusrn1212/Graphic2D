@@ -68,7 +68,7 @@ public class TextureWidget extends Widget {
     }
 
     @Override
-    void draw(Graphic2dDrawer drawer) {
+    protected void draw(Graphic2dDrawer drawer) {
         drawer.drawObject(mTexture, mRectF);
     }
 }

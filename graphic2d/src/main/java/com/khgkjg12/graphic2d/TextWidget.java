@@ -105,7 +105,7 @@ public class TextWidget extends PaintableWidget {
 
     @Override
     @WorkerThread
-    void draw(Graphic2dDrawer drawer) {
+    protected void draw(Graphic2dDrawer drawer) {
         drawer.drawText(mText, mX, mBottom - mBound.bottom, mPaint);
     }
 

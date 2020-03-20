@@ -32,6 +32,7 @@ import com.khgkjg12.graphic2d.GroupObject;
 import com.khgkjg12.graphic2d.GroupWidget;
 import com.khgkjg12.graphic2d.Object;
 import com.khgkjg12.graphic2d.OvalWidget;
+import com.khgkjg12.graphic2d.RectWidget;
 import com.khgkjg12.graphic2d.RoundRectObject;
 import com.khgkjg12.graphic2d.RoundRectWidget;
 import com.khgkjg12.graphic2d.TextObject;
@@ -99,6 +100,22 @@ public class MainActivity extends Activity implements Graphic2dRenderView.Render
         world.putWidget(gridObject);
         gridObject.addOnClickGridListener(this);
         gridObject.addOnClickChildListener(this);
+        for(int m=0; m<8; m++){
+            for(int n=0; n<8; n++){
+                CircleWidget rro = new CircleWidget(gridObject.getZ(), gridObject.getColumnX(n), gridObject.getRowY(m), true, true, Color.YELLOW, true, 50);
+                gridObject.putChild(rro, n, m);
+                for(int i=0;i<9;i++) {
+                    // world.putWidget(new TextWidget(gridObject.getZ(), gridObject.getColumnX(n)+i, gridObject.getRowY(m), true, false, Color.BLACK, false, "158", 60, Paint.Align.CENTER, Typeface.SERIF));
+                    world.putWidget(new RoundRectWidget(gridObject.getZ(), gridObject.getColumnX(n)+i, gridObject.getRowY(m), true, true, Color.YELLOW, true, 100,100,10,10));
+                }
+                for(int i=0;i<9;i++) {
+
+                    // world.putWidget(new TextWidget(gridObject.getZ(), gridObject.getColumnX(n)+i, gridObject.getRowY(m), true, false, Color.BLACK, false, "158", 60, Paint.Align.CENTER, Typeface.SERIF));
+                    world.putWidget(new RoundRectWidget(gridObject.getZ(), gridObject.getColumnX(n)+i, gridObject.getRowY(m), true, true, Color.YELLOW, true, 100, 100,10,10));
+                }
+            }
+        }
+
         /*for(int i=0;i<8;i++){
             for(int j=0; j<8; j++) {
                 gridObject.putObject(world, new TextObject("lplplp", Typeface.SANS_SERIF, Color.BLACK, 100, 0, 0, 0, true, true), i, j);
@@ -156,9 +173,14 @@ public class MainActivity extends Activity implements Graphic2dRenderView.Render
 
     @Override
     public void onClickGrid(World world, GridWidget gridWidget, Widget widget, int row, int column) {
-        CircleWidget rro = new CircleWidget(gridObject.getZ(), gridObject.getColumnX(column), gridObject.getRowY(row), true, true, Color.YELLOW, true, 50);
+        /*CircleWidget rro = new CircleWidget(gridObject.getZ(), gridObject.getColumnX(column), gridObject.getRowY(row), true, true, Color.YELLOW, true, 50);
         gridObject.putChild(rro, row, column);
-        world.putWidget(new TextWidget(gridObject.getZ(), gridObject.getColumnX(column), gridObject.getRowY(row), true, false, Color.BLACK, false, "158", 60, Paint.Align.CENTER,Typeface.SERIF));
+        for(int i=0;i<9;i++) {
+            world.putWidget(new TextWidget(gridObject.getZ(), gridObject.getColumnX(column)+i, gridObject.getRowY(row), true, false, Color.BLACK, false, "158", 60, Paint.Align.CENTER, Typeface.SERIF));
+        }
+        for(int i=0;i<9;i++) {
+            world.putWidget(new TextWidget(gridObject.getZ()+i, gridObject.getColumnX(column), gridObject.getRowY(row), true, false, Color.BLACK, false, "158", 60, Paint.Align.CENTER, Typeface.SERIF));
+        }*/
         //gridObject.putObject(new TextObject( gridObject.getZ(), gridObject.getColumnX(column),gridObject.getRowY(row), true , true,null, "IgIg", 100, Typeface.SERIF, Color.WHITE), row, column);
     }
 
@@ -181,11 +203,6 @@ public class MainActivity extends Activity implements Graphic2dRenderView.Render
 
     @Override
     public void onClickChild(World attachedWorld, GroupWidget groupWidget, Widget widget, int idx) {
-        if(gridObject.getRowSize()==4) {
-            gridObject.changeGridSize(8,8);
-        }else{
-            gridObject.changeGridSize(4, 4);
-        }
         //pop = true;
         // popObject = gridObject;
     }

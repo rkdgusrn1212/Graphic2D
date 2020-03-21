@@ -39,6 +39,9 @@ public abstract class Object {
     protected World mAttachedWorld = null;
     protected GroupObject mGroup = null;
     protected int mPressedX, mPressedY;
+    protected Object mLayerHost = null;
+    protected Object[] mForegroundObjects = null;
+    protected Object[] mBackgroundObjects = null;
 
     @WorkerThread
     public Object(float z, float x, float y, boolean visibility, boolean clickable) {
@@ -178,7 +181,15 @@ public abstract class Object {
     @WorkerThread
     void render(Graphic2dDrawer drawer){
         if(mIsInCameraRange&&isVisible()){
+            if(mBackgroundObjects!=null)
+                for(int i=mBackgroundObjects.length-1; i>=0; i--)
+                    if(mBackgroundObjects[i]!=null)
+                        mBackgroundObjects[i].draw(drawer);
             draw(drawer);
+            if(mForegroundObjects!=null)
+                for(Object obj : mForegroundObjects)
+                    if(obj!=null)
+                        obj.draw(drawer);
         }
     }
 
@@ -251,32 +262,51 @@ public abstract class Object {
             }
         }
         mZ = z;
-        if(mAttachedWorld!=null) calculateScale(mAttachedWorld);
+        if(mAttachedWorld!=null) calculateScale();
     }
 
     @WorkerThread
     public void moveXY(float x, float y){
         mX = x;
         mY = y;
-        if(mAttachedWorld!=null) calculateRenderXY(mAttachedWorld);
+        if(mAttachedWorld!=null) calculateRenderXY(mAttachedWorld.mViewportWidth/2f, mAttachedWorld.mViewportHeight/2f, mAttachedWorld.mViewportX, mAttachedWorld. mViewportY);
+        else if(mLayerHost!=null) calculateRenderXY(mLayerHost.mRenderX, mLayerHost.mRenderY, 0, 0);
+        //레이어들은 attached 안되어있기때문에 그냥 mX,mY만 바뀜.
+
     }
 
     @WorkerThread
-    void calculateScale(@NonNull World world){
-        if(mZ<world.mCameraZ) {
+    void calculateScale(){
+        if(mZ<mAttachedWorld.mCameraZ) {
             mIsInCameraRange = true;
-            mScale = world.mFocusedZ / (world.mCameraZ - mZ);
-            calculateRenderXY(world);
+            mScale = mAttachedWorld.mFocusedZ / (mAttachedWorld.mCameraZ - mZ);
+            if(mForegroundObjects!=null)
+                for(Object obj : mForegroundObjects)
+                    if(obj!=null)
+                        obj.mScale = mScale;
+            if(mBackgroundObjects!=null)
+                for(Object obj : mBackgroundObjects)
+                    if(obj!=null)
+                        obj.mScale = mScale;
+            calculateRenderXY(mAttachedWorld.mViewportWidth/2f, mAttachedWorld.mViewportHeight/2f, mAttachedWorld.mViewportX, mAttachedWorld. mViewportY);
         }else{
             mIsInCameraRange = false;
         }
     }
 
     @WorkerThread
-    void calculateRenderXY(@NonNull World world){
-        mRenderX = (world.mViewportWidth / 2f) - (world.mViewportX - mX) * mScale;
-        mRenderY = (world.mViewportHeight / 2f) - (world.mViewportY - mY) * mScale;
+    void calculateRenderXY(float originViewportX, float originViewportY, float originWorldX, float originWorldY){
+        mRenderX = originViewportX + (mX - originWorldX) * mScale;
+        mRenderY = originViewportY + (mY - originWorldY) * mScale;
         calculateAndCheckBoundary();
+        if(mForegroundObjects!=null)
+            for(Object obj : mForegroundObjects)
+                if(obj!=null)
+                    obj.calculateRenderXY(mRenderX, mRenderY, 0, 0);
+        if(mBackgroundObjects!=null)
+            for(Object obj : mBackgroundObjects)
+                if(obj!=null)
+                    obj.calculateRenderXY(mRenderX, mRenderY, 0, 0);
     }
 
     public interface OnTouchListener{
@@ -289,6 +319,55 @@ public abstract class Object {
         @WorkerThread
         void onTouchDrag(@Nullable World attachedWorld, @NonNull Object object, int x, int y);
     }
+
+    /**
+     * @exception IndexOutOfBoundsException
+     * @param object
+     * @param layer
+     */
+    public void putForegroundLayer(@Nullable Object object, int layer){
+        mForegroundObjects[layer] = object;
+        if(object!=null) {
+            object.mLayerHost = this;
+            if (mAttachedWorld != null) {
+                object.mScale = mScale;
+                object.calculateRenderXY(mRenderX, mRenderY, 0 ,0);
+            }
+        }
+    }
+
+    public void enableForeground(int layers){
+        mForegroundObjects = new Object[layers];
+    }
+
+    public void disableForeground(){
+        mForegroundObjects = null;
+    }
+
+    /**
+     * @exception IndexOutOfBoundsException
+     * @param object
+     * @param layer
+     */
+    public void putBackgroundLayer(@NonNull Object object, int layer){
+        mBackgroundObjects[layer] = object;
+        if(object!=null) {
+            object.mLayerHost = this;
+            if (mAttachedWorld != null) {
+                object.mScale = mScale;
+                object.calculateRenderXY(mRenderX, mRenderY, 0 ,0);
+            }
+        }
+    }
+
+    public void enableBackground(int layers){
+        mBackgroundObjects = new Object[layers];
+    }
+
+    public void disableBackground(){
+        mBackgroundObjects = null;
+    }
+
 
     @WorkerThread
     public boolean isClickable(){

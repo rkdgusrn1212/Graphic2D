@@ -164,9 +164,9 @@ public class World {
                 mObjects[j] = mObjects[j - 1];
                 j--;
             }
-            object.calculateScale(this);
             mObjects[i] = object;
             mObjects[i].attached(this);
+            object.calculateScale();
         }else{
             throw new PutAttachedObjectException();
         }
@@ -241,7 +241,7 @@ public class World {
     @WorkerThread
     private void calculateObjectXY(){
         for(int i=0;i<mObjectCount; i++){
-            mObjects[i].calculateRenderXY(this);
+            mObjects[i].calculateRenderXY(mViewportWidth/2f, mViewportHeight/2f, mViewportX, mViewportY);
         }
     }
 
@@ -376,7 +376,7 @@ public class World {
     public void moveCamreraZ(float z){
         mCameraZ = z;
         for(int j=0; j<mObjectCount; j++){
-            mObjects[j].calculateScale(this);
+            mObjects[j].calculateScale();
         }
     }
 

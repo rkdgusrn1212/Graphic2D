@@ -13,6 +13,7 @@ public abstract class Widget {
     protected ArrayList<Widget.OnClickListener> mOnClickListeners = null;
     protected float mZ;
     protected float mX, mY;
+    protected float mRenderX, mRenderY;
     protected ArrayList<Widget.OnTouchListener> mOnTouchListeners = null;
     protected boolean mIsPressed = false;
     protected boolean mConsumeTouchEvent = true;
@@ -20,6 +21,9 @@ public abstract class Widget {
     protected World mAttachedWorld = null;
     protected GroupWidget mGroup = null;
     protected int mPressedX, mPressedY;
+    protected Widget mLayerHost = null;
+    protected Widget[] mForegroundWidgets = null;
+    protected Widget[] mBackgroundWidgets = null;
 
     @WorkerThread
     public Widget(){
@@ -175,7 +179,15 @@ public abstract class Widget {
     @WorkerThread
     void render(Graphic2dDrawer drawer){
         if(isVisible()){
+            if(mBackgroundWidgets!=null)
+                for(int i=mBackgroundWidgets.length-1; i>=0; i--)
+                    if(mBackgroundWidgets[i]!=null)
+                        mBackgroundWidgets[i].draw(drawer);
             draw(drawer);
+            if(mForegroundWidgets!=null)
+                for(Widget widget : mForegroundWidgets)
+                    if(widget!=null)
+                        widget.draw(drawer);
         }
     }
 
@@ -239,7 +251,8 @@ public abstract class Widget {
     public void moveXY(float x, float y){
         mX = x;
         mY = y;
-        calculateAndCheckBoundary();
+        calculateRenderXY(0,0);
+        if(mLayerHost!=null) calculateRenderXY(mLayerHost.mRenderX, mLayerHost.mRenderY);
     }
 
     /**
@@ -353,4 +366,66 @@ public abstract class Widget {
         @WorkerThread
         void onTouchDrag(@Nullable World attachedWorld, @NonNull Widget widget, int x, int y);
     }
+
+    @WorkerThread
+    void calculateRenderXY(float originViewportX, float originViewportY) {
+        mRenderX = originViewportX + mX;
+        mRenderY = originViewportY + mY;
+        calculateAndCheckBoundary();
+        if (mForegroundWidgets != null)
+            for (Widget widget : mForegroundWidgets)
+                if (widget != null)
+                    widget.calculateRenderXY(mRenderX, mRenderY);
+        if (mBackgroundWidgets != null)
+            for (Widget widget : mBackgroundWidgets)
+                if (widget != null)
+                    widget.calculateRenderXY(mRenderX, mRenderY);
+    }
+    /**
+     * @exception IndexOutOfBoundsException
+     * @param widget
+     * @param layer
+     */
+    public void putForegroundLayer(@Nullable Widget widget, int layer){
+        mForegroundWidgets[layer] = widget;
+        if(widget!=null) {
+            widget.mLayerHost = this;
+            if (mAttachedWorld != null) {
+                widget.calculateRenderXY(mRenderX, mRenderY);
+            }
+        }
+    }
+
+    public void enableForeground(int layers){
+        mForegroundWidgets = new Widget[layers];
+    }
+
+    public void disableForeground(){
+        mForegroundWidgets = null;
+    }
+
+    /**
+     * @exception IndexOutOfBoundsException
+     * @param widget
+     * @param layer
+     */
+    public void putBackgroundLayer(@NonNull Widget widget, int layer){
+        mBackgroundWidgets[layer] = widget;
+        if(widget!=null) {
+            widget.mLayerHost = this;
+            if (mAttachedWorld != null) {
+                widget.calculateRenderXY(mRenderX, mRenderY);
+            }
+        }
+    }
+
+    public void enableBackground(int layers){
+        mBackgroundWidgets = new Widget[layers];
+    }
+
+    public void disableBackground(){
+        mBackgroundWidgets = null;
+    }
+
+
 }

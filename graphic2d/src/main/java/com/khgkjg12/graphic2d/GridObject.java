@@ -349,13 +349,13 @@ public class GridObject extends GroupObject {
     @Override
     public void moveZ(float z) {
         super.moveZ(z);
-        if(mAttachedWorld!=null)calculateScale(mAttachedWorld);
+        if(mAttachedWorld!=null)calculateScale();
     }
 
     @Override
     public void moveXY(float x, float y) {
         super.moveXY(x, y);
-        if(mAttachedWorld!=null) calculateRenderXY(mAttachedWorld);
+        if(mAttachedWorld!=null) calculateRenderXY(mAttachedWorld.mViewportWidth/2f, mAttachedWorld.mViewportHeight/2f, mAttachedWorld.mViewportX, mAttachedWorld. mViewportY);
     }
 
     public void changeGridSize(int row, int column){

@@ -23,23 +23,6 @@ public class TextWidget extends PaintableWidget {
         mPaint.setTypeface(typeface);
         mPaint.setTextSize(textSize);
         mText = text;
-        mPaint.getTextBounds(mText, 0, mText.length(), mBound);
-        mTextHeight = mBound.height();
-        mTextWidth = mBound.width();
-        mTop = mY - mTextHeight/2;
-        mBottom = mTop + mTextHeight;
-        Paint.Align align = mPaint.getTextAlign();
-        if(align != Paint.Align.RIGHT){
-            if(align == Paint.Align.CENTER) {
-                mLeft = mX-mTextWidth/2;
-            }else {
-                mLeft = mX;
-            }
-            mRight = mLeft + mTextWidth;
-        }else{
-            mRight = mX;
-            mLeft = mRight - mTextWidth;
-        }
     }
 
     @WorkerThread
@@ -81,18 +64,18 @@ public class TextWidget extends PaintableWidget {
         mPaint.getTextBounds(mText, 0, mText.length(), mBound);
         mTextHeight = mBound.height();
         mTextWidth = mBound.width();
-        mTop = mY - mTextHeight/2;
+        mTop = mRenderY - mTextHeight/2;
         mBottom = mTop + mTextHeight;
         Paint.Align align = mPaint.getTextAlign();
         if(align != Paint.Align.RIGHT){
             if(align == Paint.Align.CENTER) {
-                mLeft = mX-mTextWidth/2;
+                mLeft = mRenderX-mTextWidth/2;
             }else {
-                mLeft = mX;
+                mLeft = mRenderX;
             }
             mRight = mLeft + mTextWidth;
         }else{
-            mRight = mX;
+            mRight = mRenderX;
             mLeft = mRight - mTextWidth;
         }
     }
@@ -106,7 +89,7 @@ public class TextWidget extends PaintableWidget {
     @Override
     @WorkerThread
     protected void draw(Graphic2dDrawer drawer) {
-        drawer.drawText(mText, mX, mBottom - mBound.bottom, mPaint);
+        drawer.drawText(mText, mRenderX, mBottom - mBound.bottom, mPaint);
     }
 
     @WorkerThread

@@ -12,10 +12,6 @@ public class OvalWidget extends PaintableWidget {
         super(z, x, y, visibility, clickable, color, autoShadow);
         mWidth = width;
         mHeight = height;
-        mRenderRect.left = mX - mWidth/2;
-        mRenderRect.top = mY - mHeight/2;
-        mRenderRect.right = mRenderRect.left + mWidth;
-        mRenderRect.bottom = mRenderRect.top + mHeight;
     }
 
     @WorkerThread
@@ -48,8 +44,8 @@ public class OvalWidget extends PaintableWidget {
     @Override
     @WorkerThread
     boolean checkBoundary(int x, int y) {
-        float deltaX = x - mX;
-        float deltaY = y - mY;
+        float deltaX = x - mRenderX;
+        float deltaY = y - mRenderY;
         float xRadius = mWidth/2;
         float yRadius = mHeight/2;
         return (deltaX*deltaX)/(xRadius*xRadius)+(deltaY*deltaY)/(yRadius*yRadius)<=1;
@@ -57,8 +53,8 @@ public class OvalWidget extends PaintableWidget {
 
     @Override
     void calculateBoundary(){
-        mRenderRect.left = mX - mWidth/2;
-        mRenderRect.top = mY - mHeight/2;
+        mRenderRect.left = mRenderX - mWidth/2;
+        mRenderRect.top = mRenderY - mHeight/2;
         mRenderRect.right = mRenderRect.left + mWidth;
         mRenderRect.bottom = mRenderRect.top + mHeight;
     }

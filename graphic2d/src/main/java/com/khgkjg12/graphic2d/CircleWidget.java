@@ -23,8 +23,8 @@ public class CircleWidget extends PaintableWidget {
     @Override
     @WorkerThread
     boolean checkBoundary(int x, int y) {
-        float deltaX = x - mX;
-        float deltaY = y - mY;
+        float deltaX = x - mRenderX;
+        float deltaY = y - mRenderY;
         return deltaX*deltaX+deltaY*deltaY<=mRadius*mRadius;
     }
 
@@ -33,6 +33,6 @@ public class CircleWidget extends PaintableWidget {
 
     @Override
     protected void draw(Graphic2dDrawer drawer) {
-        drawer.drawCircle(mX, mY, mRadius, mPaint);
+        drawer.drawCircle(mRenderX, mRenderY, mRadius, mPaint);
     }
 }

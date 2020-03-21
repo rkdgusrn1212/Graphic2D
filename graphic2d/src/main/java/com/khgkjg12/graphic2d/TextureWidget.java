@@ -20,13 +20,6 @@ public class TextureWidget extends Widget {
         mHeight = height;
         mHorizontalDegree = degreeH%360;
         mVerticalDegree = degreeV%360;
-        mRenderWidth = mWidth * Math.abs((float) Math.cos(mHorizontalDegree * Math.PI / 180));
-        mRenderHeight = mHeight * Math.abs((float) Math.cos(mVerticalDegree * Math.PI / 180));
-        mRectF.left =  mX - mRenderWidth/2;
-        mRectF.top = mY - mRenderHeight/2;
-        mRectF.right = mRectF.left + mRenderWidth;
-        mRectF.bottom = mRectF.top + mRenderHeight;
-
     }
 
     /**
@@ -61,8 +54,8 @@ public class TextureWidget extends Widget {
     void calculateBoundary(){
         mRenderWidth = mWidth * Math.abs((float) Math.cos(mHorizontalDegree * Math.PI / 180));
         mRenderHeight = mHeight * Math.abs((float) Math.cos(mVerticalDegree * Math.PI / 180));
-        mRectF.left =  mX - mRenderWidth/2;
-        mRectF.top = mY - mRenderHeight/2;
+        mRectF.left =  mRenderX - mRenderWidth/2;
+        mRectF.top = mRenderY - mRenderHeight/2;
         mRectF.right = mRectF.left + mRenderWidth;
         mRectF.bottom = mRectF.top + mRenderHeight;
     }

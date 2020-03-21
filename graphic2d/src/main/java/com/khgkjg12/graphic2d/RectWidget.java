@@ -13,10 +13,6 @@ public class RectWidget extends PaintableWidget {
         super(z, x, y, visibility, clickable, color, autoShadow);
         mWidth = width;
         mHeight = height;
-        mLeft = mX - width/2;
-        mTop = mY - height/2;
-        mRight = mLeft + width;
-        mBottom = mTop + height;
     }
 
     @WorkerThread
@@ -54,8 +50,8 @@ public class RectWidget extends PaintableWidget {
 
     @Override
     void calculateBoundary(){
-        mLeft = mX - mWidth/2;
-        mTop = mY - mHeight/2;
+        mLeft = mRenderX - mWidth/2;
+        mTop = mRenderY - mHeight/2;
         mRight = mLeft + mWidth;
         mBottom = mTop + mHeight;
     }

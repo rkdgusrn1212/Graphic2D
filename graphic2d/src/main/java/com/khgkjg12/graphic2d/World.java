@@ -186,6 +186,7 @@ public class World {
             }
             mWidgets[i] = widget;
             mWidgets[i].attached(this);
+            mWidgets[i].calculateRenderXY(0,0);
         }else{
             throw new PutAttachedWidgetException();
         }

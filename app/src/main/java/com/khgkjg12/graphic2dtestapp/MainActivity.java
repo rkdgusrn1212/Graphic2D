@@ -55,7 +55,7 @@ import static android.view.WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON;
  * 2D오브젝트의 클릭: 검은 돌과 하얀돌을 클릭하면 해당 객체에 지정된 클릭 리스너가 실행됨. 클릭시 효과음도 설정;
  */
 
-public class MainActivity extends Activity implements Graphic2dRenderView.Renderer, GridWidget.OnClickGridListener, GroupObject.OnClickChildListener {
+public class MainActivity extends Activity implements Graphic2dRenderView.Renderer, GridWidget.OnClickGridListener, GroupWidget.OnClickChildListener {
 
     public static Texture background;
     public static Texture blackStone;
@@ -64,7 +64,7 @@ public class MainActivity extends Activity implements Graphic2dRenderView.Render
     private boolean flip = false;
     private Widget flipObject = null;
     private boolean pop = false;
-    private Object popObject = null;
+    private Widget popObject = null;
     private float timeAcc = 0;
     private int count = 0;
     GridObject gridObject;
@@ -97,16 +97,16 @@ public class MainActivity extends Activity implements Graphic2dRenderView.Render
             }
             world.putObject(horLine);
         }*/
-        gridObject = new GridObject(0,0,0,800, 800, 8, 8,true, true, true);
-        world.putObject(gridObject);
+        GridWidget gridObject = new GridWidget(0,400,400,800, 800, 8, 8,true, true, true);
+        world.putWidget(gridObject);
         gridObject.addOnClickChildListener(this);
         for(int m=0; m<8; m++){
             for(int n=0; n<8; n++){
-                CircleObject rro = new CircleObject(gridObject.getZ(), gridObject.getColumnX(n), gridObject.getRowY(m), true, true, Color.YELLOW, false, 50);
+                CircleWidget rro = new CircleWidget(gridObject.getZ(), gridObject.getColumnX(n), gridObject.getRowY(m), true, true, Color.YELLOW, false, 50);
                 rro.enableForeground(9);
                 gridObject.putChild(rro, n, m);
                 for(int i=0;i<9;i++) {
-                    rro.putForegroundLayer(new TextObject(0, i*11.1f-50, i*11.1f-50, true, false, Color.BLACK, false, ""+i, 10, Paint.Align.CENTER, Typeface.SERIF), i);
+                    rro.putForegroundLayer(new TextWidget(0, i*11.1f-50, i*11.1f-50, true, false, Color.BLACK, false, ""+i, 10, Paint.Align.CENTER, Typeface.SERIF), i);
                 }
                 /*for(int i=0;i<9;i++) {
 
@@ -151,11 +151,11 @@ public class MainActivity extends Activity implements Graphic2dRenderView.Render
             startTime+=deltaTime;
             if(startTime>=2){
                 pop = false;
-                popObject.moveXY( 0, 0);
+                popObject.moveXY( 400, 400);
                 popObject = null;
                 startTime = 0;
             }else{
-                popObject.moveXY(98*startTime-0.5f*98*startTime*startTime, 0);
+                popObject.moveXY(400+98*startTime-0.5f*98*startTime*startTime, 400);
             }
         }
     }
@@ -200,10 +200,9 @@ public class MainActivity extends Activity implements Graphic2dRenderView.Render
         blackStone.dispose();
         super.onDestroy();
     }
-
     @Override
-    public void onClickChild(World attachedWorld, GroupObject groupObject, Object object, int idx) {
+    public void onClickChild(World attachedWorld, GroupWidget groupWidget, Widget widget, int idx) {
         pop = true;
-        popObject = object;
+        popObject = groupWidget;
     }
 }

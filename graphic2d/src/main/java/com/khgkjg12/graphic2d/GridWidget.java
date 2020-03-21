@@ -54,10 +54,6 @@ public class GridWidget extends GroupWidget {
         mHeight = height;
         mRow = row;
         mColumn = column;
-        mLeft =  mX - mWidth/2;
-        mTop = mY - mHeight/2;
-        mRight = mLeft + mWidth;
-        mBottom = mTop + mHeight;
         mGridClickable = gridClickable;
     }
 
@@ -300,8 +296,8 @@ public class GridWidget extends GroupWidget {
 
     @Override
     void calculateBoundary() {
-        mLeft =  mX - mWidth/2;
-        mTop = mY - mHeight/2;
+        mLeft =  mRenderX - mWidth/2;
+        mTop = mRenderY - mHeight/2;
         mRight = mLeft + mWidth;
         mBottom = mTop + mHeight;
     }
@@ -345,12 +341,6 @@ public class GridWidget extends GroupWidget {
     @Override
     public void changeGroupSize(int groupSize) {
         throw new RuntimeException("Try to change grid size");
-    }
-
-    @Override
-    public void moveXY(float x, float y) {
-        super.moveXY(x, y);
-        calculateAndCheckBoundary();
     }
 
     public void changeGridSize(int row, int column){

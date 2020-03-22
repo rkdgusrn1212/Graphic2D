@@ -74,12 +74,16 @@ public class GroupWidget extends Widget {
             mWidgetList[idx].leaveGroup();
             if (mAttachedWorld != null) {
                 mAttachedWorld.removeWidget(mWidgetList[idx]);
+            }else if(mLayerHost!=null){
+                mWidgetList[idx].mLayerHost = null;
             }
         }
         if (widget != null) {
             widget.joinGroup(this);
             if (mAttachedWorld != null) {
                 mAttachedWorld.putWidget(widget);
+            }else if(mLayerHost!=null){
+                widget.mLayerHost = mLayerHost;
             }
         }
         mWidgetList[idx] = widget;
@@ -118,13 +122,12 @@ public class GroupWidget extends Widget {
     public void moveXY(float x, float y) {
         float deltaX = x - mX;
         float deltaY = y - mY;
-        mX = x;
-        mY = y;
         for (int i = 0; i < mGroupSize; i++) {
             if(mWidgetList[i]!=null) {
                 mWidgetList[i].moveXY(mWidgetList[i].mX+deltaX, mWidgetList[i].mY+deltaY);
             }
         }
+        super.moveXY(x, y);
     }
 
     @Override
@@ -132,8 +135,11 @@ public class GroupWidget extends Widget {
 
     @Override
     protected void draw(Graphic2dDrawer drawer) {
+        if(mLayerHost!=null)
+            for(Widget widget : mWidgetList)
+                if(widget!=null)
+                    widget.render(drawer);
     }
-
     /**
      * To get child object idx.
      * @param widget 그룹의 자식오브젝트.

@@ -182,12 +182,12 @@ public abstract class Widget {
             if(mBackgroundWidgets!=null)
                 for(int i=mBackgroundWidgets.length-1; i>=0; i--)
                     if(mBackgroundWidgets[i]!=null)
-                        mBackgroundWidgets[i].draw(drawer);
+                        mBackgroundWidgets[i].render(drawer);
             draw(drawer);
             if(mForegroundWidgets!=null)
                 for(Widget widget : mForegroundWidgets)
                     if(widget!=null)
-                        widget.draw(drawer);
+                        widget.render(drawer);
         }
     }
 

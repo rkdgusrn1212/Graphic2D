@@ -305,9 +305,6 @@ public class GridObject extends GroupObject {
         mRenderBottom = mRenderTop + mRenderHeight;
     }
 
-    @Override
-    protected void draw(Graphic2dDrawer drawer) { }
-
     public interface OnClickGridListener {
         @WorkerThread
         void onClickGrid(World world, GridObject gridObject, @Nullable Object object, int row, int column);
@@ -350,12 +347,6 @@ public class GridObject extends GroupObject {
     public void moveZ(float z) {
         super.moveZ(z);
         if(mAttachedWorld!=null)calculateScale();
-    }
-
-    @Override
-    public void moveXY(float x, float y) {
-        super.moveXY(x, y);
-        if(mAttachedWorld!=null) calculateRenderXY(mAttachedWorld.mViewportWidth/2f, mAttachedWorld.mViewportHeight/2f, mAttachedWorld.mViewportX, mAttachedWorld. mViewportY);
     }
 
     public void changeGridSize(int row, int column){

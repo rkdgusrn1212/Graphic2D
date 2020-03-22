@@ -302,9 +302,6 @@ public class GridWidget extends GroupWidget {
         mBottom = mTop + mHeight;
     }
 
-    @Override
-    protected void draw(Graphic2dDrawer drawer) { }
-
     public interface OnClickGridListener {
         @WorkerThread
         void onClickGrid(World world, GridWidget gridWidget, @Nullable Widget widget, int row, int column);

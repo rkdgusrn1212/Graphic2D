@@ -184,12 +184,12 @@ public abstract class Object {
             if(mBackgroundObjects!=null)
                 for(int i=mBackgroundObjects.length-1; i>=0; i--)
                     if(mBackgroundObjects[i]!=null)
-                        mBackgroundObjects[i].draw(drawer);
+                        mBackgroundObjects[i].render(drawer);
             draw(drawer);
             if(mForegroundObjects!=null)
                 for(Object obj : mForegroundObjects)
                     if(obj!=null)
-                        obj.draw(drawer);
+                        obj.render(drawer);
         }
     }
 
@@ -307,6 +307,12 @@ public abstract class Object {
             for(Object obj : mBackgroundObjects)
                 if(obj!=null)
                     obj.calculateRenderXY(mRenderX, mRenderY, 0, 0);
+    }
+
+    @WorkerThread
+    void onAttachedLayerHost(Object obj){
+        mLayerHost = obj;
+        calculateRenderXY(obj.mRenderX, obj.mRenderY, 0, 0);
     }
 
     public interface OnTouchListener{

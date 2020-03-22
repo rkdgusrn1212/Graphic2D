@@ -73,12 +73,16 @@ public class GroupObject extends Object{
             mObjectList[idx].leaveGroup();
             if (mAttachedWorld != null) {
                 mAttachedWorld.removeObject(mObjectList[idx]);
+            }else if(mLayerHost!=null){
+                mObjectList[idx].mLayerHost = null;
             }
         }
         if (obj != null) {
             obj.joinGroup(this);
             if (mAttachedWorld != null) {
                 mAttachedWorld.putObject(obj);
+            }else if(mLayerHost !=null){
+                obj.mLayerHost = mLayerHost;
             }
         }
         mObjectList[idx] = obj;
@@ -122,16 +126,28 @@ public class GroupObject extends Object{
     public void moveXY(float x, float y) {
         float deltaX = x - mX;
         float deltaY = y - mY;
-        mX = x;
-        mY = y;
+        super.moveXY(x, y);
         for (int i = 0; i < mGroupSize; i++) {
-            if(mObjectList[i]!=null) {
-                mObjectList[i].moveXY(mObjectList[i].mX+deltaX, mObjectList[i].mY+deltaY);
-            }
+                if (mObjectList[i] != null) {
+                    mObjectList[i].moveXY(mObjectList[i].mX + deltaX, mObjectList[i].mY + deltaY);
+                }
         }
     }
+
+    @WorkerThread
+    void onAttachedLayerHost(Object obj){
+        super.onAttachedLayerHost(obj);
+        for(Object child : mObjectList)
+            if(child!=null)
+                child.onAttachedLayerHost(obj);
+    }
+
     @Override
     protected void draw(Graphic2dDrawer drawer) {
+        if(mLayerHost!=null)
+            for(Object obj : mObjectList)
+                if(obj!=null)
+                    obj.render(drawer);
     }
 
     /**

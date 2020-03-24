@@ -207,7 +207,7 @@ public class World {
                 i++;
             }
             mObjectCount--;
-            object.detached(this);
+            object.detached();
         }else{
             throw new RemoveChildFromWorldException();
         }
@@ -223,7 +223,7 @@ public class World {
                 i++;
             }
             mWidgetCount--;
-            widget.detached(this);
+            widget.detached();
         }else{
             throw new RemoveChildFromWorldException();
         }

@@ -286,7 +286,17 @@ public abstract class Object {
     public void moveXY(float x, float y){
         mX = x;
         mY = y;
-        if(mAttachedWorld!=null) calculateRenderXY();
+        if(mAttachedWorld!=null) {
+            calculateRenderXY();
+            if (mForegroundObjects != null)
+                for (Object object : mForegroundObjects)
+                    if (object != null)
+                        object.calculateRenderXY();
+            if (mBackgroundObjects != null)
+                for (Object object : mBackgroundObjects)
+                    if (object != null)
+                        object.calculateRenderXY();
+        }
         //레이어들은 attached 안되어있기때문에 그냥 mX,mY만 바뀜.
 
     }

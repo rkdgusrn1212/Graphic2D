@@ -26,15 +26,6 @@ public abstract class Widget {
     protected Widget[] mBackgroundWidgets = null;
 
     @WorkerThread
-    public Widget(){
-        mZ =0;
-        mX =0;
-        mY =0;
-        mVisibility = true;
-        mClickable = true;
-    }
-
-    @WorkerThread
     public Widget(float z, float x, float y, boolean visibility, boolean clickable) {
         mVisibility = visibility;
         mClickable = clickable;
@@ -268,7 +259,17 @@ public abstract class Widget {
     public void moveXY(float x, float y){
         mX = x;
         mY = y;
-        calculateRenderXY();
+        if(mAttachedWorld!=null) {
+            calculateRenderXY();
+            if (mForegroundWidgets != null)
+                for (Widget widget : mForegroundWidgets)
+                    if (widget != null)
+                        widget.calculateRenderXY();
+            if (mBackgroundWidgets != null)
+                for (Widget widget : mBackgroundWidgets)
+                    if (widget != null)
+                        widget.calculateRenderXY();
+        }
     }
 
     /**

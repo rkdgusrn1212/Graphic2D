@@ -55,10 +55,27 @@ public abstract class Object {
     @WorkerThread
     void attached(World world){
         mAttachedWorld = world;
+        calculateScale();
+        if(mForegroundObjects!=null)
+            for(Object obj : mForegroundObjects)
+                if(obj!=null)
+                    obj.attached(world);
+        if(mBackgroundObjects!=null)
+            for(Object obj : mBackgroundObjects)
+                if(obj!=null)
+                    obj.attached(world);
     }
 
     @WorkerThread
-    void detached(World world) {
+    void detached() {
+        if(mForegroundObjects!=null)
+            for(Object obj : mForegroundObjects)
+                if(obj!=null)
+                    obj.detached();
+        if(mBackgroundObjects!=null)
+            for(Object obj : mBackgroundObjects)
+                if(obj!=null)
+                    obj.detached();
         mAttachedWorld = null;
     }
 
@@ -269,8 +286,7 @@ public abstract class Object {
     public void moveXY(float x, float y){
         mX = x;
         mY = y;
-        if(mAttachedWorld!=null) calculateRenderXY(mAttachedWorld.mViewportWidth/2f, mAttachedWorld.mViewportHeight/2f, mAttachedWorld.mViewportX, mAttachedWorld. mViewportY);
-        else if(mLayerHost!=null) calculateRenderXY(mLayerHost.mRenderX, mLayerHost.mRenderY, 0, 0);
+        if(mAttachedWorld!=null) calculateRenderXY();
         //레이어들은 attached 안되어있기때문에 그냥 mX,mY만 바뀜.
 
     }
@@ -280,39 +296,22 @@ public abstract class Object {
         if(mZ<mAttachedWorld.mCameraZ) {
             mIsInCameraRange = true;
             mScale = mAttachedWorld.mFocusedZ / (mAttachedWorld.mCameraZ - mZ);
-            if(mForegroundObjects!=null)
-                for(Object obj : mForegroundObjects)
-                    if(obj!=null)
-                        obj.mScale = mScale;
-            if(mBackgroundObjects!=null)
-                for(Object obj : mBackgroundObjects)
-                    if(obj!=null)
-                        obj.mScale = mScale;
-            calculateRenderXY(mAttachedWorld.mViewportWidth/2f, mAttachedWorld.mViewportHeight/2f, mAttachedWorld.mViewportX, mAttachedWorld. mViewportY);
+            calculateRenderXY();
         }else{
             mIsInCameraRange = false;
         }
     }
 
     @WorkerThread
-    void calculateRenderXY(float originViewportX, float originViewportY, float originWorldX, float originWorldY){
-        mRenderX = originViewportX + (mX - originWorldX) * mScale;
-        mRenderY = originViewportY + (mY - originWorldY) * mScale;
+    void calculateRenderXY(){
+        if(mLayerHost==null) {
+            mRenderX = mAttachedWorld.mViewportWidth/2f + (mX - mAttachedWorld.mViewportX) * mScale;
+            mRenderY = mAttachedWorld.mViewportHeight/2f + (mY - mAttachedWorld.mViewportY) * mScale;
+        }else{
+            mRenderX = mLayerHost.mRenderX + mX * mLayerHost.mScale;
+            mRenderY = mLayerHost.mRenderY + mY * mLayerHost.mScale;
+        }
         calculateAndCheckBoundary();
-        if(mForegroundObjects!=null)
-            for(Object obj : mForegroundObjects)
-                if(obj!=null)
-                    obj.calculateRenderXY(mRenderX, mRenderY, 0, 0);
-        if(mBackgroundObjects!=null)
-            for(Object obj : mBackgroundObjects)
-                if(obj!=null)
-                    obj.calculateRenderXY(mRenderX, mRenderY, 0, 0);
-    }
-
-    @WorkerThread
-    void onAttachedLayerHost(Object obj){
-        mLayerHost = obj;
-        calculateRenderXY(obj.mRenderX, obj.mRenderY, 0, 0);
     }
 
     public interface OnTouchListener{
@@ -335,10 +334,8 @@ public abstract class Object {
         mForegroundObjects[layer] = object;
         if(object!=null) {
             object.mLayerHost = this;
-            if (mAttachedWorld != null) {
-                object.mScale = mScale;
-                object.calculateRenderXY(mRenderX, mRenderY, 0 ,0);
-            }
+            if (mAttachedWorld != null)
+                object.attached(mAttachedWorld);
         }
     }
 
@@ -347,6 +344,12 @@ public abstract class Object {
     }
 
     public void disableForeground(){
+        for(Object obj : mForegroundObjects)
+            if(obj!=null) {
+                if(mAttachedWorld!=null)
+                    obj.detached();
+                obj.mLayerHost = null;
+            }
         mForegroundObjects = null;
     }
 
@@ -355,14 +358,12 @@ public abstract class Object {
      * @param object
      * @param layer
      */
-    public void putBackgroundLayer(@NonNull Object object, int layer){
+    public void putBackgroundLayer(@Nullable Object object, int layer){
         mBackgroundObjects[layer] = object;
         if(object!=null) {
             object.mLayerHost = this;
-            if (mAttachedWorld != null) {
-                object.mScale = mScale;
-                object.calculateRenderXY(mRenderX, mRenderY, 0 ,0);
-            }
+            if (mAttachedWorld != null)
+                object.attached(mAttachedWorld);
         }
     }
 
@@ -371,6 +372,12 @@ public abstract class Object {
     }
 
     public void disableBackground(){
+        for(Object obj :mBackgroundObjects)
+            if(obj!=null) {
+                if(mAttachedWorld!=null)
+                    obj.detached();
+                obj.mLayerHost = null;
+            }
         mBackgroundObjects = null;
     }
 

@@ -45,10 +45,27 @@ public abstract class Widget {
     @WorkerThread
     void attached(World world){
         mAttachedWorld = world;
+        calculateRenderXY();
+        if(mForegroundWidgets!=null)
+            for(Widget widget : mForegroundWidgets)
+                if(widget!=null)
+                    widget.attached(world);
+        if(mBackgroundWidgets!=null)
+            for(Widget widget : mBackgroundWidgets)
+                if(widget!=null)
+                    widget.attached(world);
     }
 
     @WorkerThread
-    void detached(World world) {
+    void detached() {
+        if(mForegroundWidgets!=null)
+            for(Widget widget : mForegroundWidgets)
+                if(widget!=null)
+                    widget.detached();
+        if(mBackgroundWidgets!=null)
+            for(Widget widget : mBackgroundWidgets)
+                if(widget!=null)
+                    widget.detached();
         mAttachedWorld = null;
     }
 
@@ -251,8 +268,7 @@ public abstract class Widget {
     public void moveXY(float x, float y){
         mX = x;
         mY = y;
-        calculateRenderXY(0,0);
-        if(mLayerHost!=null) calculateRenderXY(mLayerHost.mRenderX, mLayerHost.mRenderY);
+        calculateRenderXY();
     }
 
     /**
@@ -368,18 +384,15 @@ public abstract class Widget {
     }
 
     @WorkerThread
-    void calculateRenderXY(float originViewportX, float originViewportY) {
-        mRenderX = originViewportX + mX;
-        mRenderY = originViewportY + mY;
+    void calculateRenderXY() {
+        if(mLayerHost==null) {
+            mRenderX = mX;
+            mRenderY = mY;
+        }else {
+            mRenderX = mLayerHost.mRenderX + mX;
+            mRenderY = mLayerHost.mRenderY + mY;
+        }
         calculateAndCheckBoundary();
-        if (mForegroundWidgets != null)
-            for (Widget widget : mForegroundWidgets)
-                if (widget != null)
-                    widget.calculateRenderXY(mRenderX, mRenderY);
-        if (mBackgroundWidgets != null)
-            for (Widget widget : mBackgroundWidgets)
-                if (widget != null)
-                    widget.calculateRenderXY(mRenderX, mRenderY);
     }
     /**
      * @exception IndexOutOfBoundsException
@@ -391,7 +404,7 @@ public abstract class Widget {
         if(widget!=null) {
             widget.mLayerHost = this;
             if (mAttachedWorld != null) {
-                widget.calculateRenderXY(mRenderX, mRenderY);
+                widget.attached(mAttachedWorld);
             }
         }
     }
@@ -401,6 +414,12 @@ public abstract class Widget {
     }
 
     public void disableForeground(){
+        for(Widget widget : mForegroundWidgets)
+            if(widget!=null) {
+                if(mAttachedWorld!=null)
+                    widget.detached();
+                widget.mLayerHost = null;
+            }
         mForegroundWidgets = null;
     }
 
@@ -409,12 +428,12 @@ public abstract class Widget {
      * @param widget
      * @param layer
      */
-    public void putBackgroundLayer(@NonNull Widget widget, int layer){
+    public void putBackgroundLayer(@Nullable Widget widget, int layer){
         mBackgroundWidgets[layer] = widget;
         if(widget!=null) {
-            widget.mLayerHost = this;
+            widget.mLayerHost =this;
             if (mAttachedWorld != null) {
-                widget.calculateRenderXY(mRenderX, mRenderY);
+                widget.attached(mAttachedWorld);
             }
         }
     }
@@ -424,6 +443,12 @@ public abstract class Widget {
     }
 
     public void disableBackground(){
+        for(Widget widget : mBackgroundWidgets)
+            if(widget!=null) {
+                if(mAttachedWorld!=null)
+                    widget.detached();
+                widget.mLayerHost = null;
+            }
         mBackgroundWidgets = null;
     }
 

@@ -80,10 +80,13 @@ public class GroupWidget extends Widget {
         }
         if (widget != null) {
             widget.joinGroup(this);
+            widget.mLayerHost = mLayerHost;
             if (mAttachedWorld != null) {
-                mAttachedWorld.putWidget(widget);
-            }else if(mLayerHost!=null){
-                widget.mLayerHost = mLayerHost;
+                if(mLayerHost==null) {
+                    mAttachedWorld.putWidget(widget);
+                }else{
+                    widget.attached(mAttachedWorld);
+                }
             }
         }
         mWidgetList[idx] = widget;
@@ -93,22 +96,38 @@ public class GroupWidget extends Widget {
     @Override
     void attached(World world) {
         super.attached(world);
-        for (int i = 0; i < mGroupSize; i++) {
-            if(mWidgetList[i]!=null) {
-                mAttachedWorld.putWidget(mWidgetList[i]);
+        if (mLayerHost==null) {
+            for (int i = 0; i < mGroupSize; i++) {
+                if (mWidgetList[i] != null) {
+                    mAttachedWorld.putWidget(mWidgetList[i]);
+                }
+            }
+        }else{
+            for (int i = 0; i < mGroupSize; i++) {
+                if (mWidgetList[i] != null) {
+                    mWidgetList[i].attached(world);
+                }
             }
         }
     }
 
     @WorkerThread
     @Override
-    void detached(World world) {//super.detach 후 발생하는 NullPointer 때문
-        super.detached(world);
-        for (int i = 0; i < mGroupSize; i++) {
-            if(mWidgetList[i]!=null) {
-                world.removeWidget(mWidgetList[i]);
+    void detached() {
+        if (mLayerHost==null) {
+            for (int i = 0; i < mGroupSize; i++) {
+                if (mWidgetList[i] != null) {
+                    mAttachedWorld.removeWidget(mWidgetList[i]);
+                }
+            }
+        }else{
+            for (int i = 0; i < mGroupSize; i++) {
+                if (mWidgetList[i] != null) {
+                    mWidgetList[i].detached();
+                }
             }
         }
+        super.detached();
     }
 
     @WorkerThread

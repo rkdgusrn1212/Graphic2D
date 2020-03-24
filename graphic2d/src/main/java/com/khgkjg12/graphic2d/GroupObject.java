@@ -79,10 +79,13 @@ public class GroupObject extends Object{
         }
         if (obj != null) {
             obj.joinGroup(this);
+            obj.mLayerHost = mLayerHost;
             if (mAttachedWorld != null) {
-                mAttachedWorld.putObject(obj);
-            }else if(mLayerHost !=null){
-                obj.mLayerHost = mLayerHost;
+                if(mLayerHost==null) {
+                    mAttachedWorld.putObject(obj);
+                }else{
+                    obj.attached(mAttachedWorld);
+                }
             }
         }
         mObjectList[idx] = obj;
@@ -92,22 +95,38 @@ public class GroupObject extends Object{
     @Override
     void attached(World world) {
         super.attached(world);
-        for (int i = 0; i < mGroupSize; i++) {
-            if(mObjectList[i]!=null) {
-                mAttachedWorld.putObject(mObjectList[i]);
+        if (mLayerHost==null) {
+            for (int i = 0; i < mGroupSize; i++) {
+                if (mObjectList[i] != null) {
+                    mAttachedWorld.putObject(mObjectList[i]);
+                }
+            }
+        }else{
+            for (int i = 0; i < mGroupSize; i++) {
+                if (mObjectList[i] != null) {
+                    mObjectList[i].attached(world);
+                }
             }
         }
     }
 
     @WorkerThread
     @Override
-    void detached(World world) {//super.detach 후 발생하는 NullPointer 때문
-        super.detached(world);
-        for (int i = 0; i < mGroupSize; i++) {
-            if(mObjectList[i]!=null) {
-                world.removeObject(mObjectList[i]);
+    void detached() {
+        if (mLayerHost==null) {
+            for (int i = 0; i < mGroupSize; i++) {
+                if (mObjectList[i] != null) {
+                    mAttachedWorld.removeObject(mObjectList[i]);
+                }
+            }
+        }else{
+            for (int i = 0; i < mGroupSize; i++) {
+                if (mObjectList[i] != null) {
+                    mObjectList[i].detached();
+                }
             }
         }
+        super.detached();
     }
 
     @WorkerThread
@@ -132,14 +151,6 @@ public class GroupObject extends Object{
                     mObjectList[i].moveXY(mObjectList[i].mX + deltaX, mObjectList[i].mY + deltaY);
                 }
         }
-    }
-
-    @WorkerThread
-    void onAttachedLayerHost(Object obj){
-        super.onAttachedLayerHost(obj);
-        for(Object child : mObjectList)
-            if(child!=null)
-                child.onAttachedLayerHost(obj);
     }
 
     @Override

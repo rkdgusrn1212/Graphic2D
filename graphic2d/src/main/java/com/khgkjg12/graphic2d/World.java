@@ -166,7 +166,6 @@ public class World {
             }
             mObjects[i] = object;
             mObjects[i].attached(this);
-            object.calculateScale();
         }else{
             throw new PutAttachedObjectException();
         }
@@ -186,7 +185,6 @@ public class World {
             }
             mWidgets[i] = widget;
             mWidgets[i].attached(this);
-            mWidgets[i].calculateRenderXY(0,0);
         }else{
             throw new PutAttachedWidgetException();
         }
@@ -242,7 +240,7 @@ public class World {
     @WorkerThread
     private void calculateObjectXY(){
         for(int i=0;i<mObjectCount; i++){
-            mObjects[i].calculateRenderXY(mViewportWidth/2f, mViewportHeight/2f, mViewportX, mViewportY);
+            mObjects[i].calculateRenderXY();
         }
     }
 

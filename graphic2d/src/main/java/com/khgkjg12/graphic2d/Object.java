@@ -53,6 +53,16 @@ public abstract class Object {
     }
 
     @WorkerThread
+    void attachedHost(Object object){
+        mLayerHost = object;
+    }
+
+    @WorkerThread
+    void detachedHost(){
+        mLayerHost = null;
+    }
+
+    @WorkerThread
     void attached(World world){
         mAttachedWorld = world;
         calculateScale();
@@ -343,7 +353,7 @@ public abstract class Object {
     public void putForegroundLayer(@Nullable Object object, int layer){
         mForegroundObjects[layer] = object;
         if(object!=null) {
-            object.mLayerHost = this;
+            object.attachedHost(this);
             if (mAttachedWorld != null)
                 object.attached(mAttachedWorld);
         }
@@ -358,7 +368,7 @@ public abstract class Object {
             if(obj!=null) {
                 if(mAttachedWorld!=null)
                     obj.detached();
-                obj.mLayerHost = null;
+                obj.detachedHost();
             }
         mForegroundObjects = null;
     }
@@ -371,7 +381,7 @@ public abstract class Object {
     public void putBackgroundLayer(@Nullable Object object, int layer){
         mBackgroundObjects[layer] = object;
         if(object!=null) {
-            object.mLayerHost = this;
+            object.attachedHost(this);
             if (mAttachedWorld != null)
                 object.attached(mAttachedWorld);
         }
@@ -386,11 +396,10 @@ public abstract class Object {
             if(obj!=null) {
                 if(mAttachedWorld!=null)
                     obj.detached();
-                obj.mLayerHost = null;
+                obj.detachedHost();
             }
         mBackgroundObjects = null;
     }
-
 
     @WorkerThread
     public boolean isClickable(){

@@ -44,6 +44,8 @@ import com.khgkjg12.graphic2d.Graphic2dRenderView;
 import com.khgkjg12.graphic2d.Widget;
 import com.khgkjg12.graphic2d.World;
 
+import java.security.acl.Group;
+
 import static android.view.WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON;
 
 /**
@@ -102,12 +104,14 @@ public class MainActivity extends Activity implements Graphic2dRenderView.Render
         gridObject.addOnClickChildListener(this);
         for(int m=0; m<8; m++){
             for(int n=0; n<8; n++){
+                GroupWidget groupWidget = new GroupWidget(0,0,0,9,true,false);
                 CircleWidget rro = new CircleWidget(gridObject.getZ(), gridObject.getColumnX(n), gridObject.getRowY(m), true, true, Color.YELLOW, false, 50);
-                rro.enableForeground(9);
-                gridObject.putChild(rro, n, m);
                 for(int i=0;i<9;i++) {
-                    rro.putForegroundLayer(new TextWidget(0, i*11.1f-50, i*11.1f-50, true, false, Color.BLACK, false, ""+i, 10, Paint.Align.CENTER, Typeface.SERIF), i);
+                    groupWidget.putChild(new TextWidget(0, i*11.1f-50, i*11.1f-50, true, false, Color.BLACK, false, ""+i, 10, Paint.Align.CENTER, Typeface.SERIF), i);
                 }
+                rro.enableForeground(1);
+                rro.putForegroundLayer(groupWidget, 0);
+                gridObject.putChild(rro, n, m);
                 /*for(int i=0;i<9;i++) {
 
                     // world.putWidget(new TextWidget(gridObject.getZ(), gridObject.getColumnX(n)+i, gridObject.getRowY(m), true, false, Color.BLACK, false, "158", 60, Paint.Align.CENTER, Typeface.SERIF));

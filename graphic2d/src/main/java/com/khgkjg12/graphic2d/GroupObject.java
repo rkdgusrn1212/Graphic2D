@@ -91,6 +91,21 @@ public class GroupObject extends Object{
         mObjectList[idx] = obj;
     }
 
+    @Override
+    void attachedHost(Object object) {
+        super.attachedHost(object);
+        for(int i=0; i<mGroupSize; i++)
+            if(mObjectList[i]!=null)
+                mObjectList[i].attachedHost(object);
+    }
+
+    @Override
+    void detachedHost() {
+        super.detachedHost();
+        for(int i=0; i<mGroupSize; i++)
+            if(mObjectList[i]!=null)
+                mObjectList[i].detachedHost();
+    }
     @WorkerThread
     @Override
     void attached(World world) {
@@ -116,7 +131,7 @@ public class GroupObject extends Object{
         if (mLayerHost==null) {
             for (int i = 0; i < mGroupSize; i++) {
                 if (mObjectList[i] != null) {
-                    mAttachedWorld.removeObject(mObjectList[i]);
+                    mAttachedWorld.detachObject(mObjectList[i]);
                 }
             }
         }else{
@@ -138,6 +153,15 @@ public class GroupObject extends Object{
     @WorkerThread
     @Override
     void calculateBoundary() {
+    }
+
+    @Override
+    void calculateRenderXY() {
+        super.calculateRenderXY();
+        if(mLayerHost!=null) {
+            for (int i = 0; i < mGroupSize; i++)
+                mObjectList[i].calculateRenderXY();
+        }
     }
 
     @WorkerThread

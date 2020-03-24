@@ -199,34 +199,42 @@ public class World {
      */
     @WorkerThread
     public void removeObject(@NonNull Object object){
-        if(object.mGroup==null||object.mGroup.mAttachedWorld==null) {
-            int i = 0;
-            while (mObjects[i++] != object) ;
-            while (i != mObjectCount) {
-                mObjects[i - 1] = mObjects[i];
-                i++;
-            }
-            mObjectCount--;
-            object.detached();
+        if(object.mGroup==null) {
+            detachObject(object);
         }else{
             throw new RemoveChildFromWorldException();
         }
     }
 
+    void detachObject(@NonNull Object object){
+        int i = 0;
+        while (mObjects[i++] != object) ;
+        while (i != mObjectCount) {
+            mObjects[i - 1] = mObjects[i];
+            i++;
+        }
+        mObjectCount--;
+        object.detached();
+    }
+
     @WorkerThread
     public void removeWidget(@NonNull Widget widget){
-        if(widget.mGroup==null||widget.mGroup.mAttachedWorld==null) {
-            int i = 0;
-            while (mWidgets[i++] != widget) ;
-            while (i != mWidgetCount) {
-                mWidgets[i - 1] = mWidgets[i];
-                i++;
-            }
-            mWidgetCount--;
-            widget.detached();
+        if(widget.mGroup==null) {
+            detachWidget(widget);
         }else{
             throw new RemoveChildFromWorldException();
         }
+    }
+
+    void detachWidget(@NonNull Widget widget){
+        int i = 0;
+        while (mWidgets[i++] != widget) ;
+        while (i != mWidgetCount) {
+            mWidgets[i - 1] = mWidgets[i];
+            i++;
+        }
+        mWidgetCount--;
+        widget.detached();
     }
 
     @WorkerThread

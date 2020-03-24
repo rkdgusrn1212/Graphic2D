@@ -73,7 +73,7 @@ public class GroupWidget extends Widget {
         if (mWidgetList[idx] != null) {
             mWidgetList[idx].leaveGroup();
             if (mAttachedWorld != null) {
-                mAttachedWorld.removeWidget(mWidgetList[idx]);
+                mAttachedWorld.detachWidget(mWidgetList[idx]);
             }else if(mLayerHost!=null){
                 mWidgetList[idx].mLayerHost = null;
             }
@@ -117,7 +117,7 @@ public class GroupWidget extends Widget {
         if (mLayerHost==null) {
             for (int i = 0; i < mGroupSize; i++) {
                 if (mWidgetList[i] != null) {
-                    mAttachedWorld.removeWidget(mWidgetList[i]);
+                    mAttachedWorld.detachWidget(mWidgetList[i]);
                 }
             }
         }else{
@@ -134,6 +134,33 @@ public class GroupWidget extends Widget {
     @Override
     boolean checkBoundary(int x, int y) {
         return false;
+    }
+
+    @Override
+    void attachedHost(Widget widget) {
+        super.attachedHost(widget);
+        for(int i=0 ;i<mGroupSize; i++){
+            if(mWidgetList[i]!=null)
+                mWidgetList[i].attachedHost(widget);
+        }
+    }
+
+    @Override
+    void detachedHost() {
+        super.detachedHost();
+        for(int i=0 ;i<mGroupSize; i++){
+            if(mWidgetList[i]!=null)
+                mWidgetList[i].detachedHost();
+        }
+    }
+
+    @Override
+    void calculateRenderXY() {
+        super.calculateRenderXY();
+        if(mLayerHost!=null) {
+            for (int i = 0; i < mGroupSize; i++)
+                mWidgetList[i].calculateRenderXY();
+        }
     }
 
     @WorkerThread

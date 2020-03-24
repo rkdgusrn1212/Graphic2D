@@ -48,6 +48,16 @@ public abstract class Widget {
     }
 
     @WorkerThread
+    void attachedHost(Widget widget){
+        mLayerHost = widget;
+    }
+
+    @WorkerThread
+    void detachedHost(){
+        mLayerHost = null;
+    }
+
+    @WorkerThread
     void detached() {
         if(mForegroundWidgets!=null)
             for(Widget widget : mForegroundWidgets)
@@ -403,7 +413,7 @@ public abstract class Widget {
     public void putForegroundLayer(@Nullable Widget widget, int layer){
         mForegroundWidgets[layer] = widget;
         if(widget!=null) {
-            widget.mLayerHost = this;
+            widget.attachedHost(this);
             if (mAttachedWorld != null) {
                 widget.attached(mAttachedWorld);
             }
@@ -419,7 +429,7 @@ public abstract class Widget {
             if(widget!=null) {
                 if(mAttachedWorld!=null)
                     widget.detached();
-                widget.mLayerHost = null;
+                widget.detachedHost();
             }
         mForegroundWidgets = null;
     }
@@ -432,7 +442,7 @@ public abstract class Widget {
     public void putBackgroundLayer(@Nullable Widget widget, int layer){
         mBackgroundWidgets[layer] = widget;
         if(widget!=null) {
-            widget.mLayerHost =this;
+            widget.attachedHost(this);
             if (mAttachedWorld != null) {
                 widget.attached(mAttachedWorld);
             }
@@ -448,10 +458,8 @@ public abstract class Widget {
             if(widget!=null) {
                 if(mAttachedWorld!=null)
                     widget.detached();
-                widget.mLayerHost = null;
+                widget.detachedHost();
             }
         mBackgroundWidgets = null;
     }
-
-
 }

@@ -329,10 +329,10 @@ public class GridWidget extends GroupWidget {
     }
 
     float getColumnX(int column, int columnSize){
-        return mLeft+mWidth*column/columnSize+((mWidth/columnSize)/2);
+        return mX-(mWidth/2)+mWidth*column/columnSize+((mWidth/columnSize)/2);
     }
     float getRowY(int row, int rowSize){
-        return mTop+mHeight*row/rowSize+((mHeight/rowSize)/2);
+        return mY-(mHeight/2)+mHeight*row/rowSize+((mHeight/rowSize)/2);
     }
 
     @Override

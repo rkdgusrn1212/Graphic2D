@@ -104,19 +104,11 @@ public class Graphic2dDrawer {
         mPaint.setStrokeWidth(width);
         mCanvas.drawPoint(x, y, mPaint);
     }
-    
-    public void drawPoint(float x, float y, Paint paint) {
-        mCanvas.drawPoint(x, y, paint);
-    }
 
     public void drawLine(float x, float y, float x2, float y2, float width, int color) {
         mPaint.setColor(color);
         mPaint.setStrokeWidth(width);
         mCanvas.drawLine(x, y, x2, y2, mPaint);
-    }
-    
-    public void drawLine(float x, float y, float x2, float y2, Paint paint) {
-        mCanvas.drawLine(x, y, x2, y2, paint);
     }
 
     public void drawRoundRect(float left, float top, float right, float bottom, float rx, float ry, int color){
@@ -124,36 +116,12 @@ public class Graphic2dDrawer {
         mCanvas.drawRoundRect(new RectF(left, top, right, bottom), rx, ry, mPaint);
     }
 
-    public void drawRoundRect(float left, float top, float right, float bottom, float rx, float ry, Paint paint){
-        mCanvas.drawRoundRect(new RectF(left, top, right, bottom), rx, ry, paint);
-    }
-
     public void drawRect(float left, float top, float right, float bottom, int color) {
         mPaint.setColor(color);
         mCanvas.drawRect(left, top, right, bottom, mPaint);
     }
 
-    public void drawRect(float left, float top, float right, float bottom, Paint paint) {
-        mCanvas.drawRect(left, top, right, bottom, paint);
-    }
-
-    public void drawObject(Texture texture, RectF rectF) {
+    public void drawTexture(Texture texture, RectF rectF) {
         mCanvas.drawBitmap(texture.bitmap, null, rectF,null);
-    }
-
-    public void drawText(String text, float x, float y, Paint paint){
-        mCanvas.drawText(text, x, y, paint);
-    }
-
-    public void drawOval(RectF rectF, Paint paint){
-        mCanvas.drawOval(rectF, paint);
-    }
-
-    public void drawCircle(float cx, float cy, float radius, Paint paint){
-        mCanvas.drawCircle(cx, cy, radius, paint);
-    }
-
-    public Bitmap getFrameBuffer() {
-        return mFrameBuffer;
     }
 }

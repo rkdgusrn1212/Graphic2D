@@ -1,5 +1,6 @@
 package com.khgkjg12.graphic2d;
 
+import android.graphics.Canvas;
 import android.support.annotation.IntRange;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -178,11 +179,11 @@ public class GroupObject extends Object{
     }
 
     @Override
-    protected void draw(Graphic2dDrawer drawer) {
+    protected void draw(Canvas canvas) {
         if(mLayerHost!=null)
             for(Object obj : mObjectList)
                 if(obj!=null)
-                    obj.render(drawer);
+                    obj.render(canvas);
     }
 
     /**

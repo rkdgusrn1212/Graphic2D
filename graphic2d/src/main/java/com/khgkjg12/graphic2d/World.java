@@ -15,6 +15,7 @@
  */
 package com.khgkjg12.graphic2d;
 
+import android.graphics.Canvas;
 import android.graphics.RectF;
 import android.support.annotation.NonNull;
 import android.support.annotation.WorkerThread;
@@ -40,7 +41,7 @@ public class World {
     private float mMinCameraZ;
     private float mMaxCameraZ;
     float mFocusedZ;
-    private int mBackgroundColor;
+    private int mBackgroundR, mBackgroundG, mBackgroundB;
     private Texture mBackgroundTexture;
     private boolean mDragToMove;
     private boolean mPinchToZoom;
@@ -65,7 +66,9 @@ public class World {
         mMaxWidgetCount = maxWidgetCount;
         mWidgetCount = 0;
         mWidgets = new Widget[maxWidgetCount];
-        mBackgroundColor = backgroundColor;
+        mBackgroundR = (backgroundColor & 0xff0000) >> 16;
+        mBackgroundG = (backgroundColor & 0xff00) >> 8;
+        mBackgroundB = (backgroundColor & 0xff);
         mDragToMove = dragToMove;
         mPinchToZoom = pinchToZoom;
     }
@@ -258,17 +261,18 @@ public class World {
     }
 
     @WorkerThread
-    void render(Graphic2dDrawer drawer){
+    void render(Canvas canvas){
         if(mBackgroundTexture==null){
-            drawer.clear(mBackgroundColor);
+            canvas.drawRGB(mBackgroundR, mBackgroundG,
+                    mBackgroundB);
         }else{
-            drawer.drawObject(mBackgroundTexture, mRectF);
+            canvas.drawBitmap(mBackgroundTexture.bitmap, null, mRectF,null);
         }
         for(int i=mObjectCount-1; i>=0; i--){
-            mObjects[i].render(drawer);
+            mObjects[i].render(canvas);
         }
         for(int i=mWidgetCount-1; i>=0; i--){
-            mWidgets[i].render(drawer);
+            mWidgets[i].render(canvas);
         }
     }
 

@@ -1,5 +1,8 @@
 package com.khgkjg12.graphic2d;
 
+import android.graphics.Bitmap;
+import android.graphics.Canvas;
+import android.graphics.Rect;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.annotation.WorkerThread;
@@ -195,17 +198,17 @@ public abstract class Widget {
         if(mOnTouchListeners!=null) mOnTouchListeners.remove(onTouchListener);
     }
     @WorkerThread
-    void render(Graphic2dDrawer drawer){
+    void render(Canvas canvas){
         if(isVisible()){
             if(mBackgroundWidgets!=null)
                 for(int i=mBackgroundWidgets.length-1; i>=0; i--)
                     if(mBackgroundWidgets[i]!=null)
-                        mBackgroundWidgets[i].render(drawer);
-            draw(drawer);
+                        mBackgroundWidgets[i].render(canvas);
+            draw(canvas);
             if(mForegroundWidgets!=null)
                 for(Widget widget : mForegroundWidgets)
                     if(widget!=null)
-                        widget.render(drawer);
+                        widget.render(canvas);
         }
     }
 
@@ -213,7 +216,7 @@ public abstract class Widget {
      * 렌더 프레임상 x, y좌표 와 카메라 위치에 따른 스케일.
      */
     @WorkerThread
-    abstract protected void draw(Graphic2dDrawer drawer);
+    abstract protected void draw(Canvas canvas);
 
 
     public interface OnClickListener{

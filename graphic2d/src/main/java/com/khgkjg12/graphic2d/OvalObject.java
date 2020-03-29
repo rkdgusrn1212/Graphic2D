@@ -1,5 +1,6 @@
 package com.khgkjg12.graphic2d;
 
+import android.graphics.Canvas;
 import android.graphics.RectF;
 import android.support.annotation.FloatRange;
 import android.support.annotation.WorkerThread;
@@ -63,7 +64,7 @@ public class OvalObject extends PaintableObject {
     }
 
     @Override
-    protected void draw(Graphic2dDrawer drawer) {
-        drawer.drawOval(mRenderRect, mPaint);
+    protected void draw(Canvas canvas) {
+        canvas.drawOval(mRenderRect, mPaint);
     }
 }

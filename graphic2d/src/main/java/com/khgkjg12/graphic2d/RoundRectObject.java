@@ -1,13 +1,16 @@
 package com.khgkjg12.graphic2d;
 
+import android.graphics.Canvas;
+import android.graphics.RectF;
 import android.support.annotation.WorkerThread;
 
 public class RoundRectObject extends RectObject {
 
     protected float mRY, mRX;
     protected float mRenderRY, mRenderRX;
+    protected RectF mBoundaryF = new RectF();
 
-    public RoundRectObject(float z, float x, float y,  boolean visibility, boolean clickable, int color, boolean autoShadow, int width, int height, float rX, float rY) {
+    public RoundRectObject(float z, float x, float y,  boolean visibility, boolean clickable, int color, boolean autoShadow, float width, float height, float rX, float rY) {
         super(z, x, y, visibility, clickable, color, autoShadow, width, height);
         mRX = rX;
         mRY = rY;
@@ -47,11 +50,15 @@ public class RoundRectObject extends RectObject {
         super.calculateBoundary();
         mRenderRY = mRY*mScale;
         mRenderRX = mRX*mScale;
+        mBoundaryF.left = mRenderLeft;
+        mBoundaryF.right = mRenderRight;
+        mBoundaryF.top = mRenderTop;
+        mBoundaryF.bottom = mRenderBottom;
     }
 
     @Override
     @WorkerThread
-    protected void draw(Graphic2dDrawer drawer) {
-        drawer.drawRoundRect(mRenderLeft, mRenderTop, mRenderRight, mRenderBottom, mRenderRX, mRenderRY, mPaint);
+    protected void draw(Canvas canvas) {
+        canvas.drawRoundRect(mBoundaryF, mRX, mRY, mPaint);
     }
 }

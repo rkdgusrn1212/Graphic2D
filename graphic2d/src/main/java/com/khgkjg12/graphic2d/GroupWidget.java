@@ -1,5 +1,6 @@
 package com.khgkjg12.graphic2d;
 
+import android.graphics.Canvas;
 import android.support.annotation.IntRange;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -180,11 +181,11 @@ public class GroupWidget extends Widget {
     void calculateBoundary() { }
 
     @Override
-    protected void draw(Graphic2dDrawer drawer) {
+    protected void draw(Canvas canvas) {
         if(mLayerHost!=null)
             for(Widget widget : mWidgetList)
                 if(widget!=null)
-                    widget.render(drawer);
+                    widget.render(canvas);
     }
     /**
      * To get child object idx.

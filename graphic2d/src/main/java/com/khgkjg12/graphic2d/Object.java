@@ -15,6 +15,7 @@
  */
 package com.khgkjg12.graphic2d;
 
+import android.graphics.Canvas;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.annotation.WorkerThread;
@@ -206,17 +207,17 @@ public abstract class Object {
     }
 
     @WorkerThread
-    void render(Graphic2dDrawer drawer){
+    void render(Canvas canvas){
         if(mIsInCameraRange&&isVisible()){
             if(mBackgroundObjects!=null)
                 for(int i=mBackgroundObjects.length-1; i>=0; i--)
                     if(mBackgroundObjects[i]!=null)
-                        mBackgroundObjects[i].render(drawer);
-            draw(drawer);
+                        mBackgroundObjects[i].render(canvas);
+            draw(canvas);
             if(mForegroundObjects!=null)
                 for(Object obj : mForegroundObjects)
                     if(obj!=null)
-                        obj.render(drawer);
+                        obj.render(canvas);
         }
     }
 
@@ -239,7 +240,7 @@ public abstract class Object {
      * 렌더 프레임상 x, y좌표 와 카메라 위치에 따른 스케일.
      */
     @WorkerThread
-    abstract protected void draw(Graphic2dDrawer drawer);
+    abstract protected void draw(Canvas canvas);
 
 
     public interface OnClickListener{

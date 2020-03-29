@@ -1,5 +1,6 @@
 package com.khgkjg12.graphic2d;
 
+import android.graphics.Canvas;
 import android.support.annotation.FloatRange;
 import android.support.annotation.WorkerThread;
 
@@ -32,7 +33,7 @@ public class CircleWidget extends PaintableWidget {
     void calculateBoundary(){ }
 
     @Override
-    protected void draw(Graphic2dDrawer drawer) {
-        drawer.drawCircle(mRenderX, mRenderY, mRadius, mPaint);
+    protected void draw(Canvas canvas) {
+        canvas.drawCircle(mRenderX, mRenderY, mRadius, mPaint);
     }
 }

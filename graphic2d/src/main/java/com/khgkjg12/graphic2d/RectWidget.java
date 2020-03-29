@@ -1,5 +1,7 @@
 package com.khgkjg12.graphic2d;
 
+import android.graphics.Bitmap;
+import android.graphics.Canvas;
 import android.support.annotation.FloatRange;
 import android.support.annotation.WorkerThread;
 
@@ -57,7 +59,7 @@ public class RectWidget extends PaintableWidget {
     }
 
     @Override
-    protected void draw(Graphic2dDrawer drawer) {
-        drawer.drawRect(mLeft, mTop, mRight, mBottom, mPaint);
+    protected void draw(Canvas canvas) {
+        canvas.drawRect(mLeft, mTop, mRight, mBottom, mPaint);
     }
 }

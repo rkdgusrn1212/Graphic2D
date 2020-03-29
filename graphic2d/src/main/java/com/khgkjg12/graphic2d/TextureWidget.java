@@ -1,5 +1,6 @@
 package com.khgkjg12.graphic2d;
 
+import android.graphics.Canvas;
 import android.graphics.RectF;
 import android.support.annotation.NonNull;
 import android.support.annotation.WorkerThread;
@@ -61,7 +62,7 @@ public class TextureWidget extends Widget {
     }
 
     @Override
-    protected void draw(Graphic2dDrawer drawer) {
-        drawer.drawObject(mTexture, mRectF);
+    protected void draw(Canvas canvas) {
+        canvas.drawBitmap(mTexture.bitmap, null, mRectF, null);
     }
 }

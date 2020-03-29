@@ -1,5 +1,6 @@
 package com.khgkjg12.graphic2d;
 
+import android.graphics.Canvas;
 import android.graphics.Paint;
 import android.graphics.Rect;
 import android.graphics.Typeface;
@@ -88,8 +89,8 @@ public class TextWidget extends PaintableWidget {
 
     @Override
     @WorkerThread
-    protected void draw(Graphic2dDrawer drawer) {
-        drawer.drawText(mText, mRenderX, mBottom - mBound.bottom, mPaint);
+    protected void draw(Canvas canvas) {
+        canvas.drawText(mText, mRenderX, mBottom - mBound.bottom, mPaint);
     }
 
     @WorkerThread

@@ -137,14 +137,14 @@ public class Graphic2dRenderView extends SurfaceView implements Runnable, Surfac
                 float deltaTime = (System.nanoTime()-startTime) / 1000000000.0f;
                 startTime = System.nanoTime();
                 mRenderer.updateWorld(deltaTime, mWorld);
-                mWorld.render(mDrawer);
+                mWorld.render(mDrawer.mCanvas);
                 mWorld.onTouch(mInput);
                 Canvas canvas = holder.lockHardwareCanvas();
                 if(canvas==null){
                     continue;
                 }
                 canvas.getClipBounds(dstRect);
-                canvas.drawBitmap(mDrawer.getFrameBuffer(), null, dstRect, null);
+                canvas.drawBitmap(mDrawer.mFrameBuffer, null, dstRect, null);
                 holder.unlockCanvasAndPost(canvas);
             }
         }else{
@@ -153,7 +153,7 @@ public class Graphic2dRenderView extends SurfaceView implements Runnable, Surfac
                 startTime = System.nanoTime();
 
                 mRenderer.updateWorld(deltaTime, mWorld);
-                mWorld.render(mDrawer);
+                mWorld.render(mDrawer.mCanvas);
                 mWorld.onTouch(mInput);
 
                 Canvas canvas = holder.lockCanvas();
@@ -161,7 +161,7 @@ public class Graphic2dRenderView extends SurfaceView implements Runnable, Surfac
                     continue;
                 }
                 canvas.getClipBounds(dstRect);
-                canvas.drawBitmap(mDrawer.getFrameBuffer(), null, dstRect, null);
+                canvas.drawBitmap(mDrawer.mFrameBuffer, null, dstRect, null);
                 holder.unlockCanvasAndPost(canvas);
             }
         }

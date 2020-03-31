@@ -411,6 +411,7 @@ public abstract class Widget {
      * @param widget
      */
     public void addForegroundLayer(@NonNull Widget widget){
+        if(widget.mAttachedWorld!=null) throw new RuntimeException("try to add a layer widget attached world");
         if(mForegroundWidgets==null) mForegroundWidgets = new ArrayList<>();
         if(!mForegroundWidgets.contains(widget)){
             widget.mLayerHost = this;
@@ -429,6 +430,7 @@ public abstract class Widget {
     }
 
     public void addBackgroundLayer(@NonNull Widget widget){
+        if(widget.mAttachedWorld!=null) throw new RuntimeException("try to add a layer widget attached world");
         if(mBackgroundWidgets==null) mBackgroundWidgets = new ArrayList<>();
         if(!mBackgroundWidgets.contains(widget)){
             widget.mLayerHost = this;

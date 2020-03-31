@@ -3,6 +3,7 @@ package com.khgkjg12.graphic2d;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Rect;
+import android.graphics.RectF;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.annotation.WorkerThread;
@@ -25,8 +26,14 @@ public abstract class Widget {
     protected GroupWidget mGroup = null;
     protected int mPressedX, mPressedY;
     protected Widget mLayerHost = null;
-    protected Widget[] mForegroundWidgets = null;
-    protected Widget[] mBackgroundWidgets = null;
+    protected ArrayList<Widget> mForegroundWidgets = null;
+    protected ArrayList<Widget> mBackgroundWidgets = null;
+    protected RectF mOuterBoundary = new RectF();
+    protected Bitmap mCacheBitmap = null;
+    protected boolean mIgnoreCache = false;
+    protected boolean mIsCached = false;
+    protected boolean mHasCacheBitmap = false;
+
 
     @WorkerThread
     public Widget(float z, float x, float y, boolean visibility, boolean clickable) {
@@ -40,14 +47,6 @@ public abstract class Widget {
     void attached(World world){
         mAttachedWorld = world;
         calculateRenderXY();
-        if(mForegroundWidgets!=null)
-            for(Widget widget : mForegroundWidgets)
-                if(widget!=null)
-                    widget.attached(world);
-        if(mBackgroundWidgets!=null)
-            for(Widget widget : mBackgroundWidgets)
-                if(widget!=null)
-                    widget.attached(world);
     }
 
     @WorkerThread
@@ -62,14 +61,6 @@ public abstract class Widget {
 
     @WorkerThread
     void detached() {
-        if(mForegroundWidgets!=null)
-            for(Widget widget : mForegroundWidgets)
-                if(widget!=null)
-                    widget.detached();
-        if(mBackgroundWidgets!=null)
-            for(Widget widget : mBackgroundWidgets)
-                if(widget!=null)
-                    widget.detached();
         mAttachedWorld = null;
     }
 
@@ -200,15 +191,21 @@ public abstract class Widget {
     @WorkerThread
     void render(Canvas canvas){
         if(isVisible()){
-            if(mBackgroundWidgets!=null)
-                for(int i=mBackgroundWidgets.length-1; i>=0; i--)
-                    if(mBackgroundWidgets[i]!=null)
-                        mBackgroundWidgets[i].render(canvas);
+                if (mBackgroundWidgets != null)
+                    for (int i = mBackgroundWidgets.size() - 1; i >= 0; i--)
+                            mBackgroundWidgets.get(i).render(canvas);
+                if(!mIsCached||mIgnoreCache)drawWithCache(canvas);
+                if (mForegroundWidgets != null)
+                    for (Widget widget : mForegroundWidgets)
+                            widget.render(canvas);
+        }
+    }
+
+    void drawWithCache(Canvas canvas){
+        if(mHasCacheBitmap){
+            canvas.drawBitmap(mCacheBitmap, null, mOuterBoundary, null);
+        }else{
             draw(canvas);
-            if(mForegroundWidgets!=null)
-                for(Widget widget : mForegroundWidgets)
-                    if(widget!=null)
-                        widget.render(canvas);
         }
     }
 
@@ -270,19 +267,14 @@ public abstract class Widget {
 
     @WorkerThread
     public void moveXY(float x, float y){
+        float deltaX = x - mX;
+        float deltaY = y - mY;
         mX = x;
         mY = y;
         if(mAttachedWorld!=null) {
             calculateRenderXY();
-            if (mForegroundWidgets != null)
-                for (Widget widget : mForegroundWidgets)
-                    if (widget != null)
-                        widget.calculateRenderXY();
-            if (mBackgroundWidgets != null)
-                for (Widget widget : mBackgroundWidgets)
-                    if (widget != null)
-                        widget.calculateRenderXY();
         }
+        mOuterBoundary.offset(deltaX, deltaY);
     }
 
     /**
@@ -406,63 +398,130 @@ public abstract class Widget {
             mRenderX = mLayerHost.mRenderX + mX;
             mRenderY = mLayerHost.mRenderY + mY;
         }
+        if(mBackgroundWidgets!=null)
+            for(Widget widget:mBackgroundWidgets)
+                widget.calculateRenderXY();
+        if(mForegroundWidgets!=null)
+            for(Widget widget:mForegroundWidgets)
+                widget.calculateRenderXY();
         calculateAndCheckBoundary();
     }
     /**
      * @exception IndexOutOfBoundsException
      * @param widget
-     * @param layer
      */
-    public void putForegroundLayer(@Nullable Widget widget, int layer){
-        mForegroundWidgets[layer] = widget;
-        if(widget!=null) {
-            widget.attachedHost(this);
-            if (mAttachedWorld != null) {
-                widget.attached(mAttachedWorld);
+    public void addForegroundLayer(@NonNull Widget widget){
+        if(mForegroundWidgets==null) mForegroundWidgets = new ArrayList<>();
+        if(!mForegroundWidgets.contains(widget)){
+            widget.mLayerHost = this;
+            if(getAttachedWorld()!=null){
+                widget.calculateRenderXY();
             }
+            mForegroundWidgets.add(widget);
         }
     }
 
-    public void enableForeground(int layers){
-        mForegroundWidgets = new Widget[layers];
+    public void removeForegroundLayer(@NonNull Widget widget){
+        if(mForegroundWidgets!=null){
+            mForegroundWidgets.remove(widget);
+            widget.mLayerHost = null;
+        }
     }
 
-    public void disableForeground(){
-        for(Widget widget : mForegroundWidgets)
-            if(widget!=null) {
-                if(mAttachedWorld!=null)
-                    widget.detached();
-                widget.detachedHost();
+    public void addBackgroundLayer(@NonNull Widget widget){
+        if(mBackgroundWidgets==null) mBackgroundWidgets = new ArrayList<>();
+        if(!mBackgroundWidgets.contains(widget)){
+            widget.mLayerHost = this;
+            if(getAttachedWorld()!=null){
+                widget.calculateRenderXY();
             }
-        mForegroundWidgets = null;
+            mBackgroundWidgets.add(widget);
+        }
     }
+
+    public void removeBackgroundLayer(@NonNull Widget widget){
+        if(mBackgroundWidgets!=null){
+            mBackgroundWidgets.remove(widget);
+            widget.mLayerHost = null;
+        }
+    }
+
+    void calculateOuterBound(){};
 
     /**
-     * @exception IndexOutOfBoundsException
-     * @param widget
-     * @param layer
+     * world.put -> ignoreCache(선택적) ->enableCache->disableCache
      */
-    public void putBackgroundLayer(@Nullable Widget widget, int layer){
-        mBackgroundWidgets[layer] = widget;
-        if(widget!=null) {
-            widget.attachedHost(this);
-            if (mAttachedWorld != null) {
-                widget.attached(mAttachedWorld);
+    public void enableCache(){
+        calculateOuterBound();
+        if(mBackgroundWidgets!=null)
+            for(Widget widget : mBackgroundWidgets){
+                if(!widget.mIgnoreCache) {
+                    mOuterBoundary.union(widget.mOuterBoundary);
+                }
             }
+        if(mForegroundWidgets!=null)
+            for(Widget widget : mForegroundWidgets){
+                if(!widget.mIgnoreCache)
+                    mOuterBoundary.union(widget.mOuterBoundary);
+            }
+        mCacheBitmap = Bitmap.createBitmap((int)mOuterBoundary.width(), (int)mOuterBoundary.height(), Bitmap.Config.ARGB_8888);
+        Canvas canvas = new Canvas(mCacheBitmap);
+        canvas.translate(-mRenderX+(int)mOuterBoundary.width()/2,-mRenderY+(int)mOuterBoundary.height()/2);
+        if(isVisible()&&!mIgnoreCache){
+            if(mBackgroundWidgets!=null)
+                for(int i=mBackgroundWidgets.size()-1; i>=0; i--) {
+                    mBackgroundWidgets.get(i).renderOnCache(canvas);
+                }
+            draw(canvas);
+            if(mForegroundWidgets!=null)
+                for(Widget widget : mForegroundWidgets)
+                    widget.renderOnCache(canvas);
+        }
+        mHasCacheBitmap = true;
+    }
+
+    void renderOnCache(Canvas canvas){
+        if(isVisible()&&!mIgnoreCache){
+            if(mBackgroundWidgets!=null)
+                for(int i=mBackgroundWidgets.size()-1; i>=0; i--) {
+                    mBackgroundWidgets.get(i).renderOnCache(canvas);
+                }
+            draw(canvas);
+            mIsCached = true;
+            if(mForegroundWidgets!=null)
+                for(Widget widget : mForegroundWidgets)
+                    widget.renderOnCache(canvas);
         }
     }
 
-    public void enableBackground(int layers){
-        mBackgroundWidgets = new Widget[layers];
+    public void disableCache(){
+        mCacheBitmap.recycle();
+        mHasCacheBitmap = false;
+        rDisableCache();
     }
 
-    public void disableBackground(){
-        for(Widget widget : mBackgroundWidgets)
-            if(widget!=null) {
-                if(mAttachedWorld!=null)
-                    widget.detached();
-                widget.detachedHost();
-            }
-        mBackgroundWidgets = null;
+    void rDisableCache(){
+        if(isVisible()&&!mIgnoreCache&&!mHasCacheBitmap){
+            if(mBackgroundWidgets!=null)
+                for(int i=mBackgroundWidgets.size()-1; i>=0; i--) {
+                    mBackgroundWidgets.get(i).disableCache();
+                }
+            mIsCached = false;
+            if(mForegroundWidgets!=null)
+                for(Widget widget : mForegroundWidgets)
+                    widget.disableCache();
+        }
+    }
+
+    public void setIgnoreCache(boolean ignoreCache){
+        mIgnoreCache = ignoreCache;
+    }
+
+    public World getAttachedWorld(){
+        if(mLayerHost!=null){
+            return mLayerHost.getAttachedWorld();
+        }else{
+            return mAttachedWorld;
+        }
     }
 }

@@ -83,6 +83,20 @@ public class MainActivity extends Activity implements Graphic2dRenderView.Render
 
     @Override
     public void startWorld(World world, int viewportWidth, int viewportHeight) {
+       //GroupWidget groupWidget = new GroupWidget(0,0,0,9,true,false);
+        popObject = new CircleWidget(20, 300, 300, true, true, Color.RED, true, 50);
+        world.putWidget(popObject);
+        CircleWidget widget = new CircleWidget(30, 10, 10, true, true, Color.YELLOW, true, 30);
+        //widget.setIgnoreCache(true);
+        //for(int i=0;i<9;i++) {
+        //    groupWidget.putChild(new TextWidget(0, i*11.1f-50, i*11.1f-50, true, false, Color.BLACK, false, ""+i, 10, Paint.Align.CENTER, Typeface.SERIF), i);
+       // }
+        TextWidget widget2 = new TextWidget(0, -10, 0, true, false, Color.BLACK, false, "5", 10, Paint.Align.CENTER, Typeface.SERIF);
+        widget2.setIgnoreCache(true);
+        widget.addForegroundLayer(widget2);
+        widget.addForegroundLayer(new TextWidget(0, 10, 0, true, false, Color.BLACK, false, "5", 10, Paint.Align.CENTER, Typeface.SERIF));
+        popObject.addForegroundLayer(widget);
+        popObject.enableCache();
         /*for(int i=0; i< 9; i++) {
             Object verLine = new Object(Color.parseColor(i%3==0?"#021aee":"#d602ee"), 1, 801, "vertical_line_"+i);
             verLine.setPosition(-400+100*i,0);
@@ -99,6 +113,7 @@ public class MainActivity extends Activity implements Graphic2dRenderView.Render
             }
             world.putObject(horLine);
         }*/
+        /*
         GridWidget gridObject = new GridWidget(0,400,400,800, 800, 8, 8,true, true, true);
         world.putWidget(gridObject);
         gridObject.addOnClickChildListener(this);
@@ -112,13 +127,13 @@ public class MainActivity extends Activity implements Graphic2dRenderView.Render
                 rro.enableForeground(1);
                 rro.putForegroundLayer(groupWidget, 0);
                 gridObject.putChild(rro, n, m);
-                /*for(int i=0;i<9;i++) {
+                for(int i=0;i<9;i++) {
 
                     // world.putWidget(new TextWidget(gridObject.getZ(), gridObject.getColumnX(n)+i, gridObject.getRowY(m), true, false, Color.BLACK, false, "158", 60, Paint.Align.CENTER, Typeface.SERIF));
                     world.putWidget(new RoundRectWidget(gridObject.getZ(), gridObject.getColumnX(n)+i, gridObject.getRowY(m), true, true, Color.YELLOW, true, 100, 100,10,10));
-                }*/
+                }
             }
-        }
+        }*/
 
         /*for(int i=0;i<8;i++){
             for(int j=0; j<8; j++) {
@@ -151,12 +166,12 @@ public class MainActivity extends Activity implements Graphic2dRenderView.Render
             count = 0;
             timeAcc = 0;
         }
-        if(pop){
+        if(pop==pop){
             startTime+=deltaTime;
             if(startTime>=2){
-                pop = false;
+                //pop = false;
                 popObject.moveXY( 400, 400);
-                popObject = null;
+                //popObject = null;
                 startTime = 0;
             }else{
                 popObject.moveXY(400+98*startTime-0.5f*98*startTime*startTime, 400);

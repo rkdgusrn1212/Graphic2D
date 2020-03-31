@@ -113,4 +113,9 @@ public class TextWidget extends PaintableWidget {
     public Paint.Align getTextAlign(){
         return mPaint.getTextAlign();
     }
+
+    @Override
+    void calculateOuterBound() {
+        mOuterBoundary.set(mLeft, mTop, mRight, mBottom);
+    }
 }

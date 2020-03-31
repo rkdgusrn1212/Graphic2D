@@ -282,4 +282,12 @@ public class GroupWidget extends Widget {
             for(int i=0; i<size;i++) mOnClickChildListeners.get(i).onClickChild(attachedWorld, this, widget, getChildIndex(widget));
         }
     }
+
+    @Override
+    void calculateOuterBound() {
+        for(int i=0; i<mGroupSize; i++)
+            if(mWidgetList[i]!=null)
+                if(!mWidgetList[i].mIsCached)
+                    mOuterBoundary.union(mWidgetList[i].mOuterBoundary);
+    }
 }

@@ -447,7 +447,7 @@ public abstract class Widget {
     abstract void calculateOuterBound();
 
     /**
-     * world.put -> ignoreCache(선택적) ->enableCache->disableCache
+     * world.put 다음 ignoreCache(선택적) 다음 enableCache 다음 disableCache
      */
     public void enableCache(){
         if(getAttachedWorld()==null) throw new RuntimeException("Do not cache before attached");

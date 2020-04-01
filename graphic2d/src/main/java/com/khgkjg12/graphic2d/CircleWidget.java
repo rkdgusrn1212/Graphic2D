@@ -39,6 +39,6 @@ public class CircleWidget extends PaintableWidget {
 
     @Override
     void calculateOuterBound() {
-        mOuterBoundary.set(mRenderX- mRadius, mRenderY - mRadius, mRenderX+mRadius, mRenderY+mRadius);
+        mOuterBoundary.set(mRenderX- mRadius-mShadow+mShadowDx, mRenderY - mRadius-mShadow+mShadowDy, mRenderX+mRadius+mShadow+mShadowDx, mRenderY+mRadius+mShadow+mShadowDy);
     }
 }

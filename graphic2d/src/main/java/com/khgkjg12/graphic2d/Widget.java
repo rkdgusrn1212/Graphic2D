@@ -30,8 +30,8 @@ public abstract class Widget {
     protected ArrayList<Widget> mBackgroundWidgets = null;
     protected RectF mOuterBoundary = new RectF();
     protected Bitmap mCacheBitmap = null;
-    protected boolean mIgnoreCache = false;
-    protected boolean mIsCached = false;
+    protected boolean mIgnoreCache = false;//상위 widget에게 cache되는 여부. 본인이 cache하는건 상관없다
+    protected boolean mIsCached = false;//cache bitmap 위에 그려진 하위 widget들은 true. 해당 bitmap을 가진 widget은 false다
     protected boolean mHasCacheBitmap = false;
 
 
@@ -52,6 +52,9 @@ public abstract class Widget {
     @WorkerThread
     void attachedHost(Widget widget){
         mLayerHost = widget;
+        if(getAttachedWorld()!=null){
+            calculateRenderXY();
+        }
     }
 
     @WorkerThread
@@ -106,6 +109,7 @@ public abstract class Widget {
      */
     @WorkerThread
     public void setVisibility(boolean visible){
+        if(mIsCached) throw new RuntimeException("Try to change visibility of cached layer widget");
         mVisibility = visible;
     }
 
@@ -153,6 +157,7 @@ public abstract class Widget {
     @WorkerThread
     void calculateAndCheckBoundary(){
         calculateBoundary();
+        calculateOuterBound();
         if(mIsPressed&&!checkBoundary(mPressedX, mPressedY)){
             mIsPressed = false;
             onTouchCancel();
@@ -194,7 +199,7 @@ public abstract class Widget {
                 if (mBackgroundWidgets != null)
                     for (int i = mBackgroundWidgets.size() - 1; i >= 0; i--)
                             mBackgroundWidgets.get(i).render(canvas);
-                if(!mIsCached||mIgnoreCache)drawWithCache(canvas);
+                if(!mIsCached)drawWithCache(canvas);
                 if (mForegroundWidgets != null)
                     for (Widget widget : mForegroundWidgets)
                             widget.render(canvas);
@@ -267,14 +272,11 @@ public abstract class Widget {
 
     @WorkerThread
     public void moveXY(float x, float y){
-        float deltaX = x - mX;
-        float deltaY = y - mY;
         mX = x;
         mY = y;
         if(mAttachedWorld!=null) {
             calculateRenderXY();
         }
-        mOuterBoundary.offset(deltaX, deltaY);
     }
 
     /**
@@ -414,18 +416,15 @@ public abstract class Widget {
         if(widget.mAttachedWorld!=null) throw new RuntimeException("try to add a layer widget attached world");
         if(mForegroundWidgets==null) mForegroundWidgets = new ArrayList<>();
         if(!mForegroundWidgets.contains(widget)){
-            widget.mLayerHost = this;
-            if(getAttachedWorld()!=null){
-                widget.calculateRenderXY();
-            }
             mForegroundWidgets.add(widget);
+            widget.attachedHost(this);
         }
     }
 
     public void removeForegroundLayer(@NonNull Widget widget){
         if(mForegroundWidgets!=null){
             mForegroundWidgets.remove(widget);
-            widget.mLayerHost = null;
+            widget.detachedHost();
         }
     }
 
@@ -433,27 +432,27 @@ public abstract class Widget {
         if(widget.mAttachedWorld!=null) throw new RuntimeException("try to add a layer widget attached world");
         if(mBackgroundWidgets==null) mBackgroundWidgets = new ArrayList<>();
         if(!mBackgroundWidgets.contains(widget)){
-            widget.mLayerHost = this;
-            if(getAttachedWorld()!=null){
-                widget.calculateRenderXY();
-            }
             mBackgroundWidgets.add(widget);
+            widget.attachedHost(this);
         }
     }
 
     public void removeBackgroundLayer(@NonNull Widget widget){
         if(mBackgroundWidgets!=null){
             mBackgroundWidgets.remove(widget);
-            widget.mLayerHost = null;
+            widget.detachedHost();
         }
     }
 
-    void calculateOuterBound(){};
+    abstract void calculateOuterBound();
 
     /**
      * world.put -> ignoreCache(선택적) ->enableCache->disableCache
      */
     public void enableCache(){
+        if(getAttachedWorld()==null) throw new RuntimeException("Do not cache before attached");
+        if(mIsCached) throw new RuntimeException("Try to cache cached widget");
+        if(mHasCacheBitmap) throw new RuntimeException("Try to call enable cache after enable cache");
         calculateOuterBound();
         if(mBackgroundWidgets!=null)
             for(Widget widget : mBackgroundWidgets){
@@ -469,7 +468,7 @@ public abstract class Widget {
         mCacheBitmap = Bitmap.createBitmap((int)mOuterBoundary.width(), (int)mOuterBoundary.height(), Bitmap.Config.ARGB_8888);
         Canvas canvas = new Canvas(mCacheBitmap);
         canvas.translate(-mRenderX+(int)mOuterBoundary.width()/2,-mRenderY+(int)mOuterBoundary.height()/2);
-        if(isVisible()&&!mIgnoreCache){
+        if(mVisibility){
             if(mBackgroundWidgets!=null)
                 for(int i=mBackgroundWidgets.size()-1; i>=0; i--) {
                     mBackgroundWidgets.get(i).renderOnCache(canvas);
@@ -483,39 +482,56 @@ public abstract class Widget {
     }
 
     void renderOnCache(Canvas canvas){
-        if(isVisible()&&!mIgnoreCache){
-            if(mBackgroundWidgets!=null)
-                for(int i=mBackgroundWidgets.size()-1; i>=0; i--) {
-                    mBackgroundWidgets.get(i).renderOnCache(canvas);
-                }
-            draw(canvas);
+        if(mVisibility&&!mIgnoreCache){
+            if(mHasCacheBitmap){
+                canvas.drawBitmap(mCacheBitmap, null, mOuterBoundary, null);
+            }else{
+                if(mBackgroundWidgets!=null)
+                    for(int i=mBackgroundWidgets.size()-1; i>=0; i--) {
+                        mBackgroundWidgets.get(i).renderOnCache(canvas);
+                    }
+                draw(canvas);
+                if(mForegroundWidgets!=null)
+                    for(Widget widget : mForegroundWidgets)
+                        widget.renderOnCache(canvas);
+            }
             mIsCached = true;
-            if(mForegroundWidgets!=null)
-                for(Widget widget : mForegroundWidgets)
-                    widget.renderOnCache(canvas);
         }
     }
 
     public void disableCache(){
-        mCacheBitmap.recycle();
-        mHasCacheBitmap = false;
-        rDisableCache();
+        if(mHasCacheBitmap) {
+            mCacheBitmap.recycle();
+            mHasCacheBitmap = false;
+            if(mBackgroundWidgets!=null)
+                for(int i=mBackgroundWidgets.size()-1; i>=0; i--) {
+                    mBackgroundWidgets.get(i).rDisableCache();
+                }
+            if(mForegroundWidgets!=null)
+                for(Widget widget : mForegroundWidgets)
+                    widget.rDisableCache();
+        }else{
+            throw new RuntimeException("try to disable null cache");
+        }
     }
 
     void rDisableCache(){
-        if(isVisible()&&!mIgnoreCache&&!mHasCacheBitmap){
-            if(mBackgroundWidgets!=null)
-                for(int i=mBackgroundWidgets.size()-1; i>=0; i--) {
-                    mBackgroundWidgets.get(i).disableCache();
-                }
+        if(mVisibility&&!mIgnoreCache){
+            if(!mHasCacheBitmap) {
+                if (mBackgroundWidgets != null)
+                    for (int i = mBackgroundWidgets.size() - 1; i >= 0; i--) {
+                        mBackgroundWidgets.get(i).rDisableCache();
+                    }
+                if (mForegroundWidgets != null)
+                    for (Widget widget : mForegroundWidgets)
+                        widget.rDisableCache();
+            }
             mIsCached = false;
-            if(mForegroundWidgets!=null)
-                for(Widget widget : mForegroundWidgets)
-                    widget.disableCache();
         }
     }
 
     public void setIgnoreCache(boolean ignoreCache){
+        if(mIsCached) throw new RuntimeException("Try to change ignoreCache flag of cached layer widget");
         mIgnoreCache = ignoreCache;
     }
 

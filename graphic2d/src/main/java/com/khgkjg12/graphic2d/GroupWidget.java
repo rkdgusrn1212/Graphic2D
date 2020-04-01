@@ -297,4 +297,12 @@ public class GroupWidget extends Widget {
                     mOuterBoundary.union(mWidgetList[i].mOuterBoundary);
                 }
     }
+
+    @Override
+    public void rDisableCache() {
+        super.rDisableCache();
+        for(Widget widget : mWidgetList){
+            if(widget!=null) widget.rDisableCache();
+        }
+    }
 }

@@ -66,7 +66,7 @@ public class MainActivity extends Activity implements Graphic2dRenderView.Render
     private float startTime = 0;
     private boolean flip = false;
     private Widget flipObject = null;
-    private boolean pop = false;
+    private boolean pop = true;
     private Widget popObject = null;
     private float timeAcc = 0;
     private int count = 0;
@@ -139,13 +139,15 @@ public class MainActivity extends Activity implements Graphic2dRenderView.Render
             count = 0;
             timeAcc = 0;
         }
-        if(pop==pop){
+        if(pop){
             startTime+=deltaTime;
             if(startTime>=2){
                 //pop = false;
                 popObject.moveXY( 400, 400);
                 //popObject = null;
                 startTime = 0;
+                popObject.disableCache();
+                pop = false;
             }else{
                 popObject.moveXY(400+98*startTime-0.5f*98*startTime*startTime, 400);
             }
@@ -195,6 +197,6 @@ public class MainActivity extends Activity implements Graphic2dRenderView.Render
     @Override
     public void onClickChild(World attachedWorld, GroupWidget groupWidget, Widget widget, int idx) {
         pop = true;
-        popObject = groupWidget;
+        popObject.enableCache();
     }
 }

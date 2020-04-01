@@ -489,18 +489,12 @@ public abstract class Widget {
     }
 
     public void disableCache(){
-        if(mHasCacheBitmap) {
+        if(mHasCacheBitmap&&!mIsCached) {
             mCacheBitmap.recycle();
             mHasCacheBitmap = false;
-            if(mBackgroundWidgets!=null)
-                for(int i=mBackgroundWidgets.size()-1; i>=0; i--) {
-                    mBackgroundWidgets.get(i).rDisableCache();
-                }
-            if(mForegroundWidgets!=null)
-                for(Widget widget : mForegroundWidgets)
-                    widget.rDisableCache();
+            rDisableCache();
         }else{
-            throw new RuntimeException("try to disable null cache");
+            throw new RuntimeException("try to disable null cache or cached widget");
         }
     }
 

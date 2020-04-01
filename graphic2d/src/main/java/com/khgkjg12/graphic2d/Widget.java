@@ -157,7 +157,6 @@ public abstract class Widget {
     @WorkerThread
     void calculateAndCheckBoundary(){
         calculateBoundary();
-        calculateOuterBound();
         if(mIsPressed&&!checkBoundary(mPressedX, mPressedY)){
             mIsPressed = false;
             onTouchCancel();
@@ -393,12 +392,19 @@ public abstract class Widget {
 
     @WorkerThread
     void calculateRenderXY() {
+        float tempX = mRenderX;
+        float tempY = mRenderY;
         if(mLayerHost==null) {
             mRenderX = mX;
             mRenderY = mY;
         }else {
             mRenderX = mLayerHost.mRenderX + mX;
             mRenderY = mLayerHost.mRenderY + mY;
+        }
+        float dx = mRenderX-tempX;
+        float dy = mRenderY-tempY;
+        if(mHasCacheBitmap){
+            mOuterBoundary.offset(dx, dy);
         }
         if(mBackgroundWidgets!=null)
             for(Widget widget:mBackgroundWidgets)
@@ -446,6 +452,24 @@ public abstract class Widget {
 
     abstract void calculateOuterBound();
 
+    void rCalculateOuterBound() {
+        calculateOuterBound();
+        if (mBackgroundWidgets != null)
+            for (Widget widget : mBackgroundWidgets) {
+                if (widget.mVisibility && !widget.mIgnoreCache) {
+                    widget.rCalculateOuterBound();
+                    mOuterBoundary.union(widget.mOuterBoundary);
+                }
+            }
+        if (mForegroundWidgets != null)
+            for (Widget widget : mForegroundWidgets) {
+                if (widget.mVisibility && !widget.mIgnoreCache) {
+                    widget.rCalculateOuterBound();
+                    mOuterBoundary.union(widget.mOuterBoundary);
+                }
+            }
+    }
+
     /**
      * world.put 다음 ignoreCache(선택적) 다음 enableCache 다음 disableCache
      */
@@ -453,21 +477,10 @@ public abstract class Widget {
         if(getAttachedWorld()==null) throw new RuntimeException("Do not cache before attached");
         if(mIsCached) throw new RuntimeException("Try to cache cached widget");
         if(mHasCacheBitmap) throw new RuntimeException("Try to call enable cache after enable cache");
-        calculateOuterBound();
-        if(mBackgroundWidgets!=null)
-            for(Widget widget : mBackgroundWidgets){
-                if(!widget.mIgnoreCache) {
-                    mOuterBoundary.union(widget.mOuterBoundary);
-                }
-            }
-        if(mForegroundWidgets!=null)
-            for(Widget widget : mForegroundWidgets){
-                if(!widget.mIgnoreCache)
-                    mOuterBoundary.union(widget.mOuterBoundary);
-            }
+        rCalculateOuterBound();
         mCacheBitmap = Bitmap.createBitmap((int)mOuterBoundary.width(), (int)mOuterBoundary.height(), Bitmap.Config.ARGB_8888);
         Canvas canvas = new Canvas(mCacheBitmap);
-        canvas.translate(-mRenderX+(int)mOuterBoundary.width()/2,-mRenderY+(int)mOuterBoundary.height()/2);
+        canvas.translate(-mOuterBoundary.left,-mOuterBoundary.top);
         if(mVisibility){
             if(mBackgroundWidgets!=null)
                 for(int i=mBackgroundWidgets.size()-1; i>=0; i--) {

@@ -285,9 +285,11 @@ public class GroupWidget extends Widget {
 
     @Override
     void calculateOuterBound() {
-        for(int i=0; i<mGroupSize; i++)
+       for(int i=0; i<mGroupSize; i++)
             if(mWidgetList[i]!=null)
-                if(!mWidgetList[i].mIsCached)
+                if(!mWidgetList[i].mIgnoreCache) {
+                    mWidgetList[i].rCalculateOuterBound();
                     mOuterBoundary.union(mWidgetList[i].mOuterBoundary);
+                }
     }
 }

@@ -62,6 +62,11 @@ public class TextureWidget extends Widget {
     }
 
     @Override
+    void calculateOuterBound() {
+        mOuterBoundary.set(mRectF);
+    }
+
+    @Override
     protected void draw(Canvas canvas) {
         canvas.drawBitmap(mTexture.bitmap, null, mRectF, null);
     }

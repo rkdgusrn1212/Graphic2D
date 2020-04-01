@@ -116,6 +116,6 @@ public class TextWidget extends PaintableWidget {
 
     @Override
     void calculateOuterBound() {
-        mOuterBoundary.set(mLeft, mTop, mRight, mBottom);
+        mOuterBoundary.set(mLeft-mShadow+mShadowDx, mTop-mShadow+mShadowDy, mRight+mShadow+mShadowDx, mBottom+mShadow+mShadowDy);
     }
 }

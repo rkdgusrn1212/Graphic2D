@@ -61,6 +61,11 @@ public class OvalWidget extends PaintableWidget {
     }
 
     @Override
+    void calculateOuterBound() {
+        mOuterBoundary.set( mRenderRect.left-mShadow+mShadowDx,mRenderRect.top-mShadow+mShadowDy,mRenderRect.right+mShadow+mShadowDx, mRenderRect.bottom+mShadow+mShadowDy);
+    }
+
+    @Override
     protected void draw(Canvas canvas) {
         canvas.drawOval(mRenderRect, mPaint);
     }

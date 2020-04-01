@@ -59,6 +59,11 @@ public class RectWidget extends PaintableWidget {
     }
 
     @Override
+    void calculateOuterBound() {
+        mOuterBoundary.set(mLeft-mShadow+mShadowDx,mTop-mShadow+mShadowDy,mRight+mShadow+mShadowDx, mBottom+mShadow+mShadowDy);
+    }
+
+    @Override
     protected void draw(Canvas canvas) {
         canvas.drawRect(mLeft, mTop, mRight, mBottom, mPaint);
     }

@@ -6,7 +6,7 @@ import android.support.annotation.WorkerThread;
 
 public abstract class PaintableWidget extends Widget {
 
-    protected float mShadow = -1;
+    protected float mShadow = 0;
     protected boolean mAutoShadow;
     protected Paint mPaint = new Paint();
     protected float mShadowDx, mShadowDy;

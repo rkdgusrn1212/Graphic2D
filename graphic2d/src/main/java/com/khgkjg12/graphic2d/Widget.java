@@ -34,7 +34,6 @@ public abstract class Widget {
     protected boolean mIsCached = false;//cache bitmap 위에 그려진 하위 widget들은 true. 해당 bitmap을 가진 widget은 false다
     protected boolean mHasCacheBitmap = false;
 
-
     @WorkerThread
     public Widget(float z, float x, float y, boolean visibility, boolean clickable) {
         mVisibility = visibility;
@@ -193,15 +192,18 @@ public abstract class Widget {
         if(mOnTouchListeners!=null) mOnTouchListeners.remove(onTouchListener);
     }
     @WorkerThread
-    void render(Canvas canvas){
-        if(isVisible()){
-                if (mBackgroundWidgets != null)
-                    for (int i = mBackgroundWidgets.size() - 1; i >= 0; i--)
-                            mBackgroundWidgets.get(i).render(canvas);
-                if(!mIsCached)drawWithCache(canvas);
-                if (mForegroundWidgets != null)
-                    for (Widget widget : mForegroundWidgets)
-                            widget.render(canvas);
+    void render(Canvas canvas, boolean drawOnCache){
+        if(isVisible()&&(!drawOnCache||!mIgnoreCache)){
+            if (mBackgroundWidgets != null)
+                for (int i = mBackgroundWidgets.size() - 1; i >= 0; i--)
+                    mBackgroundWidgets.get(i).render(canvas, drawOnCache);
+            if(!mIsCached) {
+                drawWithCache(canvas);
+                mIsCached = drawOnCache;//아직 그려지지 않은 객체를 draw하고 만약 이게 cache에 그리는거면 mIsCached를 true로.
+            }
+            if (mForegroundWidgets != null)
+                for (Widget widget : mForegroundWidgets)
+                    widget.render(canvas, drawOnCache);
         }
     }
 
@@ -481,35 +483,9 @@ public abstract class Widget {
         mCacheBitmap = Bitmap.createBitmap((int)mOuterBoundary.width(), (int)mOuterBoundary.height(), Bitmap.Config.ARGB_8888);
         Canvas canvas = new Canvas(mCacheBitmap);
         canvas.translate(-mOuterBoundary.left,-mOuterBoundary.top);
-        if(mVisibility){
-            if(mBackgroundWidgets!=null)
-                for(int i=mBackgroundWidgets.size()-1; i>=0; i--) {
-                    mBackgroundWidgets.get(i).renderOnCache(canvas);
-                }
-            draw(canvas);
-            if(mForegroundWidgets!=null)
-                for(Widget widget : mForegroundWidgets)
-                    widget.renderOnCache(canvas);
-        }
+        render(canvas, true);
+        mIsCached = false;
         mHasCacheBitmap = true;
-    }
-
-    void renderOnCache(Canvas canvas){
-        if(mVisibility&&!mIgnoreCache){
-            if(mHasCacheBitmap){
-                canvas.drawBitmap(mCacheBitmap, null, mOuterBoundary, null);
-            }else{
-                if(mBackgroundWidgets!=null)
-                    for(int i=mBackgroundWidgets.size()-1; i>=0; i--) {
-                        mBackgroundWidgets.get(i).renderOnCache(canvas);
-                    }
-                draw(canvas);
-                if(mForegroundWidgets!=null)
-                    for(Widget widget : mForegroundWidgets)
-                        widget.renderOnCache(canvas);
-            }
-            mIsCached = true;
-        }
     }
 
     public void disableCache(){

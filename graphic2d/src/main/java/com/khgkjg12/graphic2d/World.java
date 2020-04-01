@@ -273,7 +273,7 @@ public class World {
             mObjects[i].render(canvas);
         }
         for(int i=mWidgetCount-1; i>=0; i--){
-            mWidgets[i].render(canvas);
+            mWidgets[i].render(canvas, false);
         }
     }
 

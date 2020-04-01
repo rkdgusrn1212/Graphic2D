@@ -24,6 +24,7 @@ import android.graphics.Shader;
 import android.graphics.Typeface;
 import android.os.Bundle;
 import android.util.Log;
+import android.widget.TextView;
 
 import com.khgkjg12.graphic2d.CircleObject;
 import com.khgkjg12.graphic2d.CircleWidget;
@@ -92,15 +93,21 @@ public class MainActivity extends Activity implements Graphic2dRenderView.Render
                 GroupWidget groupWidget = new GroupWidget(0,0,0,9,true,false);
                 CircleWidget rro = new CircleWidget(40, gridObject.getColumnX(n), gridObject.getRowY(m), true, true, Color.YELLOW, true, 20);
                 for(int i=0;i<9;i++) {
-                    groupWidget.putChild(new TextWidget(0, i*11.1f-50, i*11.1f-50, true, false, Color.GRAY, false, ""+i, 10, Paint.Align.CENTER, Typeface.SERIF), i);
+                    TextWidget wid = new TextWidget(0, i*11.1f-50, i*11.1f-50, true, false, Color.GRAY, false, ""+i, 10, Paint.Align.CENTER, Typeface.SERIF);
+                    groupWidget.putChild(wid, i);
+                    if(i==5){
+                        wid.setIgnoreCache(true);
+                    }
                 }
                 rro.addForegroundLayer(groupWidget);
+                if(n==3&&m==3){
+                    rro.setIgnoreCache(true);
+                }
                 gridObject.putChild(rro, n, m);
-                rro.enableCache();
             }
         }
         popObject = gridObject;
-
+        popObject.enableCache();
         /*for(int i=0;i<8;i++){
             for(int j=0; j<8; j++) {
                 gridObject.putObject(world, new TextObject("lplplp", Typeface.SANS_SERIF, Color.BLACK, 100, 0, 0, 0, true, true), i, j);

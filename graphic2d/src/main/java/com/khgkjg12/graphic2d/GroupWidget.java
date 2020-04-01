@@ -180,13 +180,18 @@ public class GroupWidget extends Widget {
     @Override
     void calculateBoundary() { }
 
-    @Override
-    protected void draw(Canvas canvas) {
-        if(mLayerHost!=null)
+    @WorkerThread
+    void render(Canvas canvas, boolean drawOnCache){
+        super.render(canvas, drawOnCache);
+        if(mLayerHost!=null||drawOnCache)
             for(Widget widget : mWidgetList)
                 if(widget!=null)
-                    widget.render(canvas);
+                    widget.render(canvas, drawOnCache);
     }
+
+    @Override
+    protected void draw(Canvas canvas) { }
+
     /**
      * To get child object idx.
      * @param widget 그룹의 자식오브젝트.

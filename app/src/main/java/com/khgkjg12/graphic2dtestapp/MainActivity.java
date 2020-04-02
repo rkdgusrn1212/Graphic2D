@@ -85,18 +85,18 @@ public class MainActivity extends Activity implements Graphic2dRenderView.Render
     @Override
     public void startWorld(World world, int viewportWidth, int viewportHeight) {
 
-        GridWidget gridObject = new GridWidget(0,400,400,800, 800, 8, 8,true, true, true);
+        GridWidget gridObject = new GridWidget(0,720,720,1440, 1440, 9, 9,true, true, true);
         world.putWidget(gridObject);
         gridObject.addOnClickChildListener(this);
-        for(int m=0; m<8; m++){
-            for(int n=0; n<8; n++){
+        for(int m=0; m<9; m++){
+            for(int n=0; n<9; n++){
                 GroupWidget groupWidget = new GroupWidget(0,0,0,9,true,false);
-                CircleWidget rro = new CircleWidget(40, gridObject.getColumnX(n), gridObject.getRowY(m), true, true, Color.YELLOW, true, 20);
+                CircleWidget rro = new CircleWidget(40, gridObject.getColumnX(n), gridObject.getRowY(m), true, true, Color.YELLOW, true, 50);
                 for(int i=0;i<9;i++) {
                     TextWidget wid = new TextWidget(0, i*11.1f-50, i*11.1f-50, true, false, Color.GRAY, false, ""+i, 10, Paint.Align.CENTER, Typeface.SERIF);
                     groupWidget.putChild(wid, i);
                     if(i==5){
-                        wid.setIgnoreCache(true);
+                       wid.setIgnoreCache(true);
                     }
                 }
                 rro.addForegroundLayer(groupWidget);
@@ -143,13 +143,13 @@ public class MainActivity extends Activity implements Graphic2dRenderView.Render
             startTime+=deltaTime;
             if(startTime>=2){
                 //pop = false;
-                popObject.moveXY( 400, 400);
+                popObject.moveXY( 720, 720);
                 //popObject = null;
                 startTime = 0;
-                popObject.disableCache();
+               //popObject.disableCache();
                 pop = false;
             }else{
-                popObject.moveXY(400+98*startTime-0.5f*98*startTime*startTime, 400);
+                popObject.moveXY(720+98*startTime-0.5f*98*startTime*startTime, 720);
             }
         }
     }
@@ -162,7 +162,6 @@ public class MainActivity extends Activity implements Graphic2dRenderView.Render
 
     @Override
     public void resumeWorld(World world,int viewportWidth, int viewportHeight) {
-        gridObject.moveXY(viewportWidth-400,viewportHeight-400);
     }
 
     @Override
@@ -181,9 +180,9 @@ public class MainActivity extends Activity implements Graphic2dRenderView.Render
     @Override
     public void onConfigurationChanged(Configuration newConfig) {
         if(newConfig.orientation==Configuration.ORIENTATION_LANDSCAPE){
-            renderView.changeViewPortSize(0, 800 );
+            renderView.changeViewPortSize(0, 1440 );
         }else{
-            renderView.changeViewPortSize(800, 0 );
+            renderView.changeViewPortSize(1440, 0 );
         }
         super.onConfigurationChanged(newConfig);
     }

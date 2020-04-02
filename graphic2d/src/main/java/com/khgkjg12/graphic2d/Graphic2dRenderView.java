@@ -38,6 +38,7 @@ public class Graphic2dRenderView extends SurfaceView implements Runnable, Surfac
     private int mPreViewportWidth, mPreViewportHeight;
     private World mWorld;
     private boolean mIsWorldInitiated;
+    private float mWidth, mHeight;
 
     public Graphic2dRenderView(Context context) {
         super(context);
@@ -130,22 +131,21 @@ public class Graphic2dRenderView extends SurfaceView implements Runnable, Surfac
         }else {
             mRenderer.resumeWorld(mWorld, mViewportWidth, mViewportHeight);
         }
-        Rect dstRect = new Rect();
         long startTime = System.nanoTime();
         if(android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O){
             while(running) {
                 float deltaTime = (System.nanoTime()-startTime) / 1000000000.0f;
                 startTime = System.nanoTime();
                 mRenderer.updateWorld(deltaTime, mWorld);
-                mWorld.render(mDrawer.mCanvas);
-                mWorld.onTouch(mInput);
-                Canvas canvas = holder.lockHardwareCanvas();
-                if(canvas==null){
-                    continue;
+                Canvas canvas = holder.lockHardwareCanvas();//일부 하드웨어 shadow 효과 적용안됨. 하려면 bitmap에 그려서 붙여야함(즉 cache 이용)
+                if(canvas!=null){
+                    canvas.scale(mWidth/mViewportWidth, mHeight/mViewportHeight);
+                    mWorld.render(canvas);
+                    holder.unlockCanvasAndPost(canvas);
+                }else{
+                    break;
                 }
-                canvas.getClipBounds(dstRect);
-                canvas.drawBitmap(mDrawer.mFrameBuffer, null, dstRect, null);
-                holder.unlockCanvasAndPost(canvas);
+                mWorld.onTouch(mInput);
             }
         }else{
             while(running) {
@@ -153,16 +153,16 @@ public class Graphic2dRenderView extends SurfaceView implements Runnable, Surfac
                 startTime = System.nanoTime();
 
                 mRenderer.updateWorld(deltaTime, mWorld);
-                mWorld.render(mDrawer.mCanvas);
-                mWorld.onTouch(mInput);
 
                 Canvas canvas = holder.lockCanvas();
-                if(canvas==null){
-                    continue;
+                if(canvas!=null){
+                    canvas.scale(mWidth/mViewportWidth, mHeight/mViewportHeight);
+                    mWorld.render(canvas);
+                    holder.unlockCanvasAndPost(canvas);
+                }else{
+                    break;
                 }
-                canvas.getClipBounds(dstRect);
-                canvas.drawBitmap(mDrawer.mFrameBuffer, null, dstRect, null);
-                holder.unlockCanvasAndPost(canvas);
+                mWorld.onTouch(mInput);
             }
         }
     }
@@ -190,6 +190,8 @@ public class Graphic2dRenderView extends SurfaceView implements Runnable, Surfac
         if(running){
             pause();
         }
+        mWidth = width;
+        mHeight = height;
         if(mPreViewportWidth==0){
             mViewportHeight = mPreViewportHeight;
             mViewportWidth = mViewportHeight * width / height;
@@ -198,7 +200,7 @@ public class Graphic2dRenderView extends SurfaceView implements Runnable, Surfac
             mViewportHeight = mViewportWidth * height / width;
         }
         mInput.setScale((float)mViewportWidth/width, (float)mViewportHeight/height);
-        mDrawer.setFrameBuffer(mViewportWidth, mViewportHeight, Bitmap.Config.RGB_565);
+        //mDrawer.setFrameBuffer(mViewportWidth, mViewportHeight, Bitmap.Config.RGB_565);
         resume();
     }
 

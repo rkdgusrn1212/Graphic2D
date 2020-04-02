@@ -9,9 +9,9 @@
     <com.khgkjg12.graphic2d.Graphic2dRenderView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        app:viewportWidth="800"
-        app:worldWidth="800"
-        app:worldHeight="800"
+        app:viewportWidth="1440"
+        app:worldWidth="1440"
+        app:worldHeight="1440"
         app:focusedZ="100"
         app:maxWidgetCount="2048"
         android:layout_gravity="center"

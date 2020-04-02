@@ -99,4 +99,12 @@ public abstract class PaintableWidget extends Widget {
     public int getAlpha(){
         return mPaint.getAlpha();
     }
+
+    public void setStyle(Paint.Style style){
+        mPaint.setStyle(style);
+    }
+
+    public void setStrokeWidth(float width){
+        mPaint.setStrokeWidth(width);
+    }
 }

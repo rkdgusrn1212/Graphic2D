@@ -107,4 +107,8 @@ public abstract class PaintableWidget extends Widget {
     public void setStrokeWidth(float width){
         mPaint.setStrokeWidth(width);
     }
+
+    public void setAntialias(boolean antialias){
+        mPaint.setAntiAlias(antialias);
+    }
 }

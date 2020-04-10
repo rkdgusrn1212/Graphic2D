@@ -1,6 +1,7 @@
 package com.khgkjg12.graphic2d;
 
 import android.graphics.Canvas;
+import android.graphics.Paint;
 import android.graphics.RectF;
 import android.support.annotation.FloatRange;
 import android.support.annotation.WorkerThread;
@@ -62,7 +63,18 @@ public class OvalWidget extends PaintableWidget {
 
     @Override
     void calculateOuterBound() {
-        mOuterBoundary.set( mRenderRect.left-mShadow+mShadowDx,mRenderRect.top-mShadow+mShadowDy,mRenderRect.right+mShadow+mShadowDx, mRenderRect.bottom+mShadow+mShadowDy);
+        float left = mRenderRect.left-mShadow+mShadowDx;
+        float top = mRenderRect.top-mShadow+mShadowDy;
+        float right = mRenderRect.right+mShadow+mShadowDx;
+        float bottom = mRenderRect.bottom+mShadow+mShadowDy;
+        if (mPaint.getStyle()!=Paint.Style.FILL){
+            float halfStrokeWidth = mPaint.getStrokeWidth()/2;
+            left -= halfStrokeWidth;
+            top -= halfStrokeWidth;
+            right += halfStrokeWidth;
+            bottom += halfStrokeWidth;
+        }
+        mOuterBoundary.set(left,top,right, bottom);
     }
 
     @Override

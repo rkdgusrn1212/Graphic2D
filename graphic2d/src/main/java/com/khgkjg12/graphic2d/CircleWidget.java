@@ -1,6 +1,7 @@
 package com.khgkjg12.graphic2d;
 
 import android.graphics.Canvas;
+import android.graphics.Paint;
 import android.support.annotation.FloatRange;
 import android.support.annotation.WorkerThread;
 
@@ -39,6 +40,17 @@ public class CircleWidget extends PaintableWidget {
 
     @Override
     void calculateOuterBound() {
-        mOuterBoundary.set(mRenderX- mRadius-mShadow+mShadowDx, mRenderY - mRadius-mShadow+mShadowDy, mRenderX+mRadius+mShadow+mShadowDx, mRenderY+mRadius+mShadow+mShadowDy);
+        float left = mRenderX- mRadius-mShadow+mShadowDx;
+        float top = mRenderY - mRadius-mShadow+mShadowDy;
+        float right = mRenderX+mRadius+mShadow+mShadowDx;
+        float bottom = mRenderY+mRadius+mShadow+mShadowDy;
+        if (mPaint.getStyle()!=Paint.Style.FILL){
+            float halfStrokeWidth = mPaint.getStrokeWidth()/2;
+            left -= halfStrokeWidth;
+            top -= halfStrokeWidth;
+            right += halfStrokeWidth;
+            bottom += halfStrokeWidth;
+        }
+        mOuterBoundary.set(left,top,right, bottom);
     }
 }

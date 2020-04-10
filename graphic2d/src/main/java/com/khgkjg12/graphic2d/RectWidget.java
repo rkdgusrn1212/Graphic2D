@@ -2,6 +2,7 @@ package com.khgkjg12.graphic2d;
 
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
+import android.graphics.Paint;
 import android.support.annotation.FloatRange;
 import android.support.annotation.WorkerThread;
 
@@ -60,7 +61,18 @@ public class RectWidget extends PaintableWidget {
 
     @Override
     void calculateOuterBound() {
-        mOuterBoundary.set(mLeft-mShadow+mShadowDx,mTop-mShadow+mShadowDy,mRight+mShadow+mShadowDx, mBottom+mShadow+mShadowDy);
+        float left = mLeft-mShadow+mShadowDx;
+        float top = mTop-mShadow+mShadowDy;
+        float right = mRight+mShadow+mShadowDx;
+        float bottom = mBottom+mShadow+mShadowDy;
+        if (mPaint.getStyle()!=Paint.Style.FILL){
+            float halfStrokeWidth = mPaint.getStrokeWidth()/2;
+            left -= halfStrokeWidth;
+            top -= halfStrokeWidth;
+            right += halfStrokeWidth;
+            bottom += halfStrokeWidth;
+        }
+        mOuterBoundary.set(left,top,right, bottom);
     }
 
     @Override

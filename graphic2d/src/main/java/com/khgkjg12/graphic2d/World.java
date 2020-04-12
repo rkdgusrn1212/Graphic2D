@@ -17,6 +17,7 @@ package com.khgkjg12.graphic2d;
 
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
+import android.graphics.Color;
 import android.graphics.RectF;
 import android.support.annotation.NonNull;
 import android.support.annotation.WorkerThread;
@@ -259,6 +260,13 @@ public class World {
     @WorkerThread
     public void setBackgroundTexture(Texture texture){
         mBackgroundTexture = texture;
+    }
+
+    @WorkerThread
+    public void changeBackgroundColor(int color){
+        mBackgroundR = (color >> 16) & 0xff;
+        mBackgroundG = (color >> 8) & 0xff;
+        mBackgroundB = color & 0xff;
     }
 
     @WorkerThread

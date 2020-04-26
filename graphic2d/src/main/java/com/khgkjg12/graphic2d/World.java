@@ -421,8 +421,8 @@ public class World {
      * return screenshot bitmap. 다 쓰고 꼭 recycle 하기.
      * @return Screenshot bitmap.
      */
-    public Bitmap getScreenshot(){
-        Bitmap screenshot = Bitmap.createBitmap(mViewportWidth, mViewportHeight, Bitmap.Config.RGB_565);
+    public Bitmap getScreenshot(Bitmap.Config config){
+        Bitmap screenshot = Bitmap.createBitmap(mViewportWidth, mViewportHeight, config);
         render(new Canvas(screenshot));
         return screenshot;
     }

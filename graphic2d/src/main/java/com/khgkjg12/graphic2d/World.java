@@ -416,4 +416,14 @@ public class World {
         if(mOnClickBackgroundListeners!=null)
             mOnClickBackgroundListeners.remove(onClickBackgroundListener);
     }
+
+    /**
+     * return screenshot bitmap. 다 쓰고 꼭 recycle 하기.
+     * @return Screenshot bitmap.
+     */
+    public Bitmap getScreenshot(){
+        Bitmap screenshot = Bitmap.createBitmap(mViewportWidth, mViewportHeight, Bitmap.Config.RGB_565);
+        render(new Canvas(screenshot));
+        return screenshot;
+    }
 }

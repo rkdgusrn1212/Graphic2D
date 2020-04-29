@@ -52,7 +52,7 @@ public class Graphic2dDrawer {
         }
     }
 
-    public Bitmap newTexture(String fileName, Bitmap.Config config) {
+    public Bitmap loadBitmap(String fileName, Bitmap.Config config) {
 
         BitmapFactory.Options options = new BitmapFactory.Options();
         options.inPreferredConfig = config;

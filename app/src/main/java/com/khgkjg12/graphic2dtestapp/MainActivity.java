@@ -143,8 +143,8 @@ public class MainActivity extends Activity implements Graphic2dRenderView.Render
 
     @Override
     public void loadTextures(Graphic2dDrawer graphic2dDrawer){
-        background = graphic2dDrawer.newTexture("background.png", Bitmap.Config.ARGB_8888);
-        blackStone = graphic2dDrawer.newTexture("black_stone.png", Bitmap.Config.ARGB_8888);
+        background = graphic2dDrawer.loadBitmap("background.png", Bitmap.Config.ARGB_8888);
+        blackStone = graphic2dDrawer.loadBitmap("black_stone.png", Bitmap.Config.ARGB_8888);
     }
 
     @Override

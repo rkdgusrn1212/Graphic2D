@@ -32,7 +32,7 @@ public class BitmapWidget extends Widget {
      * @param bitmap
      */
     @WorkerThread
-    public void setBItmap(@NonNull Bitmap bitmap){
+    public void setBitmap(@NonNull Bitmap bitmap){
         mBitmap = bitmap;
     }
 

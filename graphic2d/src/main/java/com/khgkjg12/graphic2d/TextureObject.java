@@ -1,22 +1,25 @@
 package com.khgkjg12.graphic2d;
 
+import android.graphics.Bitmap;
 import android.graphics.Canvas;
+import android.graphics.Paint;
 import android.graphics.RectF;
 import android.support.annotation.NonNull;
 import android.support.annotation.WorkerThread;
 
 public class TextureObject extends Object {
-    private Texture mTexture;
+    private Bitmap mBitmap;
     float mWidth, mHeight;
     RectF mRectF = new RectF();
     int mHorizontalDegree;
     int mVerticalDegree;
     float mRenderWidth;
     float mRenderHeight;
+    Paint mPaint;
 
-    public TextureObject(float z, float x, float y, boolean visibility, boolean clickable, float width, float height, int degreeH, int degreeV, @NonNull Texture texture){
+    public TextureObject(float z, float x, float y, boolean visibility, boolean clickable, float width, float height, int degreeH, int degreeV, @NonNull Bitmap bitmap){
         super(z, x, y, visibility, clickable);
-        mTexture = texture;
+        mBitmap = bitmap;
         mWidth = width;
         mHeight = height;
         mHorizontalDegree = degreeH%360;
@@ -25,11 +28,17 @@ public class TextureObject extends Object {
 
     /**
      * World 콜백에서만 호출.
-     * @param texture
+     * @param bitmap
      */
     @WorkerThread
-    public void setTexture(@NonNull Texture texture){
-        mTexture = texture;
+    public void setBItmap(@NonNull Bitmap bitmap){
+        mBitmap = bitmap;
+    }
+
+    public Paint getPaint(){
+        if(mPaint == null)
+            mPaint = new Paint();
+        return mPaint;
     }
 
     @Override
@@ -63,6 +72,6 @@ public class TextureObject extends Object {
 
     @Override
     protected void draw(Canvas canvas) {
-        canvas.drawBitmap(mTexture.bitmap, null, mRectF, null);
+        canvas.drawBitmap(mBitmap, null, mRectF, null);
     }
 }

@@ -21,6 +21,7 @@ import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Paint;
 import android.graphics.RectF;
+import android.support.annotation.Nullable;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -51,15 +52,7 @@ public class Graphic2dDrawer {
         }
     }
 
-    public Texture newTexture(String fileName, Texture.Format format) {
-
-        Bitmap.Config config;
-        if (format == Texture.Format.RGB565)
-            config = Bitmap.Config.RGB_565;
-        else if (format == Texture.Format.ARGB4444)
-            config = Bitmap.Config.ARGB_4444;
-        else
-            config = Bitmap.Config.ARGB_8888;
+    public Bitmap newTexture(String fileName, Bitmap.Config config) {
 
         BitmapFactory.Options options = new BitmapFactory.Options();
         options.inPreferredConfig = config;
@@ -83,15 +76,7 @@ public class Graphic2dDrawer {
                 }
             }
         }
-
-        if (bitmap.getConfig() == Bitmap.Config.RGB_565)
-            format = Texture.Format.RGB565;
-        else if (bitmap.getConfig() == Bitmap.Config.ARGB_4444)
-            format = Texture.Format.ARGB4444;
-        else
-            format = Texture.Format.ARGB8888;
-
-        return new Texture(bitmap, format);
+        return bitmap;
     }
 
     public void clear(int color) {
@@ -121,7 +106,7 @@ public class Graphic2dDrawer {
         mCanvas.drawRect(left, top, right, bottom, mPaint);
     }
 
-    public void drawTexture(Texture texture, RectF rectF) {
-        mCanvas.drawBitmap(texture.bitmap, null, rectF,null);
+    public void drawBitmap(Bitmap bitmap, RectF rectF) {
+        mCanvas.drawBitmap(bitmap, null, rectF, mPaint);
     }
 }

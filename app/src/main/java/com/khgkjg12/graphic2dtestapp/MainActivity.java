@@ -17,35 +17,22 @@ package com.khgkjg12.graphic2dtestapp;
 
 import android.app.Activity;
 import android.content.res.Configuration;
-import android.graphics.BlurMaskFilter;
+import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.graphics.Paint;
-import android.graphics.Shader;
 import android.graphics.Typeface;
 import android.os.Bundle;
 import android.util.Log;
-import android.widget.TextView;
 
-import com.khgkjg12.graphic2d.CircleObject;
 import com.khgkjg12.graphic2d.CircleWidget;
 import com.khgkjg12.graphic2d.GridObject;
 import com.khgkjg12.graphic2d.GridWidget;
-import com.khgkjg12.graphic2d.GroupObject;
 import com.khgkjg12.graphic2d.GroupWidget;
-import com.khgkjg12.graphic2d.Object;
-import com.khgkjg12.graphic2d.OvalWidget;
-import com.khgkjg12.graphic2d.RectWidget;
-import com.khgkjg12.graphic2d.RoundRectObject;
-import com.khgkjg12.graphic2d.RoundRectWidget;
-import com.khgkjg12.graphic2d.TextObject;
 import com.khgkjg12.graphic2d.TextWidget;
-import com.khgkjg12.graphic2d.Texture;
 import com.khgkjg12.graphic2d.Graphic2dDrawer;
 import com.khgkjg12.graphic2d.Graphic2dRenderView;
 import com.khgkjg12.graphic2d.Widget;
 import com.khgkjg12.graphic2d.World;
-
-import java.security.acl.Group;
 
 import static android.view.WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON;
 
@@ -60,8 +47,8 @@ import static android.view.WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON;
 
 public class MainActivity extends Activity implements Graphic2dRenderView.Renderer, GridWidget.OnClickGridListener, GroupWidget.OnClickChildListener {
 
-    public static Texture background;
-    public static Texture blackStone;
+    public static Bitmap background;
+    public static Bitmap blackStone;
     private Graphic2dRenderView renderView;
     private float startTime = 0;
     private boolean flip = false;
@@ -156,8 +143,8 @@ public class MainActivity extends Activity implements Graphic2dRenderView.Render
 
     @Override
     public void loadTextures(Graphic2dDrawer graphic2dDrawer){
-        background = graphic2dDrawer.newTexture("background.png", Texture.Format.ARGB8888);
-        blackStone = graphic2dDrawer.newTexture("black_stone.png", Texture.Format.ARGB8888);
+        background = graphic2dDrawer.newTexture("background.png", Bitmap.Config.ARGB_8888);
+        blackStone = graphic2dDrawer.newTexture("black_stone.png", Bitmap.Config.ARGB_8888);
     }
 
     @Override
@@ -189,8 +176,8 @@ public class MainActivity extends Activity implements Graphic2dRenderView.Render
 
     @Override
     protected void onDestroy() {
-        background.dispose();
-        blackStone.dispose();
+        background.recycle();
+        blackStone.recycle();
         super.onDestroy();
     }
     @Override

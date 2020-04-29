@@ -44,7 +44,7 @@ public class World {
     private float mMaxCameraZ;
     float mFocusedZ;
     private int mBackgroundR, mBackgroundG, mBackgroundB;
-    private Texture mBackgroundTexture;
+    private Bitmap mBackgroundBitmap;
     private boolean mDragToMove;
     private boolean mPinchToZoom;
     private RectF mRectF;
@@ -258,8 +258,8 @@ public class World {
     }
 
     @WorkerThread
-    public void setBackgroundTexture(Texture texture){
-        mBackgroundTexture = texture;
+    public void setBackgroundBitmap(Bitmap bitmap){
+        mBackgroundBitmap = bitmap;
     }
 
     @WorkerThread
@@ -271,11 +271,11 @@ public class World {
 
     @WorkerThread
     void render(Canvas canvas){
-        if(mBackgroundTexture==null){
+        if(mBackgroundBitmap==null){
             canvas.drawRGB(mBackgroundR, mBackgroundG,
                     mBackgroundB);
         }else{
-            canvas.drawBitmap(mBackgroundTexture.bitmap, null, mRectF,null);
+            canvas.drawBitmap(mBackgroundBitmap, null, mRectF, null);
         }
         for(int i=mObjectCount-1; i>=0; i--){
             mObjects[i].render(canvas);

@@ -16,7 +16,7 @@ public class BitmapWidget extends Widget {
     int mVerticalDegree;
     float mRenderWidth;
     float mRenderHeight;
-    Paint mPaint;
+    Paint mPaint = null;
 
     public BitmapWidget(float z, float x, float y, boolean visibility, boolean clickable, float width, float height, int degreeH, int degreeV, @NonNull Bitmap bitmap){
         super(z, x, y, visibility, clickable);
@@ -25,7 +25,6 @@ public class BitmapWidget extends Widget {
         mHeight = height;
         mHorizontalDegree = degreeH%360;
         mVerticalDegree = degreeV%360;
-        mPaint = new Paint();
     }
 
     /**
@@ -38,6 +37,8 @@ public class BitmapWidget extends Widget {
     }
 
     public Paint getPaint(){
+        if(mPaint == null)
+            mPaint = new Paint();
         return mPaint;
     }
 

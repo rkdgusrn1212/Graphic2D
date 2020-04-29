@@ -1,6 +1,6 @@
 package com.khgkjg12.graphic2d;
 
-import android.graphics.BlurMaskFilter;
+import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.MaskFilter;
 import android.graphics.Paint;
@@ -8,8 +8,8 @@ import android.graphics.RectF;
 import android.support.annotation.NonNull;
 import android.support.annotation.WorkerThread;
 
-public class TextureWidget extends Widget {
-    private Texture mTexture;
+public class BitmapWidget extends Widget {
+    private Bitmap mBitmap;
     float mWidth, mHeight;
     RectF mRectF = new RectF();
     int mHorizontalDegree;
@@ -18,9 +18,9 @@ public class TextureWidget extends Widget {
     float mRenderHeight;
     Paint mPaint;
 
-    public TextureWidget(float z, float x, float y, boolean visibility, boolean clickable, float width, float height, int degreeH, int degreeV, @NonNull Texture texture){
+    public BitmapWidget(float z, float x, float y, boolean visibility, boolean clickable, float width, float height, int degreeH, int degreeV, @NonNull Bitmap bitmap){
         super(z, x, y, visibility, clickable);
-        mTexture = texture;
+        mBitmap = bitmap;
         mWidth = width;
         mHeight = height;
         mHorizontalDegree = degreeH%360;
@@ -30,19 +30,15 @@ public class TextureWidget extends Widget {
 
     /**
      * World 콜백에서만 호출.
-     * @param texture
+     * @param bitmap
      */
     @WorkerThread
-    public void setTexture(@NonNull Texture texture){
-        mTexture = texture;
+    public void setBItmap(@NonNull Bitmap bitmap){
+        mBitmap = bitmap;
     }
 
-    public void setAlpha(int alpha){
-        mPaint.setAlpha(alpha);
-    }
-
-    public void setMaskFilter(MaskFilter maskFilter){
-        mPaint.setMaskFilter(maskFilter);
+    public Paint getPaint(){
+        return mPaint;
     }
 
     @Override
@@ -81,6 +77,6 @@ public class TextureWidget extends Widget {
 
     @Override
     protected void draw(Canvas canvas) {
-        canvas.drawBitmap(mTexture.bitmap, null, mRectF, mPaint);
+        canvas.drawBitmap(mBitmap, null, mRectF, mPaint);
     }
 }

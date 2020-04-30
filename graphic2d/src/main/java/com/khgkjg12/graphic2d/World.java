@@ -18,6 +18,7 @@ package com.khgkjg12.graphic2d;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Color;
+import android.graphics.Paint;
 import android.graphics.RectF;
 import android.support.annotation.NonNull;
 import android.support.annotation.WorkerThread;
@@ -52,6 +53,7 @@ public class World {
     int mObjectCount;
     private ArrayList<OnClickBackgroundListener> mOnClickBackgroundListeners = null;
     private OnCameraGestureListener mOnCameraGestureListener = null;
+    private Paint mBitmapPaint;
 
     World(int width, int height, int viewportX, int viewportY, float cameraZ, float minCameraZ, float maxCameraZ, float focusedZ, int backgroundColor, boolean dragToMove, boolean pinchToZoom, int maxObjectCount, int maxWidgetCount){
         mWidth = width;
@@ -73,6 +75,11 @@ public class World {
         mBackgroundB = (backgroundColor & 0xff);
         mDragToMove = dragToMove;
         mPinchToZoom = pinchToZoom;
+    }
+
+    public Paint getPaint(){
+        if(mBitmapPaint==null) mBitmapPaint = new Paint();
+        return mBitmapPaint;
     }
     
     public void setOnChangeCameraGestureListener(OnCameraGestureListener onCameraGestureListener){
@@ -275,7 +282,7 @@ public class World {
             canvas.drawRGB(mBackgroundR, mBackgroundG,
                     mBackgroundB);
         }else{
-            canvas.drawBitmap(mBackgroundBitmap, null, mRectF, null);
+            canvas.drawBitmap(mBackgroundBitmap, null, mRectF, mBitmapPaint);
         }
         for(int i=mObjectCount-1; i>=0; i--){
             mObjects[i].render(canvas);

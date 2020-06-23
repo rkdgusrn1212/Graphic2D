@@ -5,6 +5,7 @@ import android.graphics.Canvas;
 import android.graphics.MaskFilter;
 import android.graphics.Paint;
 import android.graphics.RectF;
+import android.support.annotation.FloatRange;
 import android.support.annotation.NonNull;
 import android.support.annotation.WorkerThread;
 
@@ -40,6 +41,19 @@ public class BitmapWidget extends Widget {
         if(mPaint == null)
             mPaint = new Paint();
         return mPaint;
+    }
+
+
+    @WorkerThread
+    public void changeWidth(@FloatRange(from = 0, fromInclusive = false) float width){
+        mWidth = width;
+        calculateAndCheckBoundary();
+    }
+
+    @WorkerThread
+    public void changeHeight(@FloatRange(from = 0, fromInclusive = false) float height){
+        mHeight = height;
+        calculateAndCheckBoundary();
     }
 
     @Override

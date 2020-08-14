@@ -77,10 +77,11 @@ public class MainActivity extends Activity implements Graphic2dRenderView.Render
         gridObject.addOnClickChildListener(this);
         for(int m=0; m<9; m++){
             for(int n=0; n<9; n++){
-                GroupWidget groupWidget = new GroupWidget(0,0,0,9,true,false);
+                GroupWidget groupWidget = new GroupWidget(0,0,0,1,true,false);
                 CircleWidget rro = new CircleWidget(40, gridObject.getColumnX(n), gridObject.getRowY(m), true, true, Color.YELLOW, true, 50);
-                for(int i=0;i<9;i++) {
-                    TextWidget wid = new TextWidget(0, i*11.1f-50, i*11.1f-50, true, false, Color.GRAY, false, ""+i, 10, Paint.Align.CENTER, Typeface.SERIF);
+                for(int i=0;i<1;i++) {
+                    TextWidget wid = new TextWidget(0, i*11.1f-50, i*11.1f-50, true, false, Color.GRAY, false, "테스트입니다", 50, Paint.Align.CENTER, Typeface.SERIF);
+                    wid.textEllipsis(true, 150);
                     groupWidget.putChild(wid, i);
                     if(i==5){
                        wid.setIgnoreCache(true);

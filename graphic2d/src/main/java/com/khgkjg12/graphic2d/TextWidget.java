@@ -129,4 +129,23 @@ public class TextWidget extends PaintableWidget {
         }
         mOuterBoundary.set(left,top,right, bottom);
     }
+
+    //줄여지면 true.
+    public boolean textEllipsis(boolean fromStart, float length){
+        int shortenLen = mPaint.breakText(mText, fromStart, length, null);
+        if(shortenLen != mText.length()){
+            String shortenText = mText.substring(0, shortenLen-1);
+            if(fromStart){
+                shortenText += '\u2026';
+            }else{
+                shortenText = '\u2026'+shortenText;
+            }
+            mText = shortenText;
+            textEllipsis(fromStart, length);
+            return true;
+            //...을 한단어로하고 재귀호출 또돌려서 검사하기. 생성자에서 길이제한을 두던가 아님 이런식으로 public 메소드로 길이 조절된 텍스트를 반환받아 넣는 방식도 괜찮음.
+        }else {
+            return false;
+        }
+    }
 }

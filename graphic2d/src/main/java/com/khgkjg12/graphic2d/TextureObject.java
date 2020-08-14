@@ -15,7 +15,6 @@ public class TextureObject extends Object {
     int mVerticalDegree;
     float mRenderWidth;
     float mRenderHeight;
-    Paint mPaint;
 
     public TextureObject(float z, float x, float y, boolean visibility, boolean clickable, float width, float height, int degreeH, int degreeV, @NonNull Bitmap bitmap){
         super(z, x, y, visibility, clickable);
@@ -33,12 +32,6 @@ public class TextureObject extends Object {
     @WorkerThread
     public void setBItmap(@NonNull Bitmap bitmap){
         mBitmap = bitmap;
-    }
-
-    public Paint getPaint(){
-        if(mPaint == null)
-            mPaint = new Paint();
-        return mPaint;
     }
 
     @Override

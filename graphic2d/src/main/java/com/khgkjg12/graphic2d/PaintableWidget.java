@@ -19,6 +19,10 @@ public abstract class PaintableWidget extends Widget {
         }
     }
 
+    public Paint getPaint(){
+        return mPaint;
+    }
+
     private void calculateShadow(){
         if(mZ<0){
             mShadow = 0;

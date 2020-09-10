@@ -232,39 +232,40 @@ public abstract class Widget {
      */
     @WorkerThread
     public void moveZ(float z){
-        if(mAttachedWorld!=null) {
+        World attachedWorld = getAttachedWorld();
+        if(attachedWorld!=null) {
             if (z >= mZ) {
                 int i = 0;
-                while (mAttachedWorld.mWidgets[i].mZ > z) {
+                while (attachedWorld.mWidgets[i].mZ > z) {
                     i++;
                 }
                 Widget tempWidget;
                 int j = i;
-                while (mAttachedWorld.mWidgets[j] != this) {
+                while (attachedWorld.mWidgets[j] != this) {
                     j++;
                 }
-                tempWidget = mAttachedWorld.mWidgets[j];
+                tempWidget = attachedWorld.mWidgets[j];
                 while (i != j) {
-                    mAttachedWorld.mWidgets[j] = mAttachedWorld.mWidgets[j - 1];
+                    attachedWorld.mWidgets[j] = attachedWorld.mWidgets[j - 1];
                     j--;
                 }
-                mAttachedWorld.mWidgets[j] = tempWidget;
+                attachedWorld.mWidgets[j] = tempWidget;
             } else {
-                int i = mAttachedWorld.mWidgetCount - 1;
-                while (mAttachedWorld.mWidgets[i].mZ <= z) {
+                int i = attachedWorld.mWidgetCount - 1;
+                while (attachedWorld.mWidgets[i].mZ <= z) {
                     i--;
                 }
                 Widget tempWidget;
                 int j = i;
-                while (mAttachedWorld.mWidgets[j] != this) {
+                while (attachedWorld.mWidgets[j] != this) {
                     j--;
                 }
-                tempWidget = mAttachedWorld.mWidgets[j];
+                tempWidget = attachedWorld.mWidgets[j];
                 while (i != j) {
-                    mAttachedWorld.mWidgets[j] = mAttachedWorld.mWidgets[j + 1];
+                    attachedWorld.mWidgets[j] = attachedWorld.mWidgets[j + 1];
                     j++;
                 }
-                mAttachedWorld.mWidgets[j] = tempWidget;
+                attachedWorld.mWidgets[j] = tempWidget;
             }
         }
         mZ = z;
@@ -274,11 +275,25 @@ public abstract class Widget {
     public void moveXY(float x, float y){
         mX = x;
         mY = y;
-        if(mAttachedWorld!=null) {
+        if(getAttachedWorld()!=null) {
             calculateRenderXY();
         }
     }
 
+    @WorkerThread
+    public void moveX(float x){
+        mX = x;
+        if(getAttachedWorld()!=null) {
+            calculateRenderXY();
+        }
+    }
+    @WorkerThread
+    public void moveY(float y){
+        mY = y;
+        if(getAttachedWorld()!=null) {
+            calculateRenderXY();
+        }
+    }
     /**
      * 위젯 생성자 마지막에 한번 호출해주기
      */

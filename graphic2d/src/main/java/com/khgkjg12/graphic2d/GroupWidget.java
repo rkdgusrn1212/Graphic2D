@@ -177,6 +177,29 @@ public class GroupWidget extends Widget {
         super.moveXY(x, y);
     }
 
+    @WorkerThread
+    @Override
+    public void moveX(float x) {
+        float deltaX = x - mX;
+        for (int i = 0; i < mGroupSize; i++) {
+            if(mWidgetList[i]!=null) {
+                mWidgetList[i].moveX(mWidgetList[i].mX+deltaX);
+            }
+        }
+        super.moveX(x);
+    }
+    @WorkerThread
+    @Override
+    public void moveY(float y) {
+        float deltaY = y - mY;
+        for (int i = 0; i < mGroupSize; i++) {
+            if(mWidgetList[i]!=null) {
+                mWidgetList[i].moveY(mWidgetList[i].mY+deltaY);
+            }
+        }
+        super.moveY(y);
+    }
+
     @Override
     void calculateBoundary() { }
 

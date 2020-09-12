@@ -17,10 +17,9 @@ package com.khgkjg12.graphic2d;
 
 import android.content.Context;
 import android.content.res.TypedArray;
-import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Color;
-import android.graphics.Rect;
+import android.os.SystemClock;
 import android.support.annotation.MainThread;
 import android.support.annotation.WorkerThread;
 import android.util.AttributeSet;
@@ -31,13 +30,12 @@ public class Graphic2dRenderView extends SurfaceView implements Runnable, Surfac
     Thread renderThread = null;
     SurfaceHolder holder;
     volatile boolean running = false;
-    private Renderer mRenderer;
+    private Screen mScreen;
     private Graphic2dDrawer mDrawer;
     private TouchHandler mInput = null;
     private int mViewportWidth, mViewportHeight;
     private int mPreViewportWidth, mPreViewportHeight;
     private World mWorld;
-    private boolean mIsWorldInitiated;
     private float mWidth, mHeight;
 
     public Graphic2dRenderView(Context context) {
@@ -55,18 +53,7 @@ public class Graphic2dRenderView extends SurfaceView implements Runnable, Surfac
         init(context, attrs, defStyle);
     }
 
-    /**
-     * onCreate에서 호출해야함.
-     * @param renderer
-     */
-    @MainThread
-    public void setRenderer(Renderer renderer){
-        mRenderer = renderer;
-        mRenderer.loadTextures(mDrawer);
-    }
-
     private void init(Context context, AttributeSet attrs, int defStyle) {
-        mIsWorldInitiated = false;
         // Load attributes
         final TypedArray a = getContext().obtainStyledAttributes(
                 attrs, R.styleable.Graphic2dRenderView, defStyle, 0);
@@ -125,18 +112,13 @@ public class Graphic2dRenderView extends SurfaceView implements Runnable, Surfac
     @WorkerThread
     public void run() {
         mWorld.setViewportSize(mViewportWidth, mViewportHeight);
-        if(!mIsWorldInitiated) {
-            mRenderer.startWorld(mWorld, mViewportWidth, mViewportHeight);
-            mIsWorldInitiated = true;
-        }else {
-            mRenderer.resumeWorld(mWorld, mViewportWidth, mViewportHeight);
-        }
-        long startTime = System.nanoTime();
+        mScreen.resumeWorld(mWorld, mViewportWidth, mViewportHeight);
+        long startTime = SystemClock.uptimeMillis();
         if(android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O){
             while(running) {
-                float deltaTime = (System.nanoTime()-startTime) / 1000000000.0f;
-                startTime = System.nanoTime();
-                mRenderer.updateWorld(deltaTime, mWorld);
+                long currentTime = SystemClock.uptimeMillis();
+                long deltaTime = currentTime-startTime;
+                mScreen.update(mWorld, deltaTime);
                 Canvas canvas = holder.lockHardwareCanvas();//일부 하드웨어 shadow 효과 적용안됨. 하려면 bitmap에 그려서 붙여야함(즉 cache 이용)
                 if(canvas!=null){
                     canvas.scale(mWidth/mViewportWidth, mHeight/mViewportHeight);
@@ -149,11 +131,10 @@ public class Graphic2dRenderView extends SurfaceView implements Runnable, Surfac
             }
         }else{
             while(running) {
-                float deltaTime = (System.nanoTime()-startTime) / 1000000000.0f;
-                startTime = System.nanoTime();
-
-                mRenderer.updateWorld(deltaTime, mWorld);
-
+                long currentTime = SystemClock.uptimeMillis();
+                long deltaTime = currentTime-startTime;
+                startTime = currentTime;
+                mScreen.update(mWorld, deltaTime);
                 Canvas canvas = holder.lockCanvas();
                 if(canvas!=null){
                     canvas.scale(mWidth/mViewportWidth, mHeight/mViewportHeight);
@@ -200,7 +181,6 @@ public class Graphic2dRenderView extends SurfaceView implements Runnable, Surfac
             mViewportHeight = mViewportWidth * height / width;
         }
         mInput.setScale((float)mViewportWidth/width, (float)mViewportHeight/height);
-        //mDrawer.setFrameBuffer(mViewportWidth, mViewportHeight, Bitmap.Config.RGB_565);
         resume();
     }
 
@@ -209,15 +189,25 @@ public class Graphic2dRenderView extends SurfaceView implements Runnable, Surfac
         pause();
     }
 
-    public interface Renderer{
-        @WorkerThread
-        void startWorld(World world, int viewportWidth, int viewportHeight);
-        @WorkerThread
-        void updateWorld(float deltaTime, World world);
-        @MainThread
-        void loadTextures(Graphic2dDrawer drawer);//사용 오브젝트들의 리소스들을 다 로드함.
-        @WorkerThread
-        void resumeWorld(World world, int viewportWidth, int viewportHeight);
+    @MainThread
+    public boolean attachScreen(Screen screen){
+        if(mScreen!=null) {
+            return false;
+        }
+        mScreen = screen;
+        return true;
+    }
+
+    @MainThread
+    public boolean detachScreen(){
+        if(mScreen==null){
+            return false;
+        }
+        if(running){
+            pause();
+        }
+        mScreen = null;
+        return true;
     }
 
     /**

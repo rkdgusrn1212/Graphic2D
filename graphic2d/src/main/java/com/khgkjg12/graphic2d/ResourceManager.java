@@ -23,8 +23,7 @@ import android.graphics.BitmapFactory;
 import java.io.IOException;
 import java.io.InputStream;
 
-public class ResourceManager {
-
+public class Util {
 
     public static Bitmap loadBitmap(AssetManager assetManager, String fileName, Bitmap.Config config) {
 

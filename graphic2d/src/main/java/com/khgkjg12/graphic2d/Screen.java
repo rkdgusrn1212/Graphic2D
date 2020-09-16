@@ -3,6 +3,7 @@ package com.khgkjg12.graphic2d;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.media.SoundPool;
+import android.support.annotation.AnyThread;
 import android.support.annotation.MainThread;
 import android.support.annotation.WorkerThread;
 
@@ -62,13 +63,10 @@ public abstract class Screen {
     public final void loadSounds(Context context, ){
 
     }
-
     @WorkerThread
-    abstract void onAttached(World world, int viewportWidth, int viewportHeight);
-    @WorkerThread
-    abstract void updateWorld(long deltaTime, World world);
-    @WorkerThread
-    abstract void resumeWorld(World world, int viewportWidth, int viewportHeight);
+    abstract void onResume(World world);
+    @AnyThread
+    abstract void onPause();
 
 
     public final void queueWidgetUpdate(Renderable renderable) {

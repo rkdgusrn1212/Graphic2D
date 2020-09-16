@@ -20,6 +20,7 @@ import android.content.res.TypedArray;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.os.SystemClock;
+import android.support.annotation.AnyThread;
 import android.support.annotation.MainThread;
 import android.support.annotation.WorkerThread;
 import android.util.AttributeSet;
@@ -31,7 +32,6 @@ public class Graphic2dRenderView extends SurfaceView implements Runnable, Surfac
     SurfaceHolder holder;
     volatile boolean running = false;
     private Screen mScreen;
-    private Graphic2dDrawer mDrawer;
     private TouchHandler mInput = null;
     private int mViewportWidth, mViewportHeight;
     private int mPreViewportWidth, mPreViewportHeight;
@@ -97,13 +97,12 @@ public class Graphic2dRenderView extends SurfaceView implements Runnable, Surfac
         }
         this.holder = getHolder();
         this.holder.addCallback(this);
-        mDrawer = new Graphic2dDrawer(context.getApplicationContext().getAssets());
         mInput = new TouchHandler(Graphic2dRenderView.this);
         mWorld = new World(worldWidth, worldHeight, viewportX, viewportY, cameraZ, minCameraZ, maxCameraZ, focusedZ, backgroundColor, dragToMove, pinchToZoom, maxObjectCount, maxWidgetCount);
     }
 
-    @MainThread
-    public void resume() {
+    @AnyThread
+    private void resume() {
         running = true;
         renderThread = new Thread(this);
         renderThread.start();
@@ -111,8 +110,19 @@ public class Graphic2dRenderView extends SurfaceView implements Runnable, Surfac
 
     @WorkerThread
     public void run() {
-        mWorld.setViewportSize(mViewportWidth, mViewportHeight);
-        mScreen.resumeWorld(mWorld, mViewportWidth, mViewportHeight);
+        synchronized(this){
+            mWorld.setViewportSize(mViewportWidth, mViewportHeight);
+            if(mScreen==null) {//있으면 진행하고 없으면 들어올때까지 대기타기
+                try {
+                    wait();
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                    return;
+                }
+            }
+            mScreen.onResume(mWorld);
+
+        }
         long startTime = SystemClock.uptimeMillis();
         if(android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O){
             while(running) {
@@ -146,10 +156,14 @@ public class Graphic2dRenderView extends SurfaceView implements Runnable, Surfac
                 mWorld.onTouch(mInput);
             }
         }
+        mScreen.onPause();
     }
 
-    @MainThread
-    public void pause() {
+    @AnyThread
+    private void pause() {
+        if(mScreen!=null){
+            mScreen.onPause();
+        }
         running = false;
         while(true) {
             try {
@@ -186,20 +200,24 @@ public class Graphic2dRenderView extends SurfaceView implements Runnable, Surfac
 
     @Override
     public void surfaceDestroyed(SurfaceHolder holder) {
-        pause();
+        if(running){
+            pause();
+        }
     }
 
-    @MainThread
-    public boolean attachScreen(Screen screen){
+    @AnyThread
+    public synchronized boolean attachScreen(Screen screen){
         if(mScreen!=null) {
             return false;
         }
+        mScreen.onAttached();
         mScreen = screen;
+        notify();
         return true;
     }
 
-    @MainThread
-    public boolean detachScreen(){
+    @AnyThread
+    public synchronized boolean detachScreen(){
         if(mScreen==null){
             return false;
         }
@@ -207,6 +225,7 @@ public class Graphic2dRenderView extends SurfaceView implements Runnable, Surfac
             pause();
         }
         mScreen = null;
+        mScreen.onDetached();
         return true;
     }
 

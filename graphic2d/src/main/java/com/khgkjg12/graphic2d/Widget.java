@@ -539,4 +539,64 @@ public abstract class Widget {
             return mAttachedWorld;
         }
     }
+
+    Snapshot getSnapshot(){
+        return new Snapshot();
+    }
+
+
+
+    class Snapshot{
+        private boolean mVisibility;
+        private boolean mClickable;
+        private ArrayList<Widget.OnClickListener> mOnClickListeners = null;
+        private float mZ;
+        private float mX, mY;
+        private float mRenderX, mRenderY;
+        private ArrayList<Widget.OnTouchListener> mOnTouchListeners = null;
+        private boolean mIsPressed = false;
+        private boolean mConsumeTouchEvent = true;
+        private Widget.ChildListener mChildListener;
+        private World. mAttachedWorld = null;
+        private GroupWidget mGroup = null;
+        private int mPressedX, mPressedY;
+        private Widget mLayerHost = null;
+        private ArrayList<Widget> mForegroundWidgets = null;
+        private ArrayList<Widget> mBackgroundWidgets = null;
+        private RectF mOuterBoundary = new RectF();
+        private Bitmap mCacheBitmap = null;
+        private boolean mIgnoreCache = false;//상위 widget에게 cache되는 여부. 본인이 cache하는건 상관없다
+        private boolean mIsCached = false;//cache bitmap 위에 그려진 하위 widget들은 true. 해당 bitmap을 가진 widget은 false다
+        private boolean mHasCacheBitmap = false;
+        private Snapshot(Widget widget){
+            mVisibility = widget.mVisibility;
+            mClickable = widget.mClickable;
+            mOnClickListeners = widget.mOnClickListeners;
+            mZ = widget.mZ;
+            mX = widget.mX;
+            mY = widget.mY;
+            mRenderX = widget.mRenderX;
+            mRenderY = widget.mRenderY;
+            mOnTouchListeners = widget.mOnTouchListeners;
+            mIsPressed = widget.mIsPressed;
+            mConsumeTouchEvent = widget.mConsumeTouchEvent;
+            mChildListener = widget.mChildListener.getSnapshot();
+            mAttachedWorld = widget.mAttachedWorld
+            protected Widget.ChildListener mChildListener;
+            protected World mAttachedWorld = null;
+            protected GroupWidget mGroup = null;
+            protected int mPressedX, mPressedY;
+            protected Widget mLayerHost = null;
+            protected ArrayList<Widget> mForegroundWidgets = null;
+            protected ArrayList<Widget> mBackgroundWidgets = null;
+            protected RectF mOuterBoundary = new RectF();
+            protected Bitmap mCacheBitmap = null;
+            protected boolean mIgnoreCache = false;//상위 widget에게 cache되는 여부. 본인이 cache하는건 상관없다
+            protected boolean mIsCached = false;//cache bitmap 위에 그려진 하위 widget들은 true. 해당 bitmap을 가진 widget은 false다
+            protected boolean mHasCacheBitmap = false;
+        }
+        Widget getInstance(){
+            return new Widget();
+        }
+    }
 }

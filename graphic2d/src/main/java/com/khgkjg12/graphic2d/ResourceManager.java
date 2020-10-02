@@ -15,40 +15,67 @@
  */
 package com.khgkjg12.graphic2d;
 
-import android.content.Context;
 import android.content.res.AssetManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.support.annotation.MainThread;
+import android.support.annotation.NonNull;
+import android.support.annotation.WorkerThread;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
 
-public class Util {
+public class ResourceManager {
 
-    public static Bitmap loadBitmap(AssetManager assetManager, String fileName, Bitmap.Config config) {
+    private static ResourceManager mInstance = null;
 
-        BitmapFactory.Options options = new BitmapFactory.Options();
-        options.inPreferredConfig = config;
-
-        InputStream in = null;
-        Bitmap bitmap;
-        try {
-            in = assetManager.open(fileName);
-            bitmap = BitmapFactory.decodeStream(in);
-            if (bitmap == null)
-                throw new RuntimeException("Couldn't load bitmap from asset '"
-                        + fileName + "'");
-        } catch (IOException e) {
-            throw new RuntimeException("Couldn't load bitmap from asset '"
-                    + fileName + "'");
-        } finally {
-            if (in != null) {
-                try {
-                    in.close();
-                } catch (IOException e) {
-                }
-            }
+    public static ResourceManager getInstance(){
+        if(mInstance==null){
+            mInstance = new ResourceManager();
         }
-        return bitmap;
+        return mInstance;
+    }
+
+    private Map<String, SynchronizedBitmap> mBitmapMap = new HashMap<>();
+
+    @WorkerThread
+    public synchronized boolean putBitmap(@NonNull Bitmap bitmap, @NonNull String key) {
+        SynchronizedBitmap synchronizedBitmap = new SynchronizedBitmap();
+        if(!synchronizedBitmap.loadFromBitmap(bitmap)){
+            return false;
+        }
+        return putBitmap(synchronizedBitmap, key);
+    }
+
+    @WorkerThread
+    public synchronized boolean putBitmap(AssetManager assetManager, String fileName, Bitmap.Config config, @NonNull String key){
+        SynchronizedBitmap synchronizedBitmap = new SynchronizedBitmap();
+        if(!synchronizedBitmap.loadFromAsset(assetManager, fileName, config)){
+            return false;
+        }
+        return putBitmap(synchronizedBitmap, key);
+    }
+
+    @WorkerThread
+    private boolean putBitmap(SynchronizedBitmap synchronizedBitmap, String key){
+        if(key.isEmpty()){
+            synchronizedBitmap.recycle();
+            return false;
+        }
+        if(mBitmapMap.containsKey(key)){
+            synchronizedBitmap.recycle();
+            return false;
+        }
+        mBitmapMap.put(key, synchronizedBitmap);
+        return true;
+    }
+
+    @MainThread
+    public void recycleBitmap(String key){
+        mBitmapMap.get(key).recycle();
     }
 }

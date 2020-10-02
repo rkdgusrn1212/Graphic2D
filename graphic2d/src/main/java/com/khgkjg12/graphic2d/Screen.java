@@ -64,9 +64,11 @@ public abstract class Screen {
 
     }
     @WorkerThread
-    abstract void onResume(World world);
+    abstract void onChangeViewportSize(World world, int width, int height);
     @AnyThread
-    abstract void onPause();
+    abstract void onAttached(World world);
+    @AnyThread
+    abstract void onDetached(World world);
 
 
     public final void queueWidgetUpdate(Renderable renderable) {

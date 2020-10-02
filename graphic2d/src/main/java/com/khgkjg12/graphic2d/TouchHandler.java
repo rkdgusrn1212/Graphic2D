@@ -78,7 +78,6 @@ public class TouchHandler implements View.OnTouchListener {
     }
 
     void setScale(float scaleX, float scaleY){
-
         this.scaleX = scaleX;
         this.scaleY = scaleY;
     }

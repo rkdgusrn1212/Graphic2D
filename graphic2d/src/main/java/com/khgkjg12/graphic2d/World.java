@@ -20,6 +20,7 @@ import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.RectF;
+import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.WorkerThread;
 
@@ -432,5 +433,88 @@ public class World {
         Bitmap screenshot = Bitmap.createBitmap(mViewportWidth, mViewportHeight, config);
         render(new Canvas(screenshot));
         return screenshot;
+    }
+
+    @WorkerThread
+    Snapshot getSnapshot(){
+    }
+
+    class Snapshot{
+
+        private int mWidth, mHeight;
+        private Object.Snapshot[] mObjects;//일단 이버전에선 스킵.
+        private Widget.Snapshot[] mWidgets;
+        int mWidgetCount;
+        private int mMaxWidgetCount;
+        boolean isDragging = false;
+        int startX, startY;
+        boolean isPressed = false;
+        int mViewportX;
+        int mViewportY;
+        int mViewportWidth;
+        int mViewportHeight;
+        float mCameraZ;
+        private float mMinCameraZ;
+        private float mMaxCameraZ;
+        float mFocusedZ;
+        private int mBackgroundR, mBackgroundG, mBackgroundB;
+        private Bitmap mBackgroundBitmap = null;
+        private boolean mDragToMove;
+        private boolean mPinchToZoom;
+        private RectF mRectF;
+        private int mMaxObjectCount;
+        int mObjectCount;
+        private ArrayList<OnClickBackgroundListener> mOnClickBackgroundListeners = null;
+        private OnCameraGestureListener mOnCameraGestureListener = null;
+        private Paint mBitmapPaint;
+
+        private Snapshot(World world){
+            //비트맵이랑 외부 리스너들은 외부 라이플사이클에 의존한다.
+            mWidth = world.mWidth;
+            mHeight = world.mHeight;
+            mWidgetCount = world.mWidgetCount;
+            mMaxWidgetCount = world.mMaxWidgetCount;
+            mWidgets = new Widget.Snapshot[mMaxWidgetCount];
+            for(int i=0; i<mWidgetCount; i++){
+                mWidgets[i] = world.mWidgets[i].getSnapshot();
+            };
+            isDragging = world.isDragging;
+            startX = world.startX;
+            startY = world.startY;
+            isPressed = world.isPressed;
+            mViewportX = world.mViewportX;
+            mViewportY = world.mViewportY;
+            mViewportWidth = world.mViewportWidth;
+            mViewportHeight = world.mViewportHeight;
+            mCameraZ = world.mCameraZ;
+            mMinCameraZ = world.mMinCameraZ;
+            mMaxCameraZ = world.mMaxCameraZ;
+            mFocusedZ = world.mFocusedZ;
+            mBackgroundR = world.mBackgroundR;
+            mBackgroundG = world.mBackgroundG;
+            mBackgroundB = world.mBackgroundB;
+            if(mBackgroundBitmap!=null) {
+                mBackgroundBitmap = world.mBackgroundBitmap.copy(mBackgroundBitmap.getConfig(), mBackgroundBitmap.isMutable());
+            }
+            mDragToMove = world.mDragToMove;
+            mPinchToZoom = world.mPinchToZoom;
+            mRectF = new RectF(world.mRectF);
+            mMaxObjectCount = world.mMaxObjectCount;
+            mObjectCount = world.mObjectCount;
+            mObjects = new Object.Snapshot[mMaxObjectCount];
+            for(int i=0; i<mObjectCount; i++){
+                mObjects[i] = world.mObjects[i].getSnapshot();
+            }
+            if(world.mOnClickBackgroundListeners!=null) {
+                mOnClickBackgroundListeners = new ArrayList<>();
+                mOnClickBackgroundListeners.addAll(world.mOnClickBackgroundListeners);
+            }
+            mOnCameraGestureListener = world.mOnCameraGestureListener;
+            mBitmapPaint = new Paint(world.mBitmapPaint);
+        }
+
+        World getInstance(){
+            return new World();
+        }
     }
 }

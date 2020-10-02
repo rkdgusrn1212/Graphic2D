@@ -19,6 +19,7 @@ import android.graphics.Canvas;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.annotation.WorkerThread;
+import android.widget.ProgressBar;
 
 import java.util.ArrayList;
 
@@ -495,5 +496,12 @@ public abstract class Object {
         void onTouchCancel(@Nullable World attachedWorld, @NonNull Object object);
         @WorkerThread
         void onTouchDrag(@Nullable World attachedWorld, @NonNull Object object, int x, int y);
+    }
+
+    Snapshot getSnapshot(){
+        return new Snapshot();
+    }
+    class Snapshot{
+
     }
 }

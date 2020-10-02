@@ -21,22 +21,140 @@ import android.graphics.Canvas;
 import android.graphics.Color;
 import android.os.SystemClock;
 import android.support.annotation.AnyThread;
-import android.support.annotation.MainThread;
 import android.support.annotation.WorkerThread;
 import android.util.AttributeSet;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 
-public class Graphic2dRenderView extends SurfaceView implements Runnable, SurfaceHolder.Callback {
-    Thread renderThread = null;
-    SurfaceHolder holder;
-    volatile boolean running = false;
-    private Screen mScreen;
-    private TouchHandler mInput = null;
-    private int mViewportWidth, mViewportHeight;
+public class Graphic2dRenderView extends SurfaceView implements SurfaceHolder.Callback {
+    RenderThread renderThread = null;
+    SurfaceHolder mHolder;
     private int mPreViewportWidth, mPreViewportHeight;
-    private World mWorld;
-    private float mWidth, mHeight;
+    private TouchHandler mInput;
+    private Screen mScreen = null;
+
+    private class RenderThread extends Thread{
+        private boolean mRunning = true;
+        private int mViewportWidth;
+        private int mViewportHeight;
+        private int mRealWidth;
+        private int mRealHeight;
+        private World.Snapshot mSnapshot;
+
+        private RenderThread(World.Snapshot snapshot, int viewportWidth, int viewportHeight, int realWidth, int realHeight){
+            mViewportWidth = viewportWidth;
+            mViewportHeight = viewportHeight;
+            mRealHeight = realHeight;
+            mRealWidth = realWidth;
+            mSnapshot = snapshot;
+        }
+
+        @Override
+        public void run() {
+            World world = mSnapshot.getInstance();
+                mInput.setScale((float) mViewportWidth / mRealWidth, (float) mViewportHeight / mRealHeight);
+            world.setViewportSize(mViewportWidth, mViewportHeight);
+                float canvasScaleX = mRealWidth / mViewportWidth;
+                float canvasScaleY = mRealHeight / mViewportHeight;
+                if (mScreen != null) {
+                    mScreen.onChangeViewportSize(world, mViewportWidth, mViewportHeight);
+                }
+                long startTime = SystemClock.uptimeMillis();
+                if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
+                    while (true) {
+                        synchronized (this) {
+                            if (!mRunning) {
+                                break;
+                            }
+                            if (mScreen == null) {//있으면 진행하고 없으면 들어올때까지 대기타기
+                                try {
+                                    wait();
+                                } catch (InterruptedException e) {
+                                    e.printStackTrace();
+                                    throw new RuntimeException("Graphic2dRenderView.RenderThread:Interrupted Unexpectedly");
+                                }
+                                startTime = SystemClock.uptimeMillis();
+                            }
+                            long currentTime = SystemClock.uptimeMillis();
+                            long deltaTime = currentTime - startTime;
+                            startTime = currentTime;
+                            mScreen.update(world, deltaTime);
+                            Canvas canvas = mHolder.lockHardwareCanvas();//일부 하드웨어 shadow 효과 적용안됨. 하려면 bitmap에 그려서 붙여야함(즉 cache 이용)
+                            if (canvas != null) {
+                                canvas.scale(canvasScaleX, canvasScaleY);
+                                world.render(canvas);
+                                mHolder.unlockCanvasAndPost(canvas);
+                            } else {
+                                break;
+                            }
+                            world.onTouch(mInput);
+                        }
+                    }
+                } else {
+                    while (true) {
+                        synchronized (this) {
+                            if (!mRunning) {
+                                break;
+                            }
+                            if (mScreen == null) {//있으면 진행하고 없으면 들어올때까지 대기타기
+                                try {
+                                    wait();
+                                } catch (InterruptedException e) {
+                                    e.printStackTrace();
+                                    throw new RuntimeException("Graphic2dRenderView.RenderThread:Interrupted Unexpectedly");
+                                }
+                                startTime = SystemClock.uptimeMillis();
+                            }
+                            long currentTime = SystemClock.uptimeMillis();
+                            long deltaTime = currentTime - startTime;
+                            startTime = currentTime;
+                            mScreen.update(world, deltaTime);
+                            Canvas canvas = mHolder.lockCanvas();
+                            if (canvas != null) {
+                                canvas.scale(canvasScaleX, canvasScaleY);
+                                world.render(canvas);
+                                mHolder.unlockCanvasAndPost(canvas);
+                            } else {
+                                break;
+                            }
+                            world.onTouch(mInput);
+                        }
+                    }
+                }
+            mSnapshot = world.getSnapshot();
+        }
+
+        private synchronized boolean onAttachScreen(Screen screen){
+            if(mScreen != null){
+                return false;
+            }
+            mScreen = screen;
+            mScreen.onAttached(mWorld);
+            notify();//만약 wait 상태가 아니었다면 그건 thread가 검사하기전 screen이 attached 된것.
+            return true;
+        }
+        //초기상태 to attached, detached to attachd가 thread의 검사구문 이전에 수행되어 wait가 안걸릴수도있다. 이럴때 아무문제 없다.
+        private synchronized boolean onDetachedScreen(){
+            if(mScreen == null){
+                return false;
+            }
+            mScreen.onDetached(mWorld);
+            mScreen = null;
+            return true;
+        }
+        private World.snapshot finish(){
+            synchronized(this){
+                mRunning = false;
+            }
+            try {
+                join();//종료되는 쓰래드에서 수행된 명령어들이 join이후의 명령어들에게 happen before 관계.
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+                throw new RuntimeException("Graphic2dRenderView.RenderThread:Interrupted Unexpectedly");
+            }
+            return mSnapshot;
+        }
+    }
 
     public Graphic2dRenderView(Context context) {
         super(context);
@@ -81,7 +199,7 @@ public class Graphic2dRenderView extends SurfaceView implements Runnable, Surfac
         int maxObjectCount = a.getInt(R.styleable.Graphic2dRenderView_maxObjectCount, 256);
         int maxWidgetCount = a.getInt(R.styleable.Graphic2dRenderView_maxWidgetCount, 128);
         a.recycle();
-        if(mPreViewportHeight==0&&mPreViewportWidth==0){
+        if(mPreViewportHeight<=0&&mPreViewportWidth<=0){
             mPreViewportHeight=320;
             mPreViewportWidth=320;
         }
@@ -95,114 +213,41 @@ public class Graphic2dRenderView extends SurfaceView implements Runnable, Surfac
         }else if(viewportY>worldHeight/2){
             viewportY = worldHeight/2;
         }
-        this.holder = getHolder();
-        this.holder.addCallback(this);
         mInput = new TouchHandler(Graphic2dRenderView.this);
         mWorld = new World(worldWidth, worldHeight, viewportX, viewportY, cameraZ, minCameraZ, maxCameraZ, focusedZ, backgroundColor, dragToMove, pinchToZoom, maxObjectCount, maxWidgetCount);
-    }
-
-    @AnyThread
-    private void resume() {
-        running = true;
-        renderThread = new Thread(this);
-        renderThread.start();
-    }
-
-    @WorkerThread
-    public void run() {
-        synchronized(this){
-            mWorld.setViewportSize(mViewportWidth, mViewportHeight);
-            if(mScreen==null) {//있으면 진행하고 없으면 들어올때까지 대기타기
-                try {
-                    wait();
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                    return;
-                }
-            }
-            mScreen.onResume(mWorld);
-
-        }
-        long startTime = SystemClock.uptimeMillis();
-        if(android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O){
-            while(running) {
-                long currentTime = SystemClock.uptimeMillis();
-                long deltaTime = currentTime-startTime;
-                mScreen.update(mWorld, deltaTime);
-                Canvas canvas = holder.lockHardwareCanvas();//일부 하드웨어 shadow 효과 적용안됨. 하려면 bitmap에 그려서 붙여야함(즉 cache 이용)
-                if(canvas!=null){
-                    canvas.scale(mWidth/mViewportWidth, mHeight/mViewportHeight);
-                    mWorld.render(canvas);
-                    holder.unlockCanvasAndPost(canvas);
-                }else{
-                    break;
-                }
-                mWorld.onTouch(mInput);
-            }
-        }else{
-            while(running) {
-                long currentTime = SystemClock.uptimeMillis();
-                long deltaTime = currentTime-startTime;
-                startTime = currentTime;
-                mScreen.update(mWorld, deltaTime);
-                Canvas canvas = holder.lockCanvas();
-                if(canvas!=null){
-                    canvas.scale(mWidth/mViewportWidth, mHeight/mViewportHeight);
-                    mWorld.render(canvas);
-                    holder.unlockCanvasAndPost(canvas);
-                }else{
-                    break;
-                }
-                mWorld.onTouch(mInput);
-            }
-        }
-        mScreen.onPause();
-    }
-
-    @AnyThread
-    private void pause() {
-        if(mScreen!=null){
-            mScreen.onPause();
-        }
-        running = false;
-        while(true) {
-            try {
-                renderThread.join();
-                break;
-            } catch (InterruptedException e) {
-                // retry
-            }
-        }
+        mHolder = getHolder();
+        mHolder.addCallback(this);
     }
 
     @Override
     public void surfaceCreated(SurfaceHolder holder) {
-
     }
 
     @Override
     public void surfaceChanged(SurfaceHolder holder, int format, int width, int height) {
-        if(running){
-            pause();
+        if(renderThread!=null){
+            renderThread.finish();
+            renderThread = null;
         }
-        mWidth = width;
-        mHeight = height;
+        int viewportHeight;
+        int viewportWidth;
         if(mPreViewportWidth==0){
-            mViewportHeight = mPreViewportHeight;
-            mViewportWidth = mViewportHeight * width / height;
+            viewportHeight = mPreViewportHeight;
+            viewportWidth = viewportHeight * width / height;
         } else if(mPreViewportHeight == 0){
-            mViewportWidth = mPreViewportWidth;
-            mViewportHeight = mViewportWidth * height / width;
+            viewportWidth = mPreViewportWidth;
+            viewportHeight = viewportWidth * height / width;
+        }else{
+            viewportWidth = mPreViewportWidth;
+            viewportHeight = mPreViewportHeight;
         }
-        mInput.setScale((float)mViewportWidth/width, (float)mViewportHeight/height);
-        resume();
+        renderThread = new RenderThread(viewportWidth, viewportHeight, width, height);
+        renderThread.start();
     }
 
     @Override
     public void surfaceDestroyed(SurfaceHolder holder) {
-        if(running){
-            pause();
-        }
+        renderThread.finish();
     }
 
     @AnyThread
